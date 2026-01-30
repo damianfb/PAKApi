@@ -4,16 +4,22 @@ API for Patient Transport Management System (Sistema de Gestión de Traslados de
 
 ## Overview
 
-PAKApi is a backend system designed to manage patient transport services, including health insurance integration, driver management, destination tracking, and patient records.
+PAKApi is a backend system designed to manage patient transport services, including health insurance integration, driver management, destination tracking, patient records, service configuration, billing periods, and monthly transport tracking.
 
 ## Database Schema
 
-The database consists of four main tables implemented in FASE 1:
+The database consists of seven main tables implemented across two phases:
 
+**FASE 1 (Completed):**
 - **obras_sociales**: Health insurance companies and social works
 - **pacientes**: Patient records and information
 - **conductores**: Driver information and licenses
 - **destinos**: Transport destinations (hospitals, clinics, etc.)
+
+**FASE 2 (Completed):**
+- **servicios_paciente**: Transport service configuration per patient
+- **periodos_facturacion**: Monthly billing periods
+- **traslados_mensuales**: Monthly transport tracking and billing
 
 For detailed schema information, see [supabase/SCHEMA.md](supabase/SCHEMA.md)
 
@@ -29,11 +35,13 @@ See [supabase/README.md](supabase/README.md) for detailed instructions on applyi
 
 1. Create a Supabase project at https://supabase.com
 2. Apply migrations in order:
-   - `00001_create_base_tables.sql` - Creates all tables with RLS policies
-   - `00002_seed_initial_data.sql` - Seeds initial data
+   - `00001_create_base_tables.sql` - Creates FASE 1 tables with RLS policies
+   - `00002_seed_initial_data.sql` - Seeds initial data for FASE 1
+   - `00003_create_fase2_tables.sql` - Creates FASE 2 tables with RLS policies
 
 ## Features
 
+### FASE 1 Features ✅
 - ✅ PostgreSQL database with Row Level Security (RLS)
 - ✅ Health insurance company management
 - ✅ Patient records with health insurance integration
@@ -42,6 +50,15 @@ See [supabase/README.md](supabase/README.md) for detailed instructions on applyi
 - ✅ Automatic timestamp updates
 - ✅ Comprehensive indexing for performance
 
+### FASE 2 Features ✅
+- ✅ Patient transport service configuration
+- ✅ Monthly billing period management
+- ✅ Monthly transport tracking and counting
+- ✅ Billing split between health insurance and patient
+- ✅ Service authorization and overage tracking
+- ✅ Composite unique constraints for data integrity
+
 ## Project Status
 
 **FASE 1**: ✅ Completed - Database tables created with RLS, triggers, and initial seeds
+**FASE 2**: ✅ Completed - Billing and transport tracking tables created with RLS and triggers
