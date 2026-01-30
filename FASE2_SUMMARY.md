@@ -16,8 +16,9 @@ Three new tables have been successfully created with the following specification
 - **Optional Fields**: frecuencia, dias_semana, cantidad_mensual, observaciones, fecha_fin
 - **Status Field**: activo (soft delete)
 - **Timestamps**: created_at, updated_at (with automatic trigger)
-- **Unique Constraint**: (paciente_id, tipo_servicio, destino_id, activo)
+- **Partial Unique Index**: (paciente_id, tipo_servicio, destino_id) WHERE activo = true
   - Ensures one active service per patient-type-destination combination
+  - Allows multiple inactive historical records
 - **RLS**: Enabled with full access for authenticated users
 - **Indexes**: paciente_id, obra_social_id, destino_id, activo
 
@@ -61,6 +62,7 @@ Three new tables have been successfully created with the following specification
 - **Timestamps**: created_at, updated_at (with automatic trigger)
 - **Unique Constraint**: (paciente_id, periodo_id)
   - Ensures one record per patient per billing period
+- **Check Constraints**: Non-negative values for cantidad and monto fields
 - **RLS**: Enabled with full access for authenticated users
 - **Indexes**: paciente_id, periodo_id, servicio_paciente_id, obra_social_id
 
@@ -80,13 +82,17 @@ Three new tables have been successfully created with the following specification
 
 2. **Data Integrity**
    - UUID primary keys for all tables
-   - UNIQUE constraints on composite keys:
-     - servicios_paciente: (paciente_id, tipo_servicio, destino_id, activo)
+   - Partial unique index on servicios_paciente: (paciente_id, tipo_servicio, destino_id) WHERE activo = true
+     - Allows one active service per patient-type-destination
+     - Permits multiple inactive historical records
+   - UNIQUE constraints on:
      - periodos_facturacion: periodo
      - traslados_mensuales: (paciente_id, periodo_id)
    - NOT NULL constraints on required fields
    - Foreign keys with appropriate CASCADE and SET NULL rules
-   - CHECK constraint on periodos_facturacion (fecha_fin >= fecha_inicio)
+   - CHECK constraints:
+     - periodos_facturacion: fecha_fin >= fecha_inicio
+     - traslados_mensuales: non-negative values for cantidad and monto fields
 
 3. **Automatic Timestamps**
    - created_at defaults to NOW()
@@ -218,15 +224,20 @@ Expected results:
 - 3 tables with RLS enabled
 - 3 RLS policies created ("Usuarios autenticados tienen acceso completo")
 - 3 updated_at triggers created
-- 8 foreign key relationships (4 for servicios_paciente, 4 for traslados_mensuales, 0 for periodos_facturacion)
-- 3 unique constraints (1 per table, including composite keys)
-- 11 performance indexes
-- 1 check constraint on periodos_facturacion
+- 7 foreign key relationships (3 for servicios_paciente, 4 for traslados_mensuales, 0 for periodos_facturacion)
+- 1 partial unique index on servicios_paciente (for active records only)
+- 2 unique constraints (periodos_facturacion.periodo, traslados_mensuales composite)
+- 12 performance indexes
+- 7 check constraints (1 on periodos_facturacion, 6 on traslados_mensuales)
 
 ## Design Decisions
 
-1. **Composite Unique Constraints**: 
-   - `servicios_paciente`: Prevents duplicate active services for same patient-type-destination
+1. **Partial Unique Index for Active Services**: 
+   - `servicios_paciente`: Uses partial unique index `WHERE activo = true` instead of composite unique constraint
+   - Prevents duplicate active services for same patient-type-destination
+   - Allows multiple inactive historical records for audit trail
+   
+2. **Unique Constraints for Data Integrity**:
    - `traslados_mensuales`: Ensures one record per patient per billing period
    - `periodos_facturacion`: Ensures unique monthly periods
 
@@ -236,7 +247,11 @@ Expected results:
    - `traslados_mensuales.periodo_id`: CASCADE (monthly records are meaningless without period)
    - All other FKs: SET NULL (preserve records for audit trail)
 
-3. **Decimal Precision for Money**: 10 digits with 2 decimal places (supports up to $99,999,999.99)
+3. **Data Validation Constraints**:
+   - Decimal precision for money: 10 digits with 2 decimal places (supports up to $99,999,999.99)
+   - Non-negative constraints on cantidad fields (prevent data entry errors)
+   - Non-negative constraints on monto fields (ensure valid monetary values)
+   - Date validation: fecha_fin >= fecha_inicio
 
 4. **Flexible Service Configuration**: 
    - tipo_servicio as VARCHAR allows for extensible service types
@@ -282,13 +297,14 @@ The FASE 2 tables integrate seamlessly with FASE 1:
 All requirements met:
 - ✅ Three tables created with proper structure
 - ✅ All fields, types, and relationships verified
-- ✅ UNIQUE constraints for composite keys implemented
+- ✅ Partial unique index for servicios_paciente (active records only)
+- ✅ UNIQUE constraints for periodos_facturacion and traslados_mensuales
 - ✅ Row Level Security enabled on all tables
 - ✅ Full access policies for authenticated users ("Usuarios autenticados tienen acceso completo")
 - ✅ updated_at triggers on all tables
 - ✅ Foreign key relationships with proper CASCADE/SET NULL rules
 - ✅ Performance indexes on all relevant columns
-- ✅ Check constraints for data validation
+- ✅ Check constraints for data validation (dates, non-negative values)
 - ✅ Comprehensive documentation
 - ✅ Verification queries provided
 

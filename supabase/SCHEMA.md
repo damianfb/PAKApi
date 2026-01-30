@@ -102,8 +102,9 @@
 │ activo (BOOLEAN, DEFAULT true)       │
 │ created_at (TIMESTAMP)               │
 │ updated_at (TIMESTAMP)               │
-│ UNIQUE(paciente_id, tipo_servicio,  │
-│        destino_id, activo)           │
+│ PARTIAL UNIQUE INDEX:                │
+│   (paciente_id, tipo_servicio,       │
+│    destino_id) WHERE activo = true   │
 └──────────────────────────────────────┘
                 │
                 │
@@ -114,7 +115,7 @@
 │ periodo (VARCHAR 7, UNIQUE, NOT NULL)│
 │ fecha_inicio (DATE, NOT NULL)        │
 │ fecha_fin (DATE, NOT NULL)           │
-│ estado (VARCHAR 50, DEFAULT 'abierto')
+│ estado (VARCHAR 50, DEFAULT 'abierto') │
 │ fecha_cierre (TIMESTAMP)             │
 │ observaciones (TEXT)                 │
 │ created_at (TIMESTAMP)               │
@@ -143,6 +144,7 @@
 │ created_at (TIMESTAMP)               │
 │ updated_at (TIMESTAMP)               │
 │ UNIQUE(paciente_id, periodo_id)      │
+│ CHECK: Non-negative cantidad/monto   │
 └──────────────────────────────────────┘
 ```
 
@@ -183,7 +185,9 @@
   - Links to pacientes (CASCADE)
   - Links to obras_sociales (SET NULL)
   - Links to destinos (SET NULL)
-- **Unique Constraint**: One active service per patient-type-destination combination
+- **Partial Unique Index**: (paciente_id, tipo_servicio, destino_id) WHERE activo = true
+  - Ensures one active service per patient-type-destination
+  - Allows multiple inactive historical records
 - **Usage**: Referenced by traslados_mensuales
 
 ### periodos_facturacion (Billing Periods)
@@ -203,6 +207,7 @@
   - Links to servicios_paciente (SET NULL)
   - Links to obras_sociales (SET NULL)
 - **Unique Constraint**: One record per patient per billing period
+- **Check Constraints**: Non-negative values for cantidad and monto fields
 - **Billing Fields**: monto_total, monto_obra_social, monto_paciente (DECIMAL 10,2)
 
 ## Security Features
@@ -247,9 +252,13 @@ All FASE 1 and FASE 2 tables include:
 - All timestamps use `TIMESTAMP WITH TIME ZONE` for proper timezone handling
 - FASE 1 tables support soft delete via `activo` field
 - FASE 2 adds billing and transport tracking capabilities
-- Composite unique constraints ensure data integrity:
-  - servicios_paciente: (paciente_id, tipo_servicio, destino_id, activo)
+- Partial unique index on servicios_paciente ensures one active service per patient-type-destination while allowing historical inactive records
+- Unique constraints ensure data integrity:
+  - periodos_facturacion: unique periodo
   - traslados_mensuales: (paciente_id, periodo_id)
+- Check constraints validate data:
+  - periodos_facturacion: fecha_fin >= fecha_inicio
+  - traslados_mensuales: non-negative cantidad and monto values
 - Foreign key cascading strategies:
   - CASCADE: When parent is critical to child (paciente_id in servicios_paciente and traslados_mensuales)
   - SET NULL: When parent is reference data (obra_social_id, destino_id, servicio_paciente_id)

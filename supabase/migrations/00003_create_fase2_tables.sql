@@ -20,9 +20,7 @@ CREATE TABLE servicios_paciente (
     fecha_fin DATE,
     activo BOOLEAN DEFAULT true,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    -- Composite unique constraint: one active service per patient-type-destination
-    CONSTRAINT unique_servicio_paciente UNIQUE (paciente_id, tipo_servicio, destino_id, activo)
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- Add trigger for updated_at
@@ -41,6 +39,12 @@ CREATE POLICY "Usuarios autenticados tienen acceso completo"
     TO authenticated
     USING (true)
     WITH CHECK (true);
+
+-- Add partial unique index: one active service per patient-type-destination
+-- This allows multiple inactive historical records
+CREATE UNIQUE INDEX unique_active_servicio_paciente 
+    ON servicios_paciente(paciente_id, tipo_servicio, destino_id) 
+    WHERE activo = true;
 
 -- Add indexes for performance
 CREATE INDEX idx_servicios_paciente_paciente_id ON servicios_paciente(paciente_id);
@@ -114,7 +118,14 @@ CREATE TABLE traslados_mensuales (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     -- Composite unique constraint: one record per patient per period
-    CONSTRAINT unique_traslado_mensual UNIQUE (paciente_id, periodo_id)
+    CONSTRAINT unique_traslado_mensual UNIQUE (paciente_id, periodo_id),
+    -- Check constraints to ensure non-negative values
+    CONSTRAINT check_cantidad_traslados_non_negative CHECK (cantidad_traslados >= 0),
+    CONSTRAINT check_cantidad_autorizada_non_negative CHECK (cantidad_autorizada >= 0),
+    CONSTRAINT check_cantidad_excedida_non_negative CHECK (cantidad_excedida >= 0),
+    CONSTRAINT check_monto_total_non_negative CHECK (monto_total >= 0),
+    CONSTRAINT check_monto_obra_social_non_negative CHECK (monto_obra_social >= 0),
+    CONSTRAINT check_monto_paciente_non_negative CHECK (monto_paciente >= 0)
 );
 
 -- Add trigger for updated_at
