@@ -8,7 +8,7 @@ PAKApi is a backend system designed to manage patient transport services, includ
 
 ## Database Schema
 
-The database consists of fourteen main tables implemented across five phases:
+The database consists of sixteen main tables implemented across six phases:
 
 **FASE 1 (Completed):**
 - **obras_sociales**: Health insurance companies and social works
@@ -34,6 +34,10 @@ The database consists of fourteen main tables implemented across five phases:
 **FASE 5 (Completed):**
 - **horarios_traslados**: Individual transport schedules with date, time, and driver assignment
 
+**FASE 6 (Completed):**
+- **gastos_operativos**: Operational expenses (fuel, maintenance, tolls, insurance, etc.)
+- **liquidaciones_conductores**: Driver payment settlements and liquidations
+
 For detailed schema information, see [supabase/SCHEMA.md](supabase/SCHEMA.md)
 
 ## Database Setup
@@ -54,6 +58,7 @@ See [supabase/README.md](supabase/README.md) for detailed instructions on applyi
    - `00004_create_fase3_tables.sql` - Creates FASE 3 tables with RLS policies
    - `00005_create_fase4_tables.sql` - Creates FASE 4 tables with RLS policies
    - `00006_create_fase5_tables.sql` - Creates FASE 5 tables with RLS policies
+   - `00007_create_fase6_tables.sql` - Creates FASE 6 tables with RLS policies
 
 ## Features
 
@@ -99,6 +104,17 @@ See [supabase/README.md](supabase/README.md) for detailed instructions on applyi
 - ✅ Distance tracking and reporting
 - ✅ Integration with monthly billing aggregates
 
+### FASE 6 Features ✅
+- ✅ Operational expense tracking and management
+- ✅ Multiple expense types (fuel, maintenance, tolls, insurance, etc.)
+- ✅ Driver-specific expense assignment
+- ✅ Expense approval and payment workflows
+- ✅ Driver settlement/liquidation calculations
+- ✅ Integration with transport counts and expenses
+- ✅ Bonuses and deductions support
+- ✅ Automatic net payment calculation validation
+- ✅ Payment method and transaction tracking
+
 ## Project Status
 
 **FASE 1**: ✅ Completed - Database tables created with RLS, triggers, and initial seeds
@@ -106,3 +122,4 @@ See [supabase/README.md](supabase/README.md) for detailed instructions on applyi
 **FASE 3**: ✅ Completed - Invoice and credit note tables created with RLS and triggers
 **FASE 4**: ✅ Completed - Collection and receipt tables created with RLS and triggers
 **FASE 5**: ✅ Completed - Transport schedules table created with RLS and triggers
+**FASE 6**: ✅ Completed - Operational expenses and driver settlements tables created with RLS and triggers
