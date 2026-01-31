@@ -8,7 +8,7 @@ PAKApi is a backend system designed to manage patient transport services, includ
 
 ## Database Schema
 
-The database consists of thirteen main tables implemented across four phases:
+The database consists of fourteen main tables implemented across five phases:
 
 **FASE 1 (Completed):**
 - **obras_sociales**: Health insurance companies and social works
@@ -31,6 +31,9 @@ The database consists of thirteen main tables implemented across four phases:
 - **recibos**: Payment receipts from health insurance companies
 - **recibos_detalle**: Receipt line items applied to invoices
 
+**FASE 5 (Completed):**
+- **horarios_traslados**: Individual transport schedules with date, time, and driver assignment
+
 For detailed schema information, see [supabase/SCHEMA.md](supabase/SCHEMA.md)
 
 ## Database Setup
@@ -50,6 +53,7 @@ See [supabase/README.md](supabase/README.md) for detailed instructions on applyi
    - `00003_create_fase2_tables.sql` - Creates FASE 2 tables with RLS policies
    - `00004_create_fase3_tables.sql` - Creates FASE 3 tables with RLS policies
    - `00005_create_fase4_tables.sql` - Creates FASE 4 tables with RLS policies
+   - `00006_create_fase5_tables.sql` - Creates FASE 5 tables with RLS policies
 
 ## Features
 
@@ -86,9 +90,19 @@ See [supabase/README.md](supabase/README.md) for detailed instructions on applyi
 - ✅ Status workflows for collections and receipts
 - ✅ Automatic calculation validation for pending amounts
 
+### FASE 5 Features ✅
+- ✅ Individual transport scheduling with date and time
+- ✅ Driver assignment for each transport
+- ✅ Scheduled vs actual time tracking
+- ✅ Transport type classification (one-way, round-trip)
+- ✅ Status workflow for transport lifecycle
+- ✅ Distance tracking and reporting
+- ✅ Integration with monthly billing aggregates
+
 ## Project Status
 
 **FASE 1**: ✅ Completed - Database tables created with RLS, triggers, and initial seeds
 **FASE 2**: ✅ Completed - Billing and transport tracking tables created with RLS and triggers
 **FASE 3**: ✅ Completed - Invoice and credit note tables created with RLS and triggers
 **FASE 4**: ✅ Completed - Collection and receipt tables created with RLS and triggers
+**FASE 5**: ✅ Completed - Transport schedules table created with RLS and triggers
