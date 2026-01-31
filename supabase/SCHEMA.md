@@ -217,6 +217,78 @@
 └──────────────────────────────────────┘
 ```
 
+## FASE 4 Tables
+
+```
+┌──────────────────────────────────────┐
+│           cobranzas                  │
+│──────────────────────────────────────│
+│ id (UUID, PK)                        │
+│ numero_cobranza (VARCHAR 50, UNIQUE) │
+│ fecha_cobranza (DATE, NOT NULL)      │
+│ obra_social_id (UUID, FK)        ────┼──→ obras_sociales.id (SET NULL)
+│ periodo_id (UUID, FK)            ────┼──→ periodos_facturacion.id (SET NULL)
+│ monto_total (DECIMAL 10,2, DEFAULT 0)│
+│ monto_cobrado (DECIMAL 10,2,         │
+│                DEFAULT 0)            │
+│ monto_pendiente (DECIMAL 10,2,       │
+│                  DEFAULT 0)          │
+│ estado (VARCHAR 50, DEFAULT          │
+│         'pendiente')                 │
+│ fecha_vencimiento (DATE)             │
+│ observaciones (TEXT)                 │
+│ created_at (TIMESTAMP)               │
+│ updated_at (TIMESTAMP)               │
+│ CHECK: Non-negative monetary values  │
+│ CHECK: monto_pendiente =             │
+│        monto_total - monto_cobrado   │
+│ CHECK: fecha_vencimiento >=          │
+│        fecha_cobranza                │
+└──────────────────────────────────────┘
+                │
+                │ (1:N)
+                │
+                ▼
+┌──────────────────────────────────────┐
+│            recibos                   │
+│──────────────────────────────────────│
+│ id (UUID, PK)                        │
+│ numero_recibo (VARCHAR 50, UNIQUE)   │
+│ fecha_emision (DATE, NOT NULL)       │
+│ fecha_pago (DATE, NOT NULL)          │
+│ cobranza_id (UUID, FK)           ────┼──→ cobranzas.id (SET NULL)
+│ obra_social_id (UUID, FK)        ────┼──→ obras_sociales.id (SET NULL)
+│ monto_total (DECIMAL 10,2, DEFAULT 0)│
+│ metodo_pago (VARCHAR 50)             │
+│ numero_operacion (VARCHAR 100)       │
+│ estado (VARCHAR 50, DEFAULT          │
+│         'emitido')                   │
+│ observaciones (TEXT)                 │
+│ created_at (TIMESTAMP)               │
+│ updated_at (TIMESTAMP)               │
+│ CHECK: Non-negative monto_total      │
+│ CHECK: fecha_pago >= fecha_emision   │
+└──────────────────────────────────────┘
+                │
+                │ (1:N)
+                │
+                ▼
+┌──────────────────────────────────────┐
+│        recibos_detalle               │
+│──────────────────────────────────────│
+│ id (UUID, PK)                        │
+│ recibo_id (UUID, FK, NOT NULL)   ────┼──→ recibos.id (CASCADE)
+│ factura_id (UUID, FK)            ────┼──→ facturas.id (SET NULL)
+│ descripcion (VARCHAR 500, NOT NULL)  │
+│ monto_aplicado (DECIMAL 10,2,        │
+│                 DEFAULT 0)           │
+│ observaciones (TEXT)                 │
+│ created_at (TIMESTAMP)               │
+│ updated_at (TIMESTAMP)               │
+│ CHECK: Non-negative monto_aplicado   │
+└──────────────────────────────────────┘
+```
+
 ## Table Descriptions
 
 ### FASE 1 Tables
@@ -313,9 +385,43 @@
 - **Status Values**: borrador, emitida, aplicada, anulada
 - **Motivo Values**: sobrecobranza, error_facturacion, cancelacion, ajuste, descuento
 
+### FASE 4 Tables
+
+### cobranzas (Collections)
+- **Purpose**: Tracks collection processes for invoices from health insurance companies
+- **Key Fields**: numero_cobranza (unique), fecha_cobranza, montos (total, cobrado, pendiente), estado
+- **Relationships**:
+  - Links to obras_sociales (SET NULL)
+  - Links to periodos_facturacion (SET NULL)
+- **Unique Constraint**: numero_cobranza must be unique
+- **Check Constraints**: Non-negative monetary values, monto_pendiente = monto_total - monto_cobrado, fecha_vencimiento >= fecha_cobranza
+- **Status Values**: pendiente, parcial, cobrado, anulado
+- **Usage**: Referenced by recibos
+
+### recibos (Receipts)
+- **Purpose**: Stores receipts issued for payments received from health insurance companies
+- **Key Fields**: numero_recibo (unique), fecha_emision, fecha_pago, monto_total, metodo_pago, estado
+- **Relationships**:
+  - Links to cobranzas (SET NULL)
+  - Links to obras_sociales (SET NULL)
+- **Unique Constraint**: numero_recibo must be unique
+- **Check Constraints**: Non-negative monto_total, fecha_pago >= fecha_emision
+- **Status Values**: emitido, confirmado, anulado
+- **Payment Methods**: efectivo, transferencia, cheque, tarjeta
+- **Usage**: Referenced by recibos_detalle
+
+### recibos_detalle (Receipt Line Items)
+- **Purpose**: Detail lines for each receipt showing which invoices are being paid
+- **Key Fields**: descripcion, monto_aplicado
+- **Relationships**:
+  - Links to recibos (CASCADE)
+  - Links to facturas (SET NULL)
+- **Check Constraints**: Non-negative monto_aplicado
+- **Usage**: Provides payment allocation to specific invoices
+
 ## Security Features
 
-All FASE 1, FASE 2 and FASE 3 tables include:
+All FASE 1, FASE 2, FASE 3, and FASE 4 tables include:
 - ✅ Row Level Security (RLS) enabled
 - ✅ Policy "Usuarios autenticados tienen acceso completo" for authenticated users (full access)
 - ✅ updated_at trigger for automatic timestamp updates
@@ -368,24 +474,48 @@ All FASE 1, FASE 2 and FASE 3 tables include:
 | notas_credito     | idx_notas_credito_estado                 | estado           | Fast status filtering           |
 | notas_credito     | idx_notas_credito_fecha_emision          | fecha_emision    | Fast date range queries         |
 
+### FASE 4 Indexes
+
+| Table             | Index Name                                | Column(s)        | Purpose                         |
+|-------------------|-------------------------------------------|------------------|---------------------------------|
+| cobranzas         | idx_cobranzas_numero_cobranza            | numero_cobranza  | Fast collection number lookup   |
+| cobranzas         | idx_cobranzas_obra_social_id             | obra_social_id   | Fast health insurance filtering |
+| cobranzas         | idx_cobranzas_periodo_id                 | periodo_id       | Fast billing period filtering   |
+| cobranzas         | idx_cobranzas_estado                     | estado           | Fast status filtering           |
+| cobranzas         | idx_cobranzas_fecha_cobranza             | fecha_cobranza   | Fast date range queries         |
+| recibos           | idx_recibos_numero_recibo                | numero_recibo    | Fast receipt number lookup      |
+| recibos           | idx_recibos_cobranza_id                  | cobranza_id      | Fast collection lookup          |
+| recibos           | idx_recibos_obra_social_id               | obra_social_id   | Fast health insurance filtering |
+| recibos           | idx_recibos_estado                       | estado           | Fast status filtering           |
+| recibos           | idx_recibos_fecha_emision                | fecha_emision    | Fast issue date queries         |
+| recibos           | idx_recibos_fecha_pago                   | fecha_pago       | Fast payment date queries       |
+| recibos_detalle   | idx_recibos_detalle_recibo_id            | recibo_id        | Fast receipt lookup             |
+| recibos_detalle   | idx_recibos_detalle_factura_id           | factura_id       | Fast invoice lookup             |
+
 ## Notes
 
 - All timestamps use `TIMESTAMP WITH TIME ZONE` for proper timezone handling
 - FASE 1 tables support soft delete via `activo` field
 - FASE 2 adds billing and transport tracking capabilities
 - FASE 3 adds invoicing and credit note management
+- FASE 4 adds collection and receipt management
 - Partial unique index on servicios_paciente ensures one active service per patient-type-destination while allowing historical inactive records
 - Unique constraints ensure data integrity:
   - periodos_facturacion: unique periodo
   - traslados_mensuales: (paciente_id, periodo_id)
   - facturas: unique numero_factura
   - notas_credito: unique numero_nota
+  - cobranzas: unique numero_cobranza
+  - recibos: unique numero_recibo
 - Check constraints validate data:
   - periodos_facturacion: fecha_fin >= fecha_inicio
   - traslados_mensuales: non-negative cantidad and monto values
   - facturas: non-negative monetary values, fecha_vencimiento >= fecha_emision
   - facturas_detalle: non-negative cantidad, precio_unitario, subtotal
   - notas_credito: non-negative monto
+  - cobranzas: non-negative monetary values, monto_pendiente calculation validation, fecha_vencimiento >= fecha_cobranza
+  - recibos: non-negative monto_total, fecha_pago >= fecha_emision
+  - recibos_detalle: non-negative monto_aplicado
 - Foreign key cascading strategies:
-  - CASCADE: When parent is critical to child (paciente_id in servicios_paciente and traslados_mensuales, periodo_id in facturas, factura_id in facturas_detalle)
-  - SET NULL: When parent is reference data (obra_social_id, destino_id, servicio_paciente_id, factura_id in notas_credito)
+  - CASCADE: When parent is critical to child (paciente_id in servicios_paciente and traslados_mensuales, periodo_id in facturas, factura_id in facturas_detalle, recibo_id in recibos_detalle)
+  - SET NULL: When parent is reference data (obra_social_id, destino_id, servicio_paciente_id, factura_id in notas_credito, cobranza_id, factura_id in recibos_detalle)
