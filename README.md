@@ -162,10 +162,26 @@ See [supabase/README.md](supabase/README.md) for detailed instructions on applyi
   - Backup and restore procedures
   - Rollback procedures
   - Monitoring and alerting setup guide
+### FASE 7B Features ✅
+- ✅ Automatic transfer generation (POST /traslados/generar-periodo)
+- ✅ Automatic invoice generation (POST /facturas/generar)
+- ✅ Driver settlement generation (POST /liquidaciones/generar)
+- ✅ Monthly budget summary (GET /presupuesto/resumen/:mes/:anio)
+- ✅ Analytical reports (GET /reportes/*)
+  - ✅ Annual billing report
+  - ✅ Pending collections report
+  - ✅ Patients by health insurance report
+  - ✅ Monthly profitability report
+  - ✅ Driver performance report
+- ✅ Batch processing and calculations
+- ✅ Business logic implementation
+- ✅ Shared utility functions
 
 ## API Documentation
 
 For the REST API documentation, see:
+- [FASE7A_API_DOCUMENTATION.md](FASE7A_API_DOCUMENTATION.md) - Complete CRUD API reference
+- [FASE7B_SUMMARY.md](FASE7B_SUMMARY.md) - Batch processes and reports API reference
 - [FASE7_COMPLETE_DOCUMENTATION.md](FASE7_COMPLETE_DOCUMENTATION.md) - Complete Phase 7 documentation (CRUD + Reports)
 - [FASE7A_API_DOCUMENTATION.md](FASE7A_API_DOCUMENTATION.md) - CRUD API reference
 - [FASE8_COMPLETION_REPORT.md](FASE8_COMPLETION_REPORT.md) - Phase 8 implementation report
@@ -207,3 +223,14 @@ Test coverage includes:
 **FASE 6**: ✅ Completed - Operational expenses and driver settlements tables created with RLS and triggers  
 **FASE 7**: ✅ Completed - Edge Functions with CRUD operations (7A) and reporting/dashboards (7B)  
 **FASE 8**: ✅ Completed - E2E tests, complete Edge Function coverage, security hardening, deployment documentation
+- [supabase/functions/README.md](supabase/functions/README.md) - Deployment guide
+
+## Project Status
+
+**FASE 1**: ✅ Completed - Database tables created with RLS, triggers, and initial seeds
+**FASE 2**: ✅ Completed - Billing and transport tracking tables created with RLS and triggers
+**FASE 3**: ✅ Completed - Invoice and credit note tables created with RLS and triggers
+**FASE 4**: ✅ Completed - Collection and receipt tables created with RLS and triggers
+**FASE 5**: ✅ Completed - Transport schedules table created with RLS and triggers
+**FASE 6**: ✅ Completed - Operational expenses and driver settlements tables created with RLS and triggers
+**FASE 7**: ✅ Completed - Edge Functions with CRUD operations (7A) and reporting/dashboards (7B)
