@@ -1,4 +1,4 @@
-# Database Schema Diagram - FASE 1, FASE 2 & FASE 3
+# Database Schema Diagram - FASE 1, FASE 2, FASE 3, FASE 4 & FASE 5
 
 ## Entity Relationship Diagram
 
@@ -289,6 +289,42 @@
 └──────────────────────────────────────┘
 ```
 
+## FASE 5 Tables
+
+```
+┌──────────────────────────────────────┐
+│      horarios_traslados              │
+│──────────────────────────────────────│
+│ id (UUID, PK)                        │
+│ paciente_id (UUID, FK, NOT NULL) ────┼──→ pacientes.id (CASCADE)
+│ conductor_id (UUID, FK)          ────┼──→ conductores.id (SET NULL)
+│ destino_id (UUID, FK)            ────┼──→ destinos.id (SET NULL)
+│ servicio_paciente_id (UUID, FK)  ────┼──→ servicios_paciente.id (SET NULL)
+│ traslado_mensual_id (UUID, FK)   ────┼──→ traslados_mensuales.id (SET NULL)
+│ fecha (DATE, NOT NULL)               │
+│ hora_inicio (TIME)                   │
+│ hora_fin (TIME)                      │
+│ hora_salida_real (TIME)              │
+│ hora_llegada_real (TIME)             │
+│ tipo_traslado (VARCHAR 100,          │
+│                NOT NULL)             │
+│ estado (VARCHAR 50, DEFAULT          │
+│         'programado')                │
+│ distancia_km (DECIMAL 8,2)           │
+│ observaciones (TEXT)                 │
+│ motivo_cancelacion (TEXT)            │
+│ created_at (TIMESTAMP)               │
+│ updated_at (TIMESTAMP)               │
+│ UNIQUE(paciente_id, fecha,           │
+│        tipo_traslado,                │
+│        servicio_paciente_id)         │
+│ CHECK: Non-negative distancia_km     │
+│ CHECK: hora_fin >= hora_inicio       │
+│ CHECK: hora_llegada_real >=          │
+│        hora_salida_real              │
+└──────────────────────────────────────┘
+```
+
 ## Table Descriptions
 
 ### FASE 1 Tables
@@ -419,9 +455,26 @@
 - **Check Constraints**: Non-negative monto_aplicado
 - **Usage**: Provides payment allocation to specific invoices
 
+### FASE 5 Tables
+
+### horarios_traslados (Transport Schedules)
+- **Purpose**: Tracks individual transport schedules/trips for patients
+- **Key Fields**: fecha, hora_inicio, hora_fin, tipo_traslado, estado, conductor_id
+- **Relationships**:
+  - Links to pacientes (CASCADE)
+  - Links to conductores (SET NULL)
+  - Links to destinos (SET NULL)
+  - Links to servicios_paciente (SET NULL)
+  - Links to traslados_mensuales (SET NULL)
+- **Composite Unique Constraint**: (paciente_id, fecha, tipo_traslado, servicio_paciente_id) - one schedule per patient per date per service type
+- **Check Constraints**: Non-negative distancia_km, logical time sequences (hora_fin >= hora_inicio, hora_llegada_real >= hora_salida_real)
+- **Status Values**: programado, confirmado, en_curso, completado, cancelado, no_realizado
+- **Transport Types**: ida (outbound), vuelta (return), ida_y_vuelta (round-trip)
+- **Usage**: Detailed transport scheduling with driver assignment, links to monthly billing aggregates
+
 ## Security Features
 
-All FASE 1, FASE 2, FASE 3, and FASE 4 tables include:
+All FASE 1, FASE 2, FASE 3, FASE 4, and FASE 5 tables include:
 - ✅ Row Level Security (RLS) enabled
 - ✅ Policy "Usuarios autenticados tienen acceso completo" for authenticated users (full access)
 - ✅ updated_at trigger for automatic timestamp updates
@@ -492,6 +545,18 @@ All FASE 1, FASE 2, FASE 3, and FASE 4 tables include:
 | recibos_detalle   | idx_recibos_detalle_recibo_id            | recibo_id        | Fast receipt lookup             |
 | recibos_detalle   | idx_recibos_detalle_factura_id           | factura_id       | Fast invoice lookup             |
 
+### FASE 5 Indexes
+
+| Table                | Index Name                                    | Column(s)              | Purpose                           |
+|----------------------|-----------------------------------------------|------------------------|-----------------------------------|
+| horarios_traslados   | idx_horarios_traslados_paciente_id           | paciente_id            | Fast patient lookups              |
+| horarios_traslados   | idx_horarios_traslados_conductor_id          | conductor_id           | Fast driver filtering             |
+| horarios_traslados   | idx_horarios_traslados_destino_id            | destino_id             | Fast destination filtering        |
+| horarios_traslados   | idx_horarios_traslados_servicio_paciente_id  | servicio_paciente_id   | Fast service configuration lookup |
+| horarios_traslados   | idx_horarios_traslados_traslado_mensual_id   | traslado_mensual_id    | Fast monthly aggregate lookup     |
+| horarios_traslados   | idx_horarios_traslados_fecha                 | fecha                  | Fast date range queries           |
+| horarios_traslados   | idx_horarios_traslados_estado                | estado                 | Fast status filtering             |
+
 ## Notes
 
 - All timestamps use `TIMESTAMP WITH TIME ZONE` for proper timezone handling
@@ -499,6 +564,7 @@ All FASE 1, FASE 2, FASE 3, and FASE 4 tables include:
 - FASE 2 adds billing and transport tracking capabilities
 - FASE 3 adds invoicing and credit note management
 - FASE 4 adds collection and receipt management
+- FASE 5 adds individual transport scheduling with driver assignment
 - Partial unique index on servicios_paciente ensures one active service per patient-type-destination while allowing historical inactive records
 - Unique constraints ensure data integrity:
   - periodos_facturacion: unique periodo
@@ -507,6 +573,7 @@ All FASE 1, FASE 2, FASE 3, and FASE 4 tables include:
   - notas_credito: unique numero_nota
   - cobranzas: unique numero_cobranza
   - recibos: unique numero_recibo
+  - horarios_traslados: (paciente_id, fecha, tipo_traslado, servicio_paciente_id)
 - Check constraints validate data:
   - periodos_facturacion: fecha_fin >= fecha_inicio
   - traslados_mensuales: non-negative cantidad and monto values
@@ -516,6 +583,7 @@ All FASE 1, FASE 2, FASE 3, and FASE 4 tables include:
   - cobranzas: non-negative monetary values, monto_pendiente calculation validation, fecha_vencimiento >= fecha_cobranza
   - recibos: non-negative monto_total, fecha_pago >= fecha_emision
   - recibos_detalle: non-negative monto_aplicado
+  - horarios_traslados: non-negative distancia_km, hora_fin >= hora_inicio, hora_llegada_real >= hora_salida_real
 - Foreign key cascading strategies:
-  - CASCADE: When parent is critical to child (paciente_id in servicios_paciente and traslados_mensuales, periodo_id in facturas, factura_id in facturas_detalle, recibo_id in recibos_detalle)
-  - SET NULL: When parent is reference data (obra_social_id, destino_id, servicio_paciente_id, factura_id in notas_credito, cobranza_id, factura_id in recibos_detalle)
+  - CASCADE: When parent is critical to child (paciente_id in servicios_paciente, traslados_mensuales, and horarios_traslados; periodo_id in facturas; factura_id in facturas_detalle; recibo_id in recibos_detalle)
+  - SET NULL: When parent is reference data (obra_social_id, destino_id, servicio_paciente_id, factura_id in notas_credito, cobranza_id, factura_id in recibos_detalle, conductor_id in horarios_traslados)
