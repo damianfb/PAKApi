@@ -1,0 +1,79 @@
+<div class="dashboard-container">
+  <h1>Dashboard</h1>
+
+  @if (loading()) {
+    <div class="loading-container">
+      <mat-spinner></mat-spinner>
+    </div>
+  } @else if (kpis()) {
+    <div class="kpi-grid">
+      <mat-card class="kpi-card primary">
+        <mat-card-content>
+          <div class="kpi-icon">
+            <mat-icon>attach_money</mat-icon>
+          </div>
+          <div class="kpi-info">
+            <h2>{{ kpis()!.totalFacturado | currency:'ARS':'symbol-narrow':'1.0-0' }}</h2>
+            <p>Total Facturado</p>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="kpi-card warn">
+        <mat-card-content>
+          <div class="kpi-icon">
+            <mat-icon>pending</mat-icon>
+          </div>
+          <div class="kpi-info">
+            <h2>{{ kpis()!.pendienteCobro | currency:'ARS':'symbol-narrow':'1.0-0' }}</h2>
+            <p>Pendiente de Cobro</p>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="kpi-card accent">
+        <mat-card-content>
+          <div class="kpi-icon">
+            <mat-icon>directions_car</mat-icon>
+          </div>
+          <div class="kpi-info">
+            <h2>{{ kpis()!.viajesHoy }}</h2>
+            <p>Viajes Hoy</p>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="kpi-card success">
+        <mat-card-content>
+          <div class="kpi-icon">
+            <mat-icon>people</mat-icon>
+          </div>
+          <div class="kpi-info">
+            <h2>{{ kpis()!.pacientesActivos }}</h2>
+            <p>Pacientes Activos</p>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="kpi-card info">
+        <mat-card-content>
+          <div class="kpi-icon">
+            <mat-icon>person</mat-icon>
+          </div>
+          <div class="kpi-info">
+            <h2>{{ kpis()!.conductoresActivos }}</h2>
+            <p>Conductores Activos</p>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  }
+
+  @if (error()) {
+    <mat-card class="error-card">
+      <mat-card-content>
+        <p>{{ error() }}</p>
+      </mat-card-content>
+    </mat-card>
+  }
+</div>
