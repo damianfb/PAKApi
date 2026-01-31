@@ -42,3 +42,5 @@ temp/
 .supabase/
 supabase/.branches/
 supabase/.temp/
+postman_collection.json
+supabase/config.toml
