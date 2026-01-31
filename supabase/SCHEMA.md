@@ -565,6 +565,7 @@ All FASE 1, FASE 2, FASE 3, FASE 4, and FASE 5 tables include:
 - FASE 3 adds invoicing and credit note management
 - FASE 4 adds collection and receipt management
 - FASE 5 adds individual transport scheduling with driver assignment
+- FASE 6 adds operational expense tracking and driver settlement/liquidation management
 - Partial unique index on servicios_paciente ensures one active service per patient-type-destination while allowing historical inactive records
 - Unique constraints ensure data integrity:
   - periodos_facturacion: unique periodo
@@ -574,6 +575,8 @@ All FASE 1, FASE 2, FASE 3, FASE 4, and FASE 5 tables include:
   - cobranzas: unique numero_cobranza
   - recibos: unique numero_recibo
   - horarios_traslados: (paciente_id, fecha, tipo_traslado, servicio_paciente_id)
+  - gastos_operativos: unique numero_gasto
+  - liquidaciones_conductores: unique numero_liquidacion
 - Check constraints validate data:
   - periodos_facturacion: fecha_fin >= fecha_inicio
   - traslados_mensuales: non-negative cantidad and monto values
@@ -584,6 +587,116 @@ All FASE 1, FASE 2, FASE 3, FASE 4, and FASE 5 tables include:
   - recibos: non-negative monto_total, fecha_pago >= fecha_emision
   - recibos_detalle: non-negative monto_aplicado
   - horarios_traslados: non-negative distancia_km, hora_fin >= hora_inicio, hora_llegada_real >= hora_salida_real
+  - gastos_operativos: non-negative monto, fecha_pago >= fecha
+  - liquidaciones_conductores: non-negative amounts, monto_neto calculation validation, fecha_pago >= fecha_generacion
 - Foreign key cascading strategies:
-  - CASCADE: When parent is critical to child (paciente_id in servicios_paciente, traslados_mensuales, and horarios_traslados; periodo_id in facturas; factura_id in facturas_detalle; recibo_id in recibos_detalle)
-  - SET NULL: When parent is reference data (obra_social_id, destino_id, servicio_paciente_id, factura_id in notas_credito, cobranza_id, factura_id in recibos_detalle, conductor_id in horarios_traslados)
+  - CASCADE: When parent is critical to child (paciente_id in servicios_paciente, traslados_mensuales, and horarios_traslados; periodo_id in facturas; factura_id in facturas_detalle; recibo_id in recibos_detalle; conductor_id in liquidaciones_conductores)
+  - SET NULL: When parent is reference data (obra_social_id, destino_id, servicio_paciente_id, factura_id in notas_credito, cobranza_id, factura_id in recibos_detalle, conductor_id in horarios_traslados and gastos_operativos, periodo_id in gastos_operativos and liquidaciones_conductores)
+
+## FASE 6 Tables
+
+```
+┌──────────────────────────────────────┐
+│       gastos_operativos              │
+│──────────────────────────────────────│
+│ id (UUID, PK)                        │
+│ numero_gasto (VARCHAR 50, UNIQUE)    │
+│ fecha (DATE, NOT NULL)               │
+│ tipo_gasto (VARCHAR 100, NOT NULL)   │
+│ monto (DECIMAL 10,2, NOT NULL)       │
+│ conductor_id (UUID, FK)          ────┼──→ conductores.id (SET NULL)
+│ periodo_id (UUID, FK)            ────┼──→ periodos_facturacion.id (SET NULL)
+│ descripcion (TEXT)                   │
+│ comprobante (VARCHAR 100)            │
+│ proveedor (VARCHAR 255)              │
+│ estado (VARCHAR 50, DEFAULT          │
+│         'registrado')                │
+│ fecha_pago (DATE)                    │
+│ observaciones (TEXT)                 │
+│ created_at (TIMESTAMP)               │
+│ updated_at (TIMESTAMP)               │
+│ CHECK: monto >= 0                    │
+│ CHECK: fecha_pago >= fecha           │
+└──────────────────────────────────────┘
+
+
+┌──────────────────────────────────────┐
+│   liquidaciones_conductores          │
+│──────────────────────────────────────│
+│ id (UUID, PK)                        │
+│ numero_liquidacion (VARCHAR 50,      │
+│                     UNIQUE)          │
+│ conductor_id (UUID, FK, NOT NULL)────┼──→ conductores.id (CASCADE)
+│ periodo_id (UUID, FK)            ────┼──→ periodos_facturacion.id (SET NULL)
+│ fecha_generacion (DATE, NOT NULL)    │
+│ fecha_pago (DATE)                    │
+│ cantidad_traslados (INTEGER,         │
+│                     DEFAULT 0)       │
+│ monto_traslados (DECIMAL 10,2,       │
+│                  DEFAULT 0)          │
+│ monto_gastos (DECIMAL 10,2,          │
+│               DEFAULT 0)             │
+│ monto_bonificaciones (DECIMAL 10,2,  │
+│                       DEFAULT 0)     │
+│ monto_deducciones (DECIMAL 10,2,     │
+│                    DEFAULT 0)        │
+│ monto_neto (DECIMAL 10,2, DEFAULT 0) │
+│ metodo_pago (VARCHAR 50)             │
+│ numero_comprobante (VARCHAR 100)     │
+│ estado (VARCHAR 50, DEFAULT          │
+│         'pendiente')                 │
+│ observaciones (TEXT)                 │
+│ created_at (TIMESTAMP)               │
+│ updated_at (TIMESTAMP)               │
+│ CHECK: Non-negative amounts          │
+│ CHECK: monto_neto = monto_traslados  │
+│        - monto_gastos +              │
+│        monto_bonificaciones -        │
+│        monto_deducciones             │
+│ CHECK: fecha_pago >=                 │
+│        fecha_generacion              │
+└──────────────────────────────────────┘
+```
+
+### FASE 6 Tables
+
+### gastos_operativos (Operational Expenses)
+- **Purpose**: Tracks operational expenses (fuel, maintenance, tolls, insurance, etc.)
+- **Key Fields**: numero_gasto, fecha, tipo_gasto, monto, conductor_id, estado
+- **Relationships**:
+  - Links to conductores (SET NULL) - for driver-specific expenses
+  - Links to periodos_facturacion (SET NULL) - for monthly expense reporting
+- **Unique Constraint**: numero_gasto (e.g., GAS-2026-0001)
+- **Check Constraints**: Non-negative monto, fecha_pago >= fecha
+- **Expense Types**: combustible (fuel), mantenimiento (maintenance), peaje (toll), seguro (insurance), limpieza (cleaning), reparacion (repair), otros (others)
+- **Status Values**: registrado (registered), aprobado (approved), pagado (paid), rechazado (rejected), anulado (cancelled)
+- **Usage**: Track all operational costs with supplier and voucher tracking, approval workflow, and payment status
+
+### liquidaciones_conductores (Driver Settlements)
+- **Purpose**: Tracks driver payment settlements/liquidations based on transports and expenses
+- **Key Fields**: numero_liquidacion, conductor_id, fecha_generacion, monto_neto, estado
+- **Relationships**:
+  - Links to conductores (CASCADE) - driver is essential
+  - Links to periodos_facturacion (SET NULL) - for monthly settlement cycles
+- **Unique Constraint**: numero_liquidacion (e.g., LIQ-2026-0001)
+- **Check Constraints**: Non-negative amounts, monto_neto calculation validation, fecha_pago >= fecha_generacion
+- **Status Values**: pendiente (pending), aprobada (approved), pagada (paid), anulada (cancelled)
+- **Usage**: Calculate driver compensation from transports, deduct expenses, apply bonuses/deductions, track payment method and transaction details
+
+### FASE 6 Indexes
+
+| Table                     | Index Name                                       | Column(s)          | Purpose                         |
+|---------------------------|--------------------------------------------------|--------------------|---------------------------------|
+| gastos_operativos         | idx_gastos_operativos_numero_gasto              | numero_gasto       | Fast expense number lookup      |
+| gastos_operativos         | idx_gastos_operativos_conductor_id              | conductor_id       | Fast driver filtering           |
+| gastos_operativos         | idx_gastos_operativos_periodo_id                | periodo_id         | Fast billing period filtering   |
+| gastos_operativos         | idx_gastos_operativos_tipo_gasto                | tipo_gasto         | Fast expense type filtering     |
+| gastos_operativos         | idx_gastos_operativos_estado                    | estado             | Fast status filtering           |
+| gastos_operativos         | idx_gastos_operativos_fecha                     | fecha              | Fast date range queries         |
+| liquidaciones_conductores | idx_liquidaciones_conductores_numero_liquidacion| numero_liquidacion | Fast settlement number lookup   |
+| liquidaciones_conductores | idx_liquidaciones_conductores_conductor_id      | conductor_id       | Fast driver lookup              |
+| liquidaciones_conductores | idx_liquidaciones_conductores_periodo_id        | periodo_id         | Fast billing period filtering   |
+| liquidaciones_conductores | idx_liquidaciones_conductores_estado            | estado             | Fast status filtering           |
+| liquidaciones_conductores | idx_liquidaciones_conductores_fecha_generacion  | fecha_generacion   | Fast generation date queries    |
+| liquidaciones_conductores | idx_liquidaciones_conductores_fecha_pago        | fecha_pago         | Fast payment date queries       |
+
