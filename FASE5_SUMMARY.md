@@ -175,7 +175,7 @@ Expected results:
 - 5 foreign key relationships:
   - horarios_traslados: paciente_id (CASCADE), conductor_id (SET NULL), destino_id (SET NULL), servicio_paciente_id (SET NULL), traslado_mensual_id (SET NULL)
 - 2 unique constraints (primary key + composite unique)
-- 8 performance indexes (7 regular indexes + 1 composite unique index)
+- 9 performance indexes (primary key index + 7 regular indexes + 1 composite unique index)
 - 3 check constraints for data validation
 - All record counts should be 0 initially
 

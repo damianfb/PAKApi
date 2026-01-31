@@ -103,7 +103,7 @@ SELECT
 FROM pg_indexes
 WHERE tablename = 'horarios_traslados'
 ORDER BY indexname;
--- Expected: 8 indexes (1 PK + 7 regular indexes):
+-- Expected: 9 indexes:
 --   - horarios_traslados_pkey (primary key on id)
 --   - idx_horarios_traslados_paciente_id
 --   - idx_horarios_traslados_conductor_id
@@ -112,7 +112,7 @@ ORDER BY indexname;
 --   - idx_horarios_traslados_traslado_mensual_id
 --   - idx_horarios_traslados_fecha
 --   - idx_horarios_traslados_estado
---   - unique_horario_traslado (composite unique)
+--   - unique_horario_traslado (composite unique index)
 
 -- ============================================
 -- 8. Verify column definitions
@@ -183,7 +183,7 @@ FROM horarios_traslados;
 -- ✓ updated_at trigger is configured
 -- ✓ 5 foreign key relationships with appropriate CASCADE/SET NULL rules
 -- ✓ 2 unique constraints (PK + composite)
--- ✓ 8 indexes for performance
+-- ✓ 9 indexes for performance (PK, 7 regular indexes, 1 composite unique index)
 -- ✓ 18 columns with correct data types and nullability
 -- ✓ 3 check constraints for data validation
 -- ✓ Initial record count is 0
