@@ -38,10 +38,11 @@ The database consists of sixteen main tables implemented across six phases:
 - **gastos_operativos**: Operational expenses (fuel, maintenance, tolls, insurance, etc.)
 - **liquidaciones_conductores**: Driver payment settlements and liquidations
 
-**FASE 7A (Completed):**
-- **Edge Functions**: TypeScript/Deno Edge Functions for REST API endpoints
-- **CRUD Operations**: Full CRUD for obras_sociales, pacientes, destinos, conductores, servicios_paciente
-- **API Documentation**: Comprehensive API reference with examples
+**FASE 7 (Completed):**
+- **Phase 7A - CRUD Operations**: Full CRUD Edge Functions for all core entities
+- **Phase 7B - Reports & Dashboards**: Reporting views and dashboard endpoints
+- **Database Views**: 6 analytical views for business intelligence
+- **Report Endpoints**: Annual billing, pending collections, profitability, patient analytics, dashboards
 
 For detailed schema information, see [supabase/SCHEMA.md](supabase/SCHEMA.md)
 
@@ -64,6 +65,7 @@ See [supabase/README.md](supabase/README.md) for detailed instructions on applyi
    - `00005_create_fase4_tables.sql` - Creates FASE 4 tables with RLS policies
    - `00006_create_fase5_tables.sql` - Creates FASE 5 tables with RLS policies
    - `00007_create_fase6_tables.sql` - Creates FASE 6 tables with RLS policies
+   - `00008_create_fase7_reporting_views.sql` - Creates FASE 7 reporting views and analytics
 
 ## Features
 
@@ -120,21 +122,30 @@ See [supabase/README.md](supabase/README.md) for detailed instructions on applyi
 - ✅ Automatic net payment calculation validation
 - ✅ Payment method and transaction tracking
 
-### FASE 7A Features ✅
-- ✅ Supabase Edge Functions (TypeScript/Deno)
-- ✅ REST API endpoints for all core entities
-- ✅ Full CRUD operations (POST, GET, PUT, DELETE)
-- ✅ Pagination and filtering support
-- ✅ Special endpoint: GET /pacientes/:id/servicios
-- ✅ CORS support for frontend integration
-- ✅ Comprehensive error handling
-- ✅ Complete API documentation
-- ✅ Deployment-ready functions
+### FASE 7 Features ✅
+- ✅ **Phase 7A - CRUD Operations:**
+  - Supabase Edge Functions (TypeScript/Deno)
+  - REST API endpoints for all core entities
+  - Full CRUD operations (POST, GET, PUT, DELETE)
+  - Pagination and filtering support
+  - Special endpoint: GET /pacientes/:id/servicios
+  - CORS support for frontend integration
+  - Comprehensive error handling
+- ✅ **Phase 7B - Reports & Dashboards:**
+  - Annual billing report (facturación anual)
+  - Pending collections report with aging (cobranzas pendientes)
+  - Patients by health insurance analytics (pacientes por obra social)
+  - Monthly profitability analysis (rentabilidad mensual)
+  - Annual summary with KPIs (resumen anual)
+  - General dashboard with real-time metrics
+  - 6 optimized database views for reporting
+  - Automatic report generation endpoints
 
 ## API Documentation
 
 For the REST API documentation, see:
-- [FASE7A_API_DOCUMENTATION.md](FASE7A_API_DOCUMENTATION.md) - Complete API reference
+- [FASE7_COMPLETE_DOCUMENTATION.md](FASE7_COMPLETE_DOCUMENTATION.md) - Complete Phase 7 documentation (CRUD + Reports)
+- [FASE7A_API_DOCUMENTATION.md](FASE7A_API_DOCUMENTATION.md) - CRUD API reference
 - [supabase/functions/README.md](supabase/functions/README.md) - Deployment guide
 
 ## Project Status
@@ -145,4 +156,4 @@ For the REST API documentation, see:
 **FASE 4**: ✅ Completed - Collection and receipt tables created with RLS and triggers
 **FASE 5**: ✅ Completed - Transport schedules table created with RLS and triggers
 **FASE 6**: ✅ Completed - Operational expenses and driver settlements tables created with RLS and triggers
-**FASE 7A**: ✅ Completed - Edge Functions with CRUD operations for all core entities
+**FASE 7**: ✅ Completed - Edge Functions with CRUD operations (7A) and reporting/dashboards (7B)
