@@ -8,7 +8,7 @@ PAKApi is a backend system designed to manage patient transport services, includ
 
 ## Database Schema
 
-The database consists of seven main tables implemented across two phases:
+The database consists of ten main tables implemented across three phases:
 
 **FASE 1 (Completed):**
 - **obras_sociales**: Health insurance companies and social works
@@ -20,6 +20,11 @@ The database consists of seven main tables implemented across two phases:
 - **servicios_paciente**: Transport service configuration per patient
 - **periodos_facturacion**: Monthly billing periods
 - **traslados_mensuales**: Monthly transport tracking and billing
+
+**FASE 3 (Completed):**
+- **facturas**: Invoices for health insurance companies
+- **facturas_detalle**: Invoice line items with service details
+- **notas_credito**: Credit notes for invoice adjustments
 
 For detailed schema information, see [supabase/SCHEMA.md](supabase/SCHEMA.md)
 
@@ -38,6 +43,7 @@ See [supabase/README.md](supabase/README.md) for detailed instructions on applyi
    - `00001_create_base_tables.sql` - Creates FASE 1 tables with RLS policies
    - `00002_seed_initial_data.sql` - Seeds initial data for FASE 1
    - `00003_create_fase2_tables.sql` - Creates FASE 2 tables with RLS policies
+   - `00004_create_fase3_tables.sql` - Creates FASE 3 tables with RLS policies
 
 ## Features
 
@@ -58,7 +64,16 @@ See [supabase/README.md](supabase/README.md) for detailed instructions on applyi
 - ✅ Service authorization and overage tracking
 - ✅ Composite unique constraints for data integrity
 
+### FASE 3 Features ✅
+- ✅ Invoice generation and management
+- ✅ Invoice line items with detailed billing
+- ✅ Credit note issuance and tracking
+- ✅ Status workflows for invoices and credit notes
+- ✅ Integration with billing periods and monthly transports
+- ✅ Comprehensive audit trail with timestamps
+
 ## Project Status
 
 **FASE 1**: ✅ Completed - Database tables created with RLS, triggers, and initial seeds
 **FASE 2**: ✅ Completed - Billing and transport tracking tables created with RLS and triggers
+**FASE 3**: ✅ Completed - Invoice and credit note tables created with RLS and triggers
