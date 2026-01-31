@@ -1,0 +1,80 @@
+<div class="pacientes-container">
+  <div class="header">
+    <h1>Gestión de Pacientes</h1>
+    <button mat-raised-button color="primary">
+      <mat-icon>add</mat-icon>
+      Nuevo Paciente
+    </button>
+  </div>
+
+  <mat-form-field appearance="outline" class="search-field">
+    <mat-label>Buscar paciente</mat-label>
+    <input matInput placeholder="Nombre, DNI, etc.">
+    <mat-icon matPrefix>search</mat-icon>
+  </mat-form-field>
+
+  @if (loading()) {
+    <div class="loading-container">
+      <mat-spinner></mat-spinner>
+    </div>
+  } @else {
+    <div class="table-container">
+      <table mat-table [dataSource]="pacientes()" class="mat-elevation-z2">
+        <ng-container matColumnDef="nombre">
+          <th mat-header-cell *matHeaderCellDef>Nombre Completo</th>
+          <td mat-cell *matCellDef="let paciente">
+            {{ paciente.apellido }}, {{ paciente.nombre }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="dni">
+          <th mat-header-cell *matHeaderCellDef>DNI</th>
+          <td mat-cell *matCellDef="let paciente">{{ paciente.dni }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="telefono">
+          <th mat-header-cell *matHeaderCellDef>Teléfono</th>
+          <td mat-cell *matCellDef="let paciente">{{ paciente.telefono || '-' }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="direccion">
+          <th mat-header-cell *matHeaderCellDef>Dirección</th>
+          <td mat-cell *matCellDef="let paciente">
+            {{ paciente.direccion_particular }}, {{ paciente.localidad }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="activo">
+          <th mat-header-cell *matHeaderCellDef>Estado</th>
+          <td mat-cell *matCellDef="let paciente">
+            <mat-chip [class.active]="paciente.activo" [class.inactive]="!paciente.activo">
+              {{ paciente.activo ? 'Activo' : 'Inactivo' }}
+            </mat-chip>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="acciones">
+          <th mat-header-cell *matHeaderCellDef>Acciones</th>
+          <td mat-cell *matCellDef="let paciente">
+            <button mat-icon-button color="primary">
+              <mat-icon>visibility</mat-icon>
+            </button>
+            <button mat-icon-button color="accent">
+              <mat-icon>edit</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      </table>
+    </div>
+
+    @if (pacientes().length === 0) {
+      <div class="no-data">
+        <mat-icon>info</mat-icon>
+        <p>No hay pacientes registrados</p>
+      </div>
+    }
+  }
+</div>
