@@ -131,10 +131,26 @@ See [supabase/README.md](supabase/README.md) for detailed instructions on applyi
 - ✅ Complete API documentation
 - ✅ Deployment-ready functions
 
+### FASE 7B Features ✅
+- ✅ Automatic transfer generation (POST /traslados/generar-periodo)
+- ✅ Automatic invoice generation (POST /facturas/generar)
+- ✅ Driver settlement generation (POST /liquidaciones/generar)
+- ✅ Monthly budget summary (GET /presupuesto/resumen/:mes/:anio)
+- ✅ Analytical reports (GET /reportes/*)
+  - ✅ Annual billing report
+  - ✅ Pending collections report
+  - ✅ Patients by health insurance report
+  - ✅ Monthly profitability report
+  - ✅ Driver performance report
+- ✅ Batch processing and calculations
+- ✅ Business logic implementation
+- ✅ Shared utility functions
+
 ## API Documentation
 
 For the REST API documentation, see:
-- [FASE7A_API_DOCUMENTATION.md](FASE7A_API_DOCUMENTATION.md) - Complete API reference
+- [FASE7A_API_DOCUMENTATION.md](FASE7A_API_DOCUMENTATION.md) - Complete CRUD API reference
+- [FASE7B_SUMMARY.md](FASE7B_SUMMARY.md) - Batch processes and reports API reference
 - [supabase/functions/README.md](supabase/functions/README.md) - Deployment guide
 
 ## Project Status
@@ -146,3 +162,4 @@ For the REST API documentation, see:
 **FASE 5**: ✅ Completed - Transport schedules table created with RLS and triggers
 **FASE 6**: ✅ Completed - Operational expenses and driver settlements tables created with RLS and triggers
 **FASE 7A**: ✅ Completed - Edge Functions with CRUD operations for all core entities
+**FASE 7B**: ✅ Completed - Edge Functions for batch processes, calculations, and reports
