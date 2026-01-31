@@ -1,6 +1,16 @@
-# Supabase Edge Functions - FASE 7A
+# Supabase Edge Functions - FASE 7A & 7B
 
 This directory contains TypeScript Edge Functions for the PAKApi project, providing REST API endpoints for managing patient transport services.
+
+## Overview
+
+The Edge Functions are organized into two phases:
+
+### FASE 7A: CRUD Operations ✅
+Basic CRUD endpoints for core entities (completed).
+
+### FASE 7B: Batch Processes and Reports ✅
+Automated batch operations and analytical reports (completed).
 
 ## Directory Structure
 
@@ -9,17 +19,31 @@ functions/
 ├── _shared/
 │   ├── cors.ts           # CORS configuration
 │   ├── response.ts       # Response helpers
-│   └── supabase.ts       # Supabase client factory
-├── obras-sociales/
-│   └── index.ts          # Health insurance CRUD
-├── pacientes/
-│   └── index.ts          # Patient CRUD + services
-├── destinos/
-│   └── index.ts          # Destination CRUD
-├── conductores/
-│   └── index.ts          # Driver CRUD
-├── servicios-paciente/
-│   └── index.ts          # Patient service CRUD
+│   ├── supabase.ts       # Supabase client factory
+│   └── utils.ts          # Common utilities (NEW in FASE 7B)
+│
+├── obras-sociales/       # FASE 7A: Health insurance CRUD
+│   └── index.ts
+├── pacientes/            # FASE 7A: Patient CRUD + services
+│   └── index.ts
+├── destinos/             # FASE 7A: Destination CRUD
+│   └── index.ts
+├── conductores/          # FASE 7A: Driver CRUD
+│   └── index.ts
+├── servicios-paciente/   # FASE 7A: Patient service CRUD
+│   └── index.ts
+│
+├── traslados-generar-periodo/  # FASE 7B: Generate monthly transfers
+│   └── index.ts
+├── facturas-generar/           # FASE 7B: Generate monthly invoices
+│   └── index.ts
+├── liquidaciones-generar/      # FASE 7B: Generate driver settlements
+│   └── index.ts
+├── presupuesto-resumen/        # FASE 7B: Monthly budget summary
+│   └── index.ts
+├── reportes/                   # FASE 7B: Analytical reports
+│   └── index.ts
+│
 └── deno.json             # Deno configuration
 ```
 
@@ -49,23 +73,32 @@ To find your project reference ID:
 
 ### 3. Deploy Functions
 
-Deploy all functions at once:
+Deploy FASE 7A functions (CRUD):
 
 ```bash
 cd /path/to/PAKApi
 
-# Deploy each function
-supabase functions deploy obras-sociales
-supabase functions deploy pacientes
-supabase functions deploy destinos
-supabase functions deploy conductores
-supabase functions deploy servicios-paciente
+# Deploy FASE 7A functions
+for func in obras-sociales pacientes destinos conductores servicios-paciente; do
+  supabase functions deploy $func
+done
 ```
 
-Or use a loop:
+Deploy FASE 7B functions (Batch & Reports):
 
 ```bash
-for func in obras-sociales pacientes destinos conductores servicios-paciente; do
+# Deploy FASE 7B functions
+for func in traslados-generar-periodo facturas-generar liquidaciones-generar presupuesto-resumen reportes; do
+  supabase functions deploy $func
+done
+```
+
+Or deploy all at once:
+
+```bash
+# Deploy ALL functions (FASE 7A + 7B)
+for func in obras-sociales pacientes destinos conductores servicios-paciente traslados-generar-periodo facturas-generar liquidaciones-generar presupuesto-resumen reportes; do
+  echo "Deploying $func..."
   supabase functions deploy $func
 done
 ```
@@ -139,14 +172,16 @@ curl -X GET "${SUPABASE_URL}/functions/v1/obras-sociales?activo=true" \
 
 ## Function Endpoints
 
-### obras-sociales
+### FASE 7A - CRUD Operations
+
+#### obras-sociales
 - `GET /obras-sociales` - List all
 - `GET /obras-sociales/:id` - Get one
 - `POST /obras-sociales` - Create
 - `PUT /obras-sociales/:id` - Update
 - `DELETE /obras-sociales/:id` - Delete (soft)
 
-### pacientes
+#### pacientes
 - `GET /pacientes` - List all
 - `GET /pacientes/:id` - Get one
 - `GET /pacientes/:id/servicios` - Get patient services
@@ -154,26 +189,50 @@ curl -X GET "${SUPABASE_URL}/functions/v1/obras-sociales?activo=true" \
 - `PUT /pacientes/:id` - Update
 - `DELETE /pacientes/:id` - Delete (soft)
 
-### destinos
+#### destinos
 - `GET /destinos` - List all
 - `GET /destinos/:id` - Get one
 - `POST /destinos` - Create
 - `PUT /destinos/:id` - Update
 - `DELETE /destinos/:id` - Delete (soft)
 
-### conductores
+#### conductores
 - `GET /conductores` - List all
 - `GET /conductores/:id` - Get one
 - `POST /conductores` - Create
 - `PUT /conductores/:id` - Update
 - `DELETE /conductores/:id` - Delete (soft)
 
-### servicios-paciente
+#### servicios-paciente
 - `GET /servicios-paciente` - List all
 - `GET /servicios-paciente/:id` - Get one
 - `POST /servicios-paciente` - Create
 - `PUT /servicios-paciente/:id` - Update
 - `DELETE /servicios-paciente/:id` - Delete (soft)
+
+### FASE 7B - Batch Processes & Reports
+
+#### traslados-generar-periodo
+- `POST /traslados/generar-periodo` - Generate monthly transfers
+  - Request: `{ "mes": 1, "anio": 2026 }`
+
+#### facturas-generar
+- `POST /facturas/generar` - Generate monthly invoices
+  - Request: `{ "mes": 1, "anio": 2026 }`
+
+#### liquidaciones-generar
+- `POST /liquidaciones/generar` - Generate driver settlements
+  - Request: `{ "mes": 1, "anio": 2026 }`
+
+#### presupuesto-resumen
+- `GET /presupuesto/resumen/:mes/:anio` - Monthly budget summary
+
+#### reportes
+- `GET /reportes/facturacion-anual/:anio` - Annual billing report
+- `GET /reportes/cobranzas-pendientes` - Pending collections
+- `GET /reportes/pacientes-por-obra-social` - Patients by health insurance
+- `GET /reportes/rentabilidad/:mes/:anio` - Monthly profitability
+- `GET /reportes/conductores-rendimiento/:mes/:anio` - Driver performance
 
 ## Common Query Parameters
 
@@ -246,8 +305,10 @@ supabase functions list
 ## Documentation
 
 For complete API documentation, see:
-- `FASE7A_API_DOCUMENTATION.md` - Full API reference
-- `FASE7A_SUMMARY.md` - Implementation summary
+- **FASE 7A**: `FASE7A_API_DOCUMENTATION.md` - Full CRUD API reference
+- **FASE 7B**: `FASE7B_SUMMARY.md` - Batch processes and reports API reference
+- **FASE 7B**: `FASE7B_DEPLOYMENT_GUIDE.md` - Detailed testing and deployment guide
+- `FASE7A_SUMMARY.md` - FASE 7A implementation summary
 
 ## Support
 
@@ -258,9 +319,12 @@ For issues or questions:
 
 ## Next Steps
 
-After deploying and testing these basic functions:
-1. Test all CRUD operations
-2. Verify pagination and filtering
-3. Check error handling
-4. Review function performance
-5. Move to FASE 7B for advanced functionality
+After deploying and testing these functions:
+1. Test all CRUD operations (FASE 7A)
+2. Test batch processes (FASE 7B)
+3. Verify pagination and filtering
+4. Check error handling
+5. Review function performance
+6. Set up automated testing
+7. Configure monitoring and alerts
+8. Plan for integration with frontend

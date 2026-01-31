@@ -141,11 +141,27 @@ See [supabase/README.md](supabase/README.md) for detailed instructions on applyi
   - 6 optimized database views for reporting
   - Automatic report generation endpoints
 
+### FASE 7B Features ✅
+- ✅ Automatic transfer generation (POST /traslados/generar-periodo)
+- ✅ Automatic invoice generation (POST /facturas/generar)
+- ✅ Driver settlement generation (POST /liquidaciones/generar)
+- ✅ Monthly budget summary (GET /presupuesto/resumen/:mes/:anio)
+- ✅ Analytical reports (GET /reportes/*)
+  - ✅ Annual billing report
+  - ✅ Pending collections report
+  - ✅ Patients by health insurance report
+  - ✅ Monthly profitability report
+  - ✅ Driver performance report
+- ✅ Batch processing and calculations
+- ✅ Business logic implementation
+- ✅ Shared utility functions
+
 ## API Documentation
 
 For the REST API documentation, see:
+- [FASE7A_API_DOCUMENTATION.md](FASE7A_API_DOCUMENTATION.md) - Complete CRUD API reference
+- [FASE7B_SUMMARY.md](FASE7B_SUMMARY.md) - Batch processes and reports API reference
 - [FASE7_COMPLETE_DOCUMENTATION.md](FASE7_COMPLETE_DOCUMENTATION.md) - Complete Phase 7 documentation (CRUD + Reports)
-- [FASE7A_API_DOCUMENTATION.md](FASE7A_API_DOCUMENTATION.md) - CRUD API reference
 - [supabase/functions/README.md](supabase/functions/README.md) - Deployment guide
 
 ## Project Status
