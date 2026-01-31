@@ -12,21 +12,20 @@ import { PacientesService } from '../../../core/services/pacientes.service';
 import { Paciente } from '../../../shared/models/entities.model';
 
 @Component({
-  selector: 'app-pacientes-list',
-  standalone: true,
-  imports: [
-    CommonModule,
-    RouterModule,
-    MatTableModule,
-    MatButtonModule,
-    MatIconModule,
-    MatInputModule,
-    MatFormFieldModule,
-    MatProgressSpinnerModule,
-    MatChipsModule
-  ],
-  templateUrl: './pacientes-list.component.html',
-  styleUrl: './pacientes-list.component.scss'
+    selector: 'app-pacientes-list',
+    imports: [
+        CommonModule,
+        RouterModule,
+        MatTableModule,
+        MatButtonModule,
+        MatIconModule,
+        MatInputModule,
+        MatFormFieldModule,
+        MatProgressSpinnerModule,
+        MatChipsModule
+    ],
+    templateUrl: './pacientes-list.component.html',
+    styleUrl: './pacientes-list.component.scss'
 })
 export class PacientesListComponent implements OnInit {
   pacientes = signal<Paciente[]>([]);

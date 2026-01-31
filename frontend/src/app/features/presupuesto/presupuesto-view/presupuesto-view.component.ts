@@ -4,11 +4,10 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
-  selector: 'app-presupuesto-view',
-  standalone: true,
-  imports: [CommonModule, MatCardModule, MatIconModule],
-  templateUrl: './presupuesto-view.component.html',
-  styleUrl: './presupuesto-view.component.scss'
+    selector: 'app-presupuesto-view',
+    imports: [CommonModule, MatCardModule, MatIconModule],
+    templateUrl: './presupuesto-view.component.html',
+    styleUrl: './presupuesto-view.component.scss'
 })
 export class PresupuestoViewComponent {
 

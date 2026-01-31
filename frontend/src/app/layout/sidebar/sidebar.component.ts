@@ -11,16 +11,15 @@ interface MenuItem {
 }
 
 @Component({
-  selector: 'app-sidebar',
-  standalone: true,
-  imports: [
-    CommonModule,
-    RouterModule,
-    MatListModule,
-    MatIconModule
-  ],
-  templateUrl: './sidebar.component.html',
-  styleUrl: './sidebar.component.scss'
+    selector: 'app-sidebar',
+    imports: [
+        CommonModule,
+        RouterModule,
+        MatListModule,
+        MatIconModule
+    ],
+    templateUrl: './sidebar.component.html',
+    styleUrl: './sidebar.component.scss'
 })
 export class SidebarComponent {
   menuItems: MenuItem[] = [

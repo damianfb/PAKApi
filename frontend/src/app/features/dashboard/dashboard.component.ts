@@ -7,16 +7,15 @@ import { ReportesService } from '../../core/services/reportes.service';
 import { DashboardKPI } from '../../shared/models/api.model';
 
 @Component({
-  selector: 'app-dashboard',
-  standalone: true,
-  imports: [
-    CommonModule,
-    MatCardModule,
-    MatIconModule,
-    MatProgressSpinnerModule
-  ],
-  templateUrl: './dashboard.component.html',
-  styleUrl: './dashboard.component.scss'
+    selector: 'app-dashboard',
+    imports: [
+        CommonModule,
+        MatCardModule,
+        MatIconModule,
+        MatProgressSpinnerModule
+    ],
+    templateUrl: './dashboard.component.html',
+    styleUrl: './dashboard.component.scss'
 })
 export class DashboardComponent implements OnInit {
   kpis = signal<DashboardKPI | null>(null);

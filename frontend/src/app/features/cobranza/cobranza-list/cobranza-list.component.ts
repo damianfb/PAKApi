@@ -4,11 +4,10 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
-  selector: 'app-cobranza-list',
-  standalone: true,
-  imports: [CommonModule, MatCardModule, MatIconModule],
-  templateUrl: './cobranza-list.component.html',
-  styleUrl: './cobranza-list.component.scss'
+    selector: 'app-cobranza-list',
+    imports: [CommonModule, MatCardModule, MatIconModule],
+    templateUrl: './cobranza-list.component.html',
+    styleUrl: './cobranza-list.component.scss'
 })
 export class CobranzaListComponent {
 
