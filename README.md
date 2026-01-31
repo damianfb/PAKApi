@@ -38,6 +38,11 @@ The database consists of sixteen main tables implemented across six phases:
 - **gastos_operativos**: Operational expenses (fuel, maintenance, tolls, insurance, etc.)
 - **liquidaciones_conductores**: Driver payment settlements and liquidations
 
+**FASE 7A (Completed):**
+- **Edge Functions**: TypeScript/Deno Edge Functions for REST API endpoints
+- **CRUD Operations**: Full CRUD for obras_sociales, pacientes, destinos, conductores, servicios_paciente
+- **API Documentation**: Comprehensive API reference with examples
+
 For detailed schema information, see [supabase/SCHEMA.md](supabase/SCHEMA.md)
 
 ## Database Setup
@@ -115,6 +120,23 @@ See [supabase/README.md](supabase/README.md) for detailed instructions on applyi
 - ✅ Automatic net payment calculation validation
 - ✅ Payment method and transaction tracking
 
+### FASE 7A Features ✅
+- ✅ Supabase Edge Functions (TypeScript/Deno)
+- ✅ REST API endpoints for all core entities
+- ✅ Full CRUD operations (POST, GET, PUT, DELETE)
+- ✅ Pagination and filtering support
+- ✅ Special endpoint: GET /pacientes/:id/servicios
+- ✅ CORS support for frontend integration
+- ✅ Comprehensive error handling
+- ✅ Complete API documentation
+- ✅ Deployment-ready functions
+
+## API Documentation
+
+For the REST API documentation, see:
+- [FASE7A_API_DOCUMENTATION.md](FASE7A_API_DOCUMENTATION.md) - Complete API reference
+- [supabase/functions/README.md](supabase/functions/README.md) - Deployment guide
+
 ## Project Status
 
 **FASE 1**: ✅ Completed - Database tables created with RLS, triggers, and initial seeds
@@ -123,3 +145,4 @@ See [supabase/README.md](supabase/README.md) for detailed instructions on applyi
 **FASE 4**: ✅ Completed - Collection and receipt tables created with RLS and triggers
 **FASE 5**: ✅ Completed - Transport schedules table created with RLS and triggers
 **FASE 6**: ✅ Completed - Operational expenses and driver settlements tables created with RLS and triggers
+**FASE 7A**: ✅ Completed - Edge Functions with CRUD operations for all core entities
