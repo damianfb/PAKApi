@@ -1,471 +1,291 @@
+// Edge Function: reportes
+// Purpose: Provides reporting endpoints for PAKApi
+// Endpoints:
+//   GET /reportes/facturacion-anual - Annual billing report
+//   GET /reportes/cobranzas-pendientes - Pending collections report
+//   GET /reportes/pacientes-obra-social - Patients by health insurance report
+//   GET /reportes/rentabilidad-mensual - Monthly profitability report
+//   GET /reportes/resumen-anual - Annual summary report
+//   GET /reportes/dashboard - General dashboard metrics
+
+import { corsHeaders } from '../_shared/cors.ts';
 import { createSupabaseClient } from '../_shared/supabase.ts';
 import { successResponse, errorResponse } from '../_shared/response.ts';
-import { corsHeaders } from '../_shared/cors.ts';
-import { redondear, validatePeriodo, getPeriodo } from '../_shared/utils.ts';
 
-/**
- * GET /reportes/*
- * Various report endpoints for analytics and business intelligence
- * 
- * Supported endpoints:
- * - GET /reportes/facturacion-anual/:anio - Annual billing report
- * - GET /reportes/cobranzas-pendientes - Pending collections report
- * - GET /reportes/pacientes-por-obra-social - Patients by health insurance
- * - GET /reportes/rentabilidad/:mes/:anio - Monthly profitability report
- * - GET /reportes/conductores-rendimiento/:mes/:anio - Driver performance report
- */
 Deno.serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
 
-  // Only allow GET
-  if (req.method !== 'GET') {
-    return errorResponse('Método no permitido', 405);
-  }
-
   try {
     const supabase = createSupabaseClient(req);
     const url = new URL(req.url);
-    const pathParts = url.pathname.split('/').filter(Boolean);
-    
-    // Extract report type
-    const reportIndex = pathParts.indexOf('reportes') + 1;
-    const reportType = pathParts[reportIndex];
+    const pathname = url.pathname;
 
-    if (!reportType) {
-      return errorResponse('Tipo de reporte no especificado', 400);
+    // Extract report type from path
+    // Expected format: /reportes/{report-type}
+    const pathParts = pathname.split('/').filter(p => p);
+    const reportType = pathParts[pathParts.length - 1];
+
+    // Only GET method is allowed for reports
+    if (req.method !== 'GET') {
+      return errorResponse('Method not allowed', 405);
     }
 
     // Route to appropriate report handler
     switch (reportType) {
       case 'facturacion-anual':
-        return await reporteFacturacionAnual(supabase, pathParts, reportIndex);
-      
+        return await getFacturacionAnual(supabase, url);
       case 'cobranzas-pendientes':
-        return await reporteCobranzasPendientes(supabase);
-      
-      case 'pacientes-por-obra-social':
-        return await reportePacientesPorObraSocial(supabase);
-      
-      case 'rentabilidad':
-        return await reporteRentabilidad(supabase, pathParts, reportIndex);
-      
-      case 'conductores-rendimiento':
-        return await reporteConductoresRendimiento(supabase, pathParts, reportIndex);
-      
+        return await getCobranzasPendientes(supabase, url);
+      case 'pacientes-obra-social':
+        return await getPacientesObraSocial(supabase, url);
+      case 'rentabilidad-mensual':
+        return await getRentabilidadMensual(supabase, url);
+      case 'resumen-anual':
+        return await getResumenAnual(supabase, url);
+      case 'dashboard':
+        return await getDashboard(supabase);
       default:
-        return errorResponse('Tipo de reporte no válido', 400);
+        return errorResponse(
+          'Invalid report type. Available: facturacion-anual, cobranzas-pendientes, pacientes-obra-social, rentabilidad-mensual, resumen-anual, dashboard',
+          400
+        );
     }
-
   } catch (error) {
-    console.error('Error generando reporte:', error);
-    return errorResponse('Error interno del servidor', 500, error.message);
+    console.error('Error in reportes function:', error);
+    return errorResponse('Internal server error', 500, error.message);
   }
 });
 
+// ============================================
+// Report Handlers
+// ============================================
+
 /**
- * Annual billing report by month
+ * Get annual billing report
+ * Query params: anio (year), obra_social_id (optional)
  */
-async function reporteFacturacionAnual(supabase: any, pathParts: string[], reportIndex: number) {
-  const anio = parseInt(pathParts[reportIndex + 1]);
-  
-  if (!anio || isNaN(anio) || anio < 2000 || anio > 2100) {
-    return errorResponse('Año no válido', 400);
-  }
+async function getFacturacionAnual(supabase: any, url: URL) {
+  const anio = url.searchParams.get('anio');
+  const obraSocialId = url.searchParams.get('obra_social_id');
 
-  // Get all periodos for the year
-  const { data: periodos, error: periodosError } = await supabase
-    .from('periodos_facturacion')
+  let query = supabase
+    .from('vista_facturacion_anual')
     .select('*')
-    .like('periodo', `${anio}-%`)
-    .order('periodo');
+    .order('anio', { ascending: false })
+    .order('monto_total', { ascending: false });
 
-  if (periodosError) {
-    return errorResponse('Error al obtener periodos', 500, periodosError);
+  // Apply filters
+  if (anio) {
+    query = query.eq('anio', parseInt(anio));
+  }
+  if (obraSocialId) {
+    query = query.eq('obra_social_id', obraSocialId);
   }
 
-  // Get facturas for each periodo
-  const resultados = [];
-  let totalAnual = 0;
-  let totalFacturas = 0;
+  const { data, error } = await query;
 
-  for (const periodo of periodos || []) {
-    const { data: facturas, error: facturasError } = await supabase
-      .from('facturas')
-      .select('id, numero_factura, monto_total, estado, fecha_emision')
-      .eq('periodo_id', periodo.id);
-
-    if (facturasError) {
-      console.error('Error getting facturas:', facturasError);
-      continue;
-    }
-
-    const montoMes = facturas?.reduce((sum, f) => sum + (f.monto_total || 0), 0) || 0;
-    totalAnual += montoMes;
-    totalFacturas += facturas?.length || 0;
-
-    resultados.push({
-      periodo: periodo.periodo,
-      mes: parseInt(periodo.periodo.split('-')[1]),
-      fecha_inicio: periodo.fecha_inicio,
-      fecha_fin: periodo.fecha_fin,
-      estado: periodo.estado,
-      cantidad_facturas: facturas?.length || 0,
-      monto_total: redondear(montoMes),
-      facturas_emitidas: facturas?.filter(f => f.estado === 'emitida').length || 0,
-      facturas_pagadas: facturas?.filter(f => f.estado === 'pagada').length || 0,
-    });
+  if (error) {
+    console.error('Error fetching facturacion anual:', error);
+    return errorResponse('Error fetching annual billing report', 500, error.message);
   }
 
   return successResponse({
-    anio: anio,
-    resumen: {
-      total_anual: redondear(totalAnual),
-      total_facturas: totalFacturas,
-      promedio_mensual: resultados.length > 0 ? redondear(totalAnual / resultados.length) : 0,
-      meses_con_datos: resultados.length,
-    },
-    por_mes: resultados,
+    reporte: 'facturacion_anual',
+    filtros: { anio, obra_social_id: obraSocialId },
+    total_registros: data.length,
+    datos: data
   });
 }
 
 /**
- * Pending collections report
+ * Get pending collections report
+ * Query params: obra_social_id (optional), categoria_vencimiento (optional)
  */
-async function reporteCobranzasPendientes(supabase: any) {
-  // Get all cobranzas with estado pendiente or parcial
-  const { data: cobranzas, error: cobranzasError } = await supabase
-    .from('cobranzas')
-    .select(`
-      *,
-      obra_social:obras_sociales(id, nombre, codigo),
-      periodo:periodos_facturacion(periodo, fecha_inicio, fecha_fin)
-    `)
-    .in('estado', ['pendiente', 'parcial'])
-    .order('fecha_vencimiento', { ascending: true });
+async function getCobranzasPendientes(supabase: any, url: URL) {
+  const obraSocialId = url.searchParams.get('obra_social_id');
+  const categoriaVencimiento = url.searchParams.get('categoria_vencimiento');
 
-  if (cobranzasError) {
-    return errorResponse('Error al obtener cobranzas', 500, cobranzasError);
+  let query = supabase
+    .from('vista_cobranzas_pendientes')
+    .select('*')
+    .order('dias_vencido', { ascending: false });
+
+  // Apply filters
+  if (obraSocialId) {
+    query = query.eq('obra_social_id', obraSocialId);
+  }
+  if (categoriaVencimiento) {
+    query = query.eq('categoria_vencimiento', categoriaVencimiento);
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    console.error('Error fetching cobranzas pendientes:', error);
+    return errorResponse('Error fetching pending collections report', 500, error.message);
+  }
+
+  // Calculate summary statistics
+  const totalPendiente = data.reduce((sum: number, item: any) => sum + parseFloat(item.monto_pendiente || 0), 0);
+  const totalRegistros = data.length;
+
+  return successResponse({
+    reporte: 'cobranzas_pendientes',
+    filtros: { obra_social_id: obraSocialId, categoria_vencimiento: categoriaVencimiento },
+    resumen: {
+      total_registros: totalRegistros,
+      monto_total_pendiente: totalPendiente
+    },
+    datos: data
+  });
+}
+
+/**
+ * Get patients by health insurance report
+ * Query params: obra_social_id (optional)
+ */
+async function getPacientesObraSocial(supabase: any, url: URL) {
+  const obraSocialId = url.searchParams.get('obra_social_id');
+
+  let query = supabase
+    .from('vista_pacientes_obra_social')
+    .select('*')
+    .order('total_pacientes', { ascending: false });
+
+  // Apply filters
+  if (obraSocialId) {
+    query = query.eq('obra_social_id', obraSocialId);
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    console.error('Error fetching pacientes obra social:', error);
+    return errorResponse('Error fetching patients by health insurance report', 500, error.message);
+  }
+
+  // Calculate summary statistics
+  const totalPacientes = data.reduce((sum: number, item: any) => sum + parseInt(item.total_pacientes || 0), 0);
+  const totalServicios = data.reduce((sum: number, item: any) => sum + parseInt(item.total_servicios || 0), 0);
+
+  return successResponse({
+    reporte: 'pacientes_obra_social',
+    filtros: { obra_social_id: obraSocialId },
+    resumen: {
+      total_obras_sociales: data.length,
+      total_pacientes: totalPacientes,
+      total_servicios: totalServicios
+    },
+    datos: data
+  });
+}
+
+/**
+ * Get monthly profitability report
+ * Query params: anio (year), mes (month), periodo (YYYY-MM)
+ */
+async function getRentabilidadMensual(supabase: any, url: URL) {
+  const anio = url.searchParams.get('anio');
+  const mes = url.searchParams.get('mes');
+  const periodo = url.searchParams.get('periodo');
+
+  let query = supabase
+    .from('vista_rentabilidad_mensual')
+    .select('*')
+    .order('anio', { ascending: false })
+    .order('mes', { ascending: false });
+
+  // Apply filters
+  if (periodo) {
+    query = query.eq('periodo', periodo);
+  } else {
+    if (anio) {
+      query = query.eq('anio', parseInt(anio));
+    }
+    if (mes) {
+      query = query.eq('mes', parseInt(mes));
+    }
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    console.error('Error fetching rentabilidad mensual:', error);
+    return errorResponse('Error fetching monthly profitability report', 500, error.message);
   }
 
   // Calculate totals
-  const totalPendiente = cobranzas?.reduce((sum, c) => sum + (c.monto_pendiente || 0), 0) || 0;
-  const totalVencidas = cobranzas?.filter(c => {
-    return c.fecha_vencimiento && new Date(c.fecha_vencimiento) < new Date();
-  }).length || 0;
-
-  // Group by obra_social
-  const porObraSocial = {};
-  cobranzas?.forEach(c => {
-    const osId = c.obra_social_id;
-    if (!porObraSocial[osId]) {
-      porObraSocial[osId] = {
-        obra_social: c.obra_social,
-        cantidad: 0,
-        monto_pendiente: 0,
-        cobranzas: [],
-      };
-    }
-    porObraSocial[osId].cantidad++;
-    porObraSocial[osId].monto_pendiente += c.monto_pendiente || 0;
-    porObraSocial[osId].cobranzas.push({
-      id: c.id,
-      numero_cobranza: c.numero_cobranza,
-      fecha_cobranza: c.fecha_cobranza,
-      fecha_vencimiento: c.fecha_vencimiento,
-      monto_pendiente: c.monto_pendiente,
-      estado: c.estado,
-      periodo: c.periodo?.periodo,
-    });
-  });
+  const totalFacturacion = data.reduce((sum: number, item: any) => sum + parseFloat(item.facturacion_total || 0), 0);
+  const totalEgresos = data.reduce((sum: number, item: any) => sum + parseFloat(item.egresos_totales || 0), 0);
+  const totalUtilidadNeta = data.reduce((sum: number, item: any) => sum + parseFloat(item.utilidad_neta || 0), 0);
 
   return successResponse({
+    reporte: 'rentabilidad_mensual',
+    filtros: { anio, mes, periodo },
     resumen: {
-      total_cobranzas: cobranzas?.length || 0,
-      total_pendiente: redondear(totalPendiente),
-      total_vencidas: totalVencidas,
+      total_periodos: data.length,
+      facturacion_total: totalFacturacion,
+      egresos_totales: totalEgresos,
+      utilidad_neta_total: totalUtilidadNeta,
+      margen_promedio: totalFacturacion > 0 ? ((totalUtilidadNeta / totalFacturacion) * 100).toFixed(2) : 0
     },
-    por_obra_social: Object.values(porObraSocial).map((item: any) => ({
-      ...item,
-      monto_pendiente: redondear(item.monto_pendiente),
-    })),
+    datos: data
   });
 }
 
 /**
- * Patients by health insurance report
+ * Get annual summary report
+ * Query params: anio (year, optional)
  */
-async function reportePacientesPorObraSocial(supabase: any) {
-  // Get all active pacientes with their obra_social
-  const { data: pacientes, error: pacientesError } = await supabase
-    .from('pacientes')
-    .select(`
-      id,
-      nombre,
-      apellido,
-      dni,
-      activo,
-      obra_social:obras_sociales(id, nombre, codigo)
-    `)
-    .eq('activo', true)
-    .order('obra_social_id');
+async function getResumenAnual(supabase: any, url: URL) {
+  const anio = url.searchParams.get('anio');
 
-  if (pacientesError) {
-    return errorResponse('Error al obtener pacientes', 500, pacientesError);
-  }
-
-  // Group by obra_social
-  const porObraSocial = {};
-  let sinObraSocial = 0;
-
-  pacientes?.forEach(p => {
-    if (!p.obra_social) {
-      sinObraSocial++;
-      return;
-    }
-
-    const osId = p.obra_social.id;
-    if (!porObraSocial[osId]) {
-      porObraSocial[osId] = {
-        obra_social: p.obra_social,
-        cantidad_pacientes: 0,
-        pacientes: [],
-      };
-    }
-    porObraSocial[osId].cantidad_pacientes++;
-    porObraSocial[osId].pacientes.push({
-      id: p.id,
-      nombre: p.nombre,
-      apellido: p.apellido,
-      dni: p.dni,
-    });
-  });
-
-  // Sort by cantidad_pacientes
-  const resultado = Object.values(porObraSocial).sort((a: any, b: any) => 
-    b.cantidad_pacientes - a.cantidad_pacientes
-  );
-
-  return successResponse({
-    resumen: {
-      total_pacientes: pacientes?.length || 0,
-      total_obras_sociales: resultado.length,
-      pacientes_sin_obra_social: sinObraSocial,
-    },
-    por_obra_social: resultado,
-  });
-}
-
-/**
- * Monthly profitability report
- */
-async function reporteRentabilidad(supabase: any, pathParts: string[], reportIndex: number) {
-  const mes = parseInt(pathParts[reportIndex + 1]);
-  const anio = parseInt(pathParts[reportIndex + 2]);
-
-  if (!mes || !anio || !validatePeriodo(mes, anio)) {
-    return errorResponse('Mes y año no válidos', 400);
-  }
-
-  const periodo = getPeriodo(mes, anio);
-
-  // Get periodo_facturacion
-  const { data: periodoData, error: periodoError } = await supabase
-    .from('periodos_facturacion')
+  let query = supabase
+    .from('vista_resumen_anual')
     .select('*')
-    .eq('periodo', periodo)
+    .order('anio', { ascending: false });
+
+  // Apply filters
+  if (anio) {
+    query = query.eq('anio', parseInt(anio));
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    console.error('Error fetching resumen anual:', error);
+    return errorResponse('Error fetching annual summary report', 500, error.message);
+  }
+
+  return successResponse({
+    reporte: 'resumen_anual',
+    filtros: { anio },
+    total_anios: data.length,
+    datos: data
+  });
+}
+
+/**
+ * Get general dashboard metrics
+ * No query params required
+ */
+async function getDashboard(supabase: any) {
+  const { data, error } = await supabase
+    .from('vista_dashboard_general')
+    .select('*')
     .single();
 
-  if (periodoError) {
-    return errorResponse('Periodo no encontrado', 404, periodoError);
+  if (error) {
+    console.error('Error fetching dashboard:', error);
+    return errorResponse('Error fetching dashboard metrics', 500, error.message);
   }
-
-  // Get facturas
-  const { data: facturas } = await supabase
-    .from('facturas')
-    .select('monto_total')
-    .eq('periodo_id', periodoData.id);
-
-  const ingresos = facturas?.reduce((sum, f) => sum + (f.monto_total || 0), 0) || 0;
-
-  // Get gastos
-  const { data: gastos } = await supabase
-    .from('gastos_operativos')
-    .select('monto, tipo_gasto')
-    .eq('periodo_id', periodoData.id);
-
-  const egresosGastos = gastos?.reduce((sum, g) => sum + (g.monto || 0), 0) || 0;
-
-  // Get liquidaciones
-  const { data: liquidaciones } = await supabase
-    .from('liquidaciones_conductores')
-    .select('monto_neto')
-    .eq('periodo_id', periodoData.id);
-
-  const egresosLiquidaciones = liquidaciones?.reduce((sum, l) => sum + (l.monto_neto || 0), 0) || 0;
-
-  const totalEgresos = egresosGastos + egresosLiquidaciones;
-  const utilidad = ingresos - totalEgresos;
-  const margen = ingresos > 0 ? (utilidad / ingresos) * 100 : 0;
-
-  // Get traslados stats
-  const { data: traslados } = await supabase
-    .from('traslados_mensuales')
-    .select('cantidad_traslados')
-    .eq('periodo_id', periodoData.id);
-
-  const totalTraslados = traslados?.reduce((sum, t) => sum + (t.cantidad_traslados || 0), 0) || 0;
 
   return successResponse({
-    periodo: {
-      periodo: periodo,
-      mes: mes,
-      anio: anio,
-    },
-    ingresos: {
-      total: redondear(ingresos),
-      por_traslado: totalTraslados > 0 ? redondear(ingresos / totalTraslados) : 0,
-    },
-    egresos: {
-      total: redondear(totalEgresos),
-      gastos_operativos: redondear(egresosGastos),
-      liquidaciones: redondear(egresosLiquidaciones),
-      por_traslado: totalTraslados > 0 ? redondear(totalEgresos / totalTraslados) : 0,
-    },
-    rentabilidad: {
-      utilidad: redondear(utilidad),
-      margen_porcentaje: redondear(margen),
-      utilidad_por_traslado: totalTraslados > 0 ? redondear(utilidad / totalTraslados) : 0,
-    },
-    estadisticas: {
-      total_traslados: totalTraslados,
-      total_facturas: facturas?.length || 0,
-      total_gastos: gastos?.length || 0,
-      total_liquidaciones: liquidaciones?.length || 0,
-    },
-  });
-}
-
-/**
- * Driver performance report
- */
-async function reporteConductoresRendimiento(supabase: any, pathParts: string[], reportIndex: number) {
-  const mes = parseInt(pathParts[reportIndex + 1]);
-  const anio = parseInt(pathParts[reportIndex + 2]);
-
-  if (!mes || !anio || !validatePeriodo(mes, anio)) {
-    return errorResponse('Mes y año no válidos', 400);
-  }
-
-  const periodo = getPeriodo(mes, anio);
-
-  // Get periodo_facturacion
-  const { data: periodoData, error: periodoError } = await supabase
-    .from('periodos_facturacion')
-    .select('*')
-    .eq('periodo', periodo)
-    .single();
-
-  if (periodoError) {
-    return errorResponse('Periodo no encontrado', 404, periodoError);
-  }
-
-  // Get all conductores
-  const { data: conductores, error: conductoresError } = await supabase
-    .from('conductores')
-    .select('*')
-    .eq('activo', true)
-    .order('apellido');
-
-  if (conductoresError) {
-    return errorResponse('Error al obtener conductores', 500, conductoresError);
-  }
-
-  const rendimientos = [];
-  const { inicio, fin } = {
-    inicio: periodoData.fecha_inicio,
-    fin: periodoData.fecha_fin,
-  };
-
-  for (const conductor of conductores || []) {
-    // Count traslados
-    const { data: traslados } = await supabase
-      .from('horarios_traslados')
-      .select('id, distancia_km, estado')
-      .eq('conductor_id', conductor.id)
-      .gte('fecha', inicio)
-      .lte('fecha', fin);
-
-    const totalTraslados = traslados?.length || 0;
-    const trasladosCompletados = traslados?.filter(t => t.estado === 'completado').length || 0;
-    const trasladosCancelados = traslados?.filter(t => t.estado === 'cancelado').length || 0;
-    const distanciaTotal = traslados?.reduce((sum, t) => sum + (t.distancia_km || 0), 0) || 0;
-
-    // Get liquidacion
-    const { data: liquidacion } = await supabase
-      .from('liquidaciones_conductores')
-      .select('monto_neto, cantidad_traslados')
-      .eq('conductor_id', conductor.id)
-      .eq('periodo_id', periodoData.id)
-      .single();
-
-    // Get gastos
-    const { data: gastos } = await supabase
-      .from('gastos_operativos')
-      .select('monto')
-      .eq('conductor_id', conductor.id)
-      .eq('periodo_id', periodoData.id);
-
-    const totalGastos = gastos?.reduce((sum, g) => sum + (g.monto || 0), 0) || 0;
-
-    rendimientos.push({
-      conductor: {
-        id: conductor.id,
-        nombre: conductor.nombre,
-        apellido: conductor.apellido,
-        dni: conductor.dni,
-      },
-      traslados: {
-        total: totalTraslados,
-        completados: trasladosCompletados,
-        cancelados: trasladosCancelados,
-        tasa_completados: totalTraslados > 0 
-          ? redondear((trasladosCompletados / totalTraslados) * 100) 
-          : 0,
-      },
-      distancia: {
-        total_km: redondear(distanciaTotal),
-        promedio_km: trasladosCompletados > 0 
-          ? redondear(distanciaTotal / trasladosCompletados) 
-          : 0,
-      },
-      financiero: {
-        liquidacion: redondear(liquidacion?.monto_neto || 0),
-        gastos: redondear(totalGastos),
-        ingreso_por_traslado: trasladosCompletados > 0 
-          ? redondear((liquidacion?.monto_neto || 0) / trasladosCompletados) 
-          : 0,
-      },
-    });
-  }
-
-  // Sort by total traslados
-  rendimientos.sort((a, b) => b.traslados.total - a.traslados.total);
-
-  return successResponse({
-    periodo: {
-      periodo: periodo,
-      mes: mes,
-      anio: anio,
-    },
-    resumen: {
-      total_conductores: rendimientos.length,
-      total_traslados: rendimientos.reduce((sum, r) => sum + r.traslados.total, 0),
-      total_completados: rendimientos.reduce((sum, r) => sum + r.traslados.completados, 0),
-      distancia_total: redondear(rendimientos.reduce((sum, r) => sum + r.distancia.total_km, 0)),
-    },
-    por_conductor: rendimientos,
+    reporte: 'dashboard_general',
+    datos: data,
+    fecha_actualizacion: data.fecha_actualizacion
   });
 }
