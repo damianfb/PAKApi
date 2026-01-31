@@ -141,19 +141,69 @@ See [supabase/README.md](supabase/README.md) for detailed instructions on applyi
   - 6 optimized database views for reporting
   - Automatic report generation endpoints
 
+### FASE 8 Features ✅
+- ✅ **Complete Edge Function Coverage:**
+  - 12 total Edge Functions (5 Phase 7A + 6 Phase 8 + 1 Reports)
+  - traslados-mensuales, facturas, liquidaciones-conductores
+  - recibos, horarios-traslados, gastos-operativos
+  - 61 total API endpoints (55 CRUD + 6 reporting)
+- ✅ **End-to-End Testing:**
+  - Comprehensive E2E test suite with 50+ test cases
+  - Complete billing workflow tests
+  - Driver liquidation workflow tests
+  - All CRUD operations tested
+  - All reporting endpoints validated
+  - Test utilities and helpers for easy extension
+- ✅ **Security & Documentation:**
+  - Comprehensive security hardening guide
+  - Row Level Security (RLS) policy documentation
+  - Enhanced RBAC recommendations
+  - Production deployment guide
+  - Backup and restore procedures
+  - Rollback procedures
+  - Monitoring and alerting setup guide
+
 ## API Documentation
 
 For the REST API documentation, see:
 - [FASE7_COMPLETE_DOCUMENTATION.md](FASE7_COMPLETE_DOCUMENTATION.md) - Complete Phase 7 documentation (CRUD + Reports)
 - [FASE7A_API_DOCUMENTATION.md](FASE7A_API_DOCUMENTATION.md) - CRUD API reference
-- [supabase/functions/README.md](supabase/functions/README.md) - Deployment guide
+- [FASE8_COMPLETION_REPORT.md](FASE8_COMPLETION_REPORT.md) - Phase 8 implementation report
+- [FASE8_SECURITY_GUIDE.md](FASE8_SECURITY_GUIDE.md) - Security hardening and RLS policies
+- [FASE8_DEPLOYMENT_GUIDE.md](FASE8_DEPLOYMENT_GUIDE.md) - Production deployment procedures
+- [supabase/functions/README.md](supabase/functions/README.md) - Edge Functions deployment guide
+- [tests/README.md](tests/README.md) - E2E test suite documentation
+
+## Testing
+
+The project includes a comprehensive end-to-end test suite:
+
+```bash
+# Set environment variables
+export SUPABASE_URL="https://your-project.supabase.co"
+export SUPABASE_SERVICE_KEY="your-service-key"
+
+# Run all tests
+deno test --allow-net --allow-env --allow-read tests/
+
+# Run specific test file
+deno test --allow-net --allow-env --allow-read tests/01_crud_operations_test.ts
+```
+
+Test coverage includes:
+- ✅ All CRUD operations for 11 entities
+- ✅ Complete billing workflow (10+ steps)
+- ✅ Driver liquidation workflow (9+ steps)
+- ✅ All 6 reporting endpoints
+- ✅ 50+ test cases total
 
 ## Project Status
 
-**FASE 1**: ✅ Completed - Database tables created with RLS, triggers, and initial seeds
-**FASE 2**: ✅ Completed - Billing and transport tracking tables created with RLS and triggers
-**FASE 3**: ✅ Completed - Invoice and credit note tables created with RLS and triggers
-**FASE 4**: ✅ Completed - Collection and receipt tables created with RLS and triggers
-**FASE 5**: ✅ Completed - Transport schedules table created with RLS and triggers
-**FASE 6**: ✅ Completed - Operational expenses and driver settlements tables created with RLS and triggers
-**FASE 7**: ✅ Completed - Edge Functions with CRUD operations (7A) and reporting/dashboards (7B)
+**FASE 1**: ✅ Completed - Database tables created with RLS, triggers, and initial seeds  
+**FASE 2**: ✅ Completed - Billing and transport tracking tables created with RLS and triggers  
+**FASE 3**: ✅ Completed - Invoice and credit note tables created with RLS and triggers  
+**FASE 4**: ✅ Completed - Collection and receipt tables created with RLS and triggers  
+**FASE 5**: ✅ Completed - Transport schedules table created with RLS and triggers  
+**FASE 6**: ✅ Completed - Operational expenses and driver settlements tables created with RLS and triggers  
+**FASE 7**: ✅ Completed - Edge Functions with CRUD operations (7A) and reporting/dashboards (7B)  
+**FASE 8**: ✅ Completed - E2E tests, complete Edge Function coverage, security hardening, deployment documentation
