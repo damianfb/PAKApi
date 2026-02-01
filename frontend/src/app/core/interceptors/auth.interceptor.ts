@@ -2,6 +2,7 @@ import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { AuthService } from '../auth/auth.service';
 import { catchError, from, switchMap, throwError } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
@@ -17,6 +18,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         const cloned = req.clone({
           setHeaders: {
             Authorization: `Bearer ${token}`,
+            apikey: environment.supabaseKey,
             'Content-Type': 'application/json'
           }
         });
