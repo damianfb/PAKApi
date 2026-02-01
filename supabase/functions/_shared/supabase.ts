@@ -6,7 +6,7 @@ export function createSupabaseClient(req: Request) {
   // Get the apikey header from the request
   const apikeyHeader = req.headers.get('apikey');
   
-  // Use the apikey from the request if provided, otherwise use the service role key
+  // Use the apikey from the request if provided, otherwise use the anon key from environment
   const supabaseKey = apikeyHeader ?? Deno.env.get('SUPABASE_ANON_KEY') ?? '';
   
   return createClient(
