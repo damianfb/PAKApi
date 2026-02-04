@@ -1,0 +1,165 @@
+<h2 mat-dialog-title>
+  <mat-icon>receipt_long</mat-icon>
+  Factura {{ data.factura.numero_factura }}
+</h2>
+
+<mat-dialog-content>
+  <!-- Información del Encabezado -->
+  <div class="factura-header">
+    <div class="header-info">
+      <div class="info-row">
+        <div class="info-item">
+          <span class="label">Número de Factura:</span>
+          <span class="value">{{ data.factura.numero_factura }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Estado:</span>
+          <mat-chip [color]="getEstadoColor(data.factura.estado)" selected>
+            {{ getEstadoLabel(data.factura.estado) }}
+          </mat-chip>
+        </div>
+      </div>
+      
+      <div class="info-row">
+        <div class="info-item">
+          <span class="label">Fecha de Emisión:</span>
+          <span class="value">{{ data.factura.fecha_emision | date:'dd/MM/yyyy' }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Fecha de Vencimiento:</span>
+          <span class="value">{{ data.factura.fecha_vencimiento ? (data.factura.fecha_vencimiento | date:'dd/MM/yyyy') : 'N/A' }}</span>
+        </div>
+      </div>
+
+      <div class="info-row">
+        <div class="info-item">
+          <span class="label">Obra Social:</span>
+          <span class="value">{{ data.factura.obra_social?.nombre || 'Sin asignar' }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Período:</span>
+          <span class="value">{{ formatPeriodo(data.factura.periodo) }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <!-- Tabla de Detalles -->
+  <div class="detalles-section">
+    <h3>
+      <mat-icon>list</mat-icon>
+      Detalles de la Factura
+    </h3>
+
+    @if (loading()) {
+      <div class="loading-container">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p>Cargando detalles...</p>
+      </div>
+    } @else if (detalles().length === 0) {
+      <div class="empty-state">
+        <mat-icon>inbox</mat-icon>
+        <p>No hay detalles registrados para esta factura</p>
+      </div>
+    } @else {
+      <table mat-table [dataSource]="detalles()" class="detalles-table">
+        <ng-container matColumnDef="descripcion">
+          <th mat-header-cell *matHeaderCellDef>Descripción</th>
+          <td mat-cell *matCellDef="let detalle">{{ detalle.descripcion }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="paciente">
+          <th mat-header-cell *matHeaderCellDef>Paciente</th>
+          <td mat-cell *matCellDef="let detalle">
+            {{ detalle.paciente ? detalle.paciente.apellido + ', ' + detalle.paciente.nombre : '-' }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="cantidad">
+          <th mat-header-cell *matHeaderCellDef class="text-center">Cantidad</th>
+          <td mat-cell *matCellDef="let detalle" class="text-center">{{ detalle.cantidad }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="precio_unitario">
+          <th mat-header-cell *matHeaderCellDef class="text-right">Precio Unit.</th>
+          <td mat-cell *matCellDef="let detalle" class="text-right">
+            {{ detalle.precio_unitario | currency:'ARS':'symbol-narrow':'1.2-2' }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="subtotal">
+          <th mat-header-cell *matHeaderCellDef class="text-right">Subtotal</th>
+          <td mat-cell *matCellDef="let detalle" class="text-right">
+            {{ detalle.subtotal | currency:'ARS':'symbol-narrow':'1.2-2' }}
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    }
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <!-- Totales -->
+  <div class="totales-section">
+    <div class="totales-grid">
+      <div class="total-row">
+        <span class="total-label">Subtotal:</span>
+        <span class="total-value">{{ data.factura.subtotal | currency:'ARS':'symbol-narrow':'1.2-2' }}</span>
+      </div>
+      <div class="total-row">
+        <span class="total-label">Impuestos (IVA):</span>
+        <span class="total-value">{{ data.factura.impuestos | currency:'ARS':'symbol-narrow':'1.2-2' }}</span>
+      </div>
+      <div class="total-row total-final">
+        <span class="total-label">TOTAL:</span>
+        <span class="total-value">{{ data.factura.monto_total | currency:'ARS':'symbol-narrow':'1.2-2' }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Observaciones -->
+  @if (data.factura.observaciones) {
+    <mat-divider></mat-divider>
+    <div class="observaciones-section">
+      <h3>
+        <mat-icon>notes</mat-icon>
+        Observaciones
+      </h3>
+      <p class="observaciones-text">{{ data.factura.observaciones }}</p>
+    </div>
+  }
+
+  <!-- Información adicional -->
+  @if (data.factura.fecha_pago) {
+    <mat-divider></mat-divider>
+    <div class="pago-section">
+      <h3>
+        <mat-icon>payments</mat-icon>
+        Información de Pago
+      </h3>
+      <div class="info-item">
+        <span class="label">Fecha de Pago:</span>
+        <span class="value">{{ data.factura.fecha_pago | date:'dd/MM/yyyy HH:mm' }}</span>
+      </div>
+    </div>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onPrint()">
+    <mat-icon>print</mat-icon>
+    Imprimir
+  </button>
+  @if (data.factura.estado === 'borrador') {
+    <button mat-button color="primary" (click)="onEdit()">
+      <mat-icon>edit</mat-icon>
+      Editar
+    </button>
+  }
+  <button mat-raised-button (click)="onClose()">Cerrar</button>
+</mat-dialog-actions>

@@ -121,30 +121,39 @@ export interface TrasladoMensual {
 export interface Factura {
   id: string;
   numero_factura: string;
-  obra_social_id: string;
-  periodo_facturacion_id: string;
   fecha_emision: string;
-  fecha_vencimiento: string;
+  fecha_vencimiento?: string;
+  periodo_id: string;
+  obra_social_id?: string;
   subtotal: number;
-  descuentos: number;
-  recargos: number;
-  total: number;
-  estado: 'borrador' | 'emitida' | 'enviada' | 'cobrada' | 'anulada';
+  impuestos: number;
+  monto_total: number;
+  estado: 'borrador' | 'emitida' | 'enviada' | 'cobrada' | 'pagada' | 'anulada';
+  fecha_pago?: string;
   observaciones?: string;
   created_at: string;
   updated_at: string;
+  // Relaciones expandidas
+  periodo?: PeriodoFacturacion;
+  obra_social?: ObraSocial;
+  detalles?: FacturaDetalle[];
 }
 
 export interface FacturaDetalle {
   id: string;
   factura_id: string;
-  traslado_mensual_id: string;
+  traslado_mensual_id?: string;
+  paciente_id?: string;
   descripcion: string;
   cantidad: number;
   precio_unitario: number;
   subtotal: number;
+  observaciones?: string;
   created_at: string;
   updated_at: string;
+  // Relaciones expandidas
+  paciente?: Paciente;
+  traslado_mensual?: TrasladoMensual;
 }
 
 export interface Cobranza {

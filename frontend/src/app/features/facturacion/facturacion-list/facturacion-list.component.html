@@ -7,8 +7,8 @@
     </div>
     <div class="stat-value">{{ totalFacturado | currency:'ARS':'symbol-narrow':'1.0-0' }}</div>
     <div class="stat-change positive">
-      <i class="fas fa-arrow-up"></i>
-      <span>+12% vs mes anterior</span>
+      <i class="fas fa-chart-line"></i>
+      <span>Período actual</span>
     </div>
   </div>
 
@@ -19,19 +19,19 @@
     </div>
     <div class="stat-value">{{ facturasEmitidas }}</div>
     <div class="stat-change">
-      <span>Este mes</span>
+      <span>Confirmadas</span>
     </div>
   </div>
 
   <div class="stat-card">
     <div class="stat-card-header">
-      <span class="stat-label">Pendientes AFIP</span>
+      <span class="stat-label">Pendientes</span>
       <span class="stat-icon"><i class="fas fa-clock" style="color: var(--warning);"></i></span>
     </div>
-    <div class="stat-value">{{ pendientesAfip }}</div>
+    <div class="stat-value">{{ facturasPendientes }}</div>
     <div class="stat-change negative">
       <i class="fas fa-exclamation-triangle"></i>
-      <span>Requieren CAE</span>
+      <span>En borrador</span>
     </div>
   </div>
 
@@ -42,16 +42,8 @@
     </div>
     <div class="stat-value">{{ promedioFactura | currency:'ARS':'symbol-narrow':'1.0-0' }}</div>
     <div class="stat-change">
-      <span>Enero 2025</span>
+      <span>{{ getPeriodoLabel(selectedPeriodo) }}</span>
     </div>
-  </div>
-</div>
-
-<!-- Alertas -->
-<div class="alert alert-info">
-  <i class="fas fa-info-circle"></i>
-  <div>
-    <strong>Información:</strong> Las facturas con estado "Pendiente AFIP" requieren obtener el CAE (Código de Autorización Electrónico).
   </div>
 </div>
 
@@ -59,33 +51,35 @@
 <div class="filters">
   <div class="filter-group">
     <label class="filter-label">Período</label>
-    <select class="form-select" [(ngModel)]="selectedPeriodo">
-      @for (periodo of periodos; track periodo) {
-        <option [value]="periodo">{{ periodo }}</option>
+    <select class="form-select" [(ngModel)]="selectedPeriodo" (ngModelChange)="onFilterChange()">
+      <option value="">Todos</option>
+      @for (periodo of periodos(); track periodo.id) {
+        <option [value]="periodo.id">{{ formatPeriodo(periodo) }}</option>
       }
     </select>
   </div>
   <div class="filter-group">
     <label class="filter-label">Obra Social</label>
-    <select class="form-select" [(ngModel)]="selectedObraSocial">
+    <select class="form-select" [(ngModel)]="selectedObraSocial" (ngModelChange)="onFilterChange()">
       <option value="todos">Todas</option>
-      @for (os of obrasSociales; track os) {
-        <option [value]="os.toLowerCase()">{{ os }}</option>
+      @for (os of obrasSociales(); track os.id) {
+        <option [value]="os.id">{{ os.nombre }}</option>
       }
     </select>
   </div>
   <div class="filter-group">
     <label class="filter-label">Estado</label>
-    <select class="form-select" [(ngModel)]="selectedEstado">
+    <select class="form-select" [(ngModel)]="selectedEstado" (ngModelChange)="onFilterChange()">
       <option value="todos">Todos</option>
+      <option value="borrador">Borrador</option>
       <option value="emitida">Emitida</option>
-      <option value="pendiente">Pendiente AFIP</option>
+      <option value="pagada">Pagada</option>
       <option value="anulada">Anulada</option>
     </select>
   </div>
   <div class="filter-group">
     <label class="filter-label">Buscar</label>
-    <input type="text" class="form-input" placeholder="N° Factura o CUIT..." [(ngModel)]="searchTerm">
+    <input type="text" class="form-input" placeholder="N° Factura o Obra Social..." [(ngModel)]="searchTerm">
   </div>
 </div>
 
@@ -93,8 +87,8 @@
 <div class="card">
   <div class="card-header d-flex justify-between align-center">
     <div>
-      <h2 class="card-title">Facturas Emitidas</h2>
-      <p class="card-subtitle">Listado completo de facturación</p>
+      <h2 class="card-title">Facturas</h2>
+      <p class="card-subtitle">{{ filteredFacturas.length }} factura(s) encontrada(s)</p>
     </div>
     <div class="header-actions">
       <button class="btn btn-secondary" (click)="exportData()">
@@ -108,57 +102,297 @@
     </div>
   </div>
   
-  <div class="table-container">
-    <table>
-      <thead>
-        <tr>
-          <th>Factura N°</th>
-          <th>Fecha</th>
-          <th>Obra Social</th>
-          <th>CUIT</th>
-          <th>Cant. Pacientes</th>
-          <th class="text-right">Monto</th>
-          <th>CAE</th>
-          <th>Estado</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (factura of filteredFacturas; track factura.id) {
+  @if (loading()) {
+    <div class="loading-container">
+      <i class="fas fa-spinner fa-spin fa-2x"></i>
+      <p>Cargando facturas...</p>
+    </div>
+  } @else {
+    <div class="table-container">
+      <table>
+        <thead>
           <tr>
-            <td><strong>{{ factura.numero }}</strong></td>
-            <td>{{ factura.fecha | date:'dd/MM/yyyy' }}</td>
-            <td>{{ factura.obraSocial }}</td>
-            <td>{{ factura.cuit }}</td>
-            <td>{{ factura.cantidad }}</td>
-            <td class="text-right">{{ factura.monto | currency:'ARS':'symbol-narrow':'1.0-0' }}</td>
-            <td>{{ factura.cae || '-' }}</td>
-            <td>
-              <span [class]="getEstadoBadgeClass(factura.estado)">
-                {{ getEstadoLabel(factura.estado) }}
-              </span>
-            </td>
-            <td>
-              <div class="action-buttons">
-                <button class="btn btn-sm btn-secondary btn-icon" (click)="viewFactura(factura)" title="Ver detalle">
-                  <i class="fas fa-eye"></i>
-                </button>
-                <button class="btn btn-sm btn-secondary btn-icon" (click)="downloadPdf(factura)" title="Descargar PDF">
-                  <i class="fas fa-file-pdf"></i>
-                </button>
-              </div>
-            </td>
+            <th>Factura N°</th>
+            <th>Fecha Emisión</th>
+            <th>Vencimiento</th>
+            <th>Obra Social</th>
+            <th class="text-right">Subtotal</th>
+            <th class="text-right">Impuestos</th>
+            <th class="text-right">Total</th>
+            <th>Estado</th>
+            <th>Acciones</th>
           </tr>
-        } @empty {
-          <tr>
-            <td colspan="9" class="text-center" style="padding: var(--spacing-xl);">
-              <i class="fas fa-file-invoice" style="font-size: 3rem; color: var(--text-light); margin-bottom: var(--spacing-md);"></i>
-              <p class="text-muted">No se encontraron facturas</p>
-            </td>
-          </tr>
-        }
-      </tbody>
-    </table>
-  </div>
+        </thead>
+        <tbody>
+          @for (factura of filteredFacturas; track factura.id) {
+            <tr>
+              <td><strong>{{ factura.numero_factura }}</strong></td>
+              <td>{{ factura.fecha_emision | date:'dd/MM/yyyy' }}</td>
+              <td>{{ factura.fecha_vencimiento ? (factura.fecha_vencimiento | date:'dd/MM/yyyy') : '-' }}</td>
+              <td>{{ factura.obraSocialNombre }}</td>
+              <td class="text-right">{{ factura.subtotal | currency:'ARS':'symbol-narrow':'1.0-0' }}</td>
+              <td class="text-right">{{ factura.impuestos | currency:'ARS':'symbol-narrow':'1.0-0' }}</td>
+              <td class="text-right"><strong>{{ factura.monto_total | currency:'ARS':'symbol-narrow':'1.0-0' }}</strong></td>
+              <td>
+                <span [class]="getEstadoBadgeClass(factura.estado)">
+                  {{ getEstadoLabel(factura.estado) }}
+                </span>
+              </td>
+              <td>
+                <div class="action-buttons">
+                  <button class="btn btn-sm btn-secondary btn-icon" (click)="viewFactura(factura)" title="Ver detalle">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                  @if (factura.estado === 'borrador') {
+                    <button class="btn btn-sm btn-secondary btn-icon" (click)="editFactura(factura)" title="Editar">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-sm btn-success btn-icon" (click)="emitirFactura(factura)" title="Emitir">
+                      <i class="fas fa-check"></i>
+                    </button>
+                  }
+                  @if (factura.estado === 'emitida') {
+                    <button class="btn btn-sm btn-info btn-icon" (click)="marcarComoPagada(factura)" title="Marcar pagada">
+                      <i class="fas fa-dollar-sign"></i>
+                    </button>
+                  }
+                  <button class="btn btn-sm btn-secondary btn-icon" (click)="downloadPdf(factura)" title="Descargar PDF">
+                    <i class="fas fa-file-pdf"></i>
+                  </button>
+                  @if (factura.estado !== 'anulada' && factura.estado !== 'pagada') {
+                    <button class="btn btn-sm btn-danger btn-icon" (click)="anularFactura(factura)" title="Anular">
+                      <i class="fas fa-ban"></i>
+                    </button>
+                  }
+                </div>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="9" class="text-center" style="padding: var(--spacing-xl);">
+                <i class="fas fa-file-invoice" style="font-size: 3rem; color: var(--text-light); margin-bottom: var(--spacing-md);"></i>
+                <p class="text-muted">No se encontraron facturas</p>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Paginación -->
+    @if (totalPages > 1) {
+      <div class="pagination">
+        <button class="btn btn-sm btn-secondary" [disabled]="currentPage === 1" (click)="previousPage()">
+          <i class="fas fa-chevron-left"></i> Anterior
+        </button>
+        <span class="pagination-info">Página {{ currentPage }} de {{ totalPages }}</span>
+        <button class="btn btn-sm btn-secondary" [disabled]="currentPage === totalPages" (click)="nextPage()">
+          Siguiente <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+    }
+  }
 </div>
+
+<!-- Modal de Crear/Editar Factura -->
+@if (showModal) {
+  <div class="modal-overlay" (click)="closeModal()">
+    <div class="modal modal-lg" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>
+          @if (modalMode === 'create') {
+            <i class="fas fa-plus-circle"></i> Nueva Factura
+          } @else {
+            <i class="fas fa-edit"></i> Editar Factura
+          }
+        </h2>
+        <button class="btn-close" (click)="closeModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form class="factura-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Número de Factura *</label>
+              <input type="text" class="form-input" placeholder="0004-00001762" 
+                     [value]="selectedFactura?.numero_factura || ''"
+                     #numeroFactura>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Período *</label>
+              <select class="form-select" #periodoSelect [value]="selectedFactura?.periodo_id || selectedPeriodo">
+                @for (periodo of periodos(); track periodo.id) {
+                  <option [value]="periodo.id">{{ formatPeriodo(periodo) }}</option>
+                }
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Fecha Emisión *</label>
+              <input type="date" class="form-input" 
+                     [value]="selectedFactura?.fecha_emision || ''"
+                     #fechaEmision>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Fecha Vencimiento</label>
+              <input type="date" class="form-input" 
+                     [value]="selectedFactura?.fecha_vencimiento || ''"
+                     #fechaVencimiento>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Obra Social</label>
+              <select class="form-select" #obraSocialSelect [value]="selectedFactura?.obra_social_id || ''">
+                <option value="">Seleccionar...</option>
+                @for (os of obrasSociales(); track os.id) {
+                  <option [value]="os.id">{{ os.nombre }}</option>
+                }
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Estado</label>
+              <select class="form-select" #estadoSelect [value]="selectedFactura?.estado || 'borrador'">
+                <option value="borrador">Borrador</option>
+                <option value="emitida">Emitida</option>
+                <option value="pagada">Pagada</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Subtotal</label>
+              <input type="number" class="form-input" placeholder="0.00" step="0.01"
+                     [value]="selectedFactura?.subtotal || 0"
+                     #subtotalInput>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Impuestos (IVA)</label>
+              <input type="number" class="form-input" placeholder="0.00" step="0.01"
+                     [value]="selectedFactura?.impuestos || 0"
+                     #impuestosInput>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Monto Total</label>
+              <input type="number" class="form-input" placeholder="0.00" step="0.01"
+                     [value]="selectedFactura?.monto_total || 0"
+                     #montoTotalInput>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Observaciones</label>
+            <textarea class="form-input" rows="3" placeholder="Observaciones adicionales..."
+                      #observacionesInput>{{ selectedFactura?.observaciones || '' }}</textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeModal()">Cancelar</button>
+        <button class="btn btn-primary" (click)="saveFromModal(numeroFactura.value, periodoSelect.value, fechaEmision.value, fechaVencimiento.value, obraSocialSelect.value, estadoSelect.value, subtotalInput.value, impuestosInput.value, montoTotalInput.value, observacionesInput.value)">
+          <i class="fas fa-save"></i>
+          {{ modalMode === 'create' ? 'Crear Factura' : 'Guardar Cambios' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Modal de Detalle de Factura -->
+@if (showDetalleModal && selectedFactura) {
+  <div class="modal-overlay" (click)="closeDetalleModal()">
+    <div class="modal modal-xl" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>
+          <i class="fas fa-file-invoice"></i> Factura {{ selectedFactura.numero_factura }}
+        </h2>
+        <button class="btn-close" (click)="closeDetalleModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="factura-detalle">
+          <!-- Encabezado de la factura -->
+          <div class="factura-header-info">
+            <div class="info-section">
+              <h3><i class="fas fa-info-circle"></i> Información General</h3>
+              <div class="info-grid">
+                <div class="info-item">
+                  <span class="info-label">Número:</span>
+                  <span class="info-value">{{ selectedFactura.numero_factura }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Fecha Emisión:</span>
+                  <span class="info-value">{{ selectedFactura.fecha_emision | date:'dd/MM/yyyy' }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Fecha Vencimiento:</span>
+                  <span class="info-value">{{ selectedFactura.fecha_vencimiento ? (selectedFactura.fecha_vencimiento | date:'dd/MM/yyyy') : 'N/A' }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Estado:</span>
+                  <span [class]="getEstadoBadgeClass(selectedFactura.estado)">{{ getEstadoLabel(selectedFactura.estado) }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="info-section">
+              <h3><i class="fas fa-building"></i> Obra Social</h3>
+              <div class="info-grid">
+                <div class="info-item">
+                  <span class="info-label">Nombre:</span>
+                  <span class="info-value">{{ selectedFactura.obraSocialNombre || 'Sin asignar' }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Período:</span>
+                  <span class="info-value">{{ selectedFactura.periodoNombre }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Totales -->
+          <div class="factura-totales">
+            <div class="total-item">
+              <span class="total-label">Subtotal:</span>
+              <span class="total-value">{{ selectedFactura.subtotal | currency:'ARS':'symbol-narrow':'1.2-2' }}</span>
+            </div>
+            <div class="total-item">
+              <span class="total-label">Impuestos:</span>
+              <span class="total-value">{{ selectedFactura.impuestos | currency:'ARS':'symbol-narrow':'1.2-2' }}</span>
+            </div>
+            <div class="total-item total-final">
+              <span class="total-label">TOTAL:</span>
+              <span class="total-value">{{ selectedFactura.monto_total | currency:'ARS':'symbol-narrow':'1.2-2' }}</span>
+            </div>
+          </div>
+
+          <!-- Observaciones -->
+          @if (selectedFactura.observaciones) {
+            <div class="info-section">
+              <h3><i class="fas fa-sticky-note"></i> Observaciones</h3>
+              <p class="observaciones-text">{{ selectedFactura.observaciones }}</p>
+            </div>
+          }
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="downloadPdf(selectedFactura)">
+          <i class="fas fa-file-pdf"></i> Descargar PDF
+        </button>
+        @if (selectedFactura.estado === 'borrador') {
+          <button class="btn btn-primary" (click)="editFactura(selectedFactura); closeDetalleModal()">
+            <i class="fas fa-edit"></i> Editar
+          </button>
+        }
+        <button class="btn btn-secondary" (click)="closeDetalleModal()">Cerrar</button>
+      </div>
+    </div>
+  </div>
+}
 

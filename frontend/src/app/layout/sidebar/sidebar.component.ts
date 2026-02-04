@@ -24,6 +24,7 @@ export class SidebarComponent {
     { label: 'Pacientes', icon: 'fas fa-user-injured', route: '/pacientes' },
     { label: 'Horarios', icon: 'fas fa-calendar-alt', route: '/horarios' },
     { label: 'Facturación', icon: 'fas fa-file-invoice-dollar', route: '/facturacion' },
+    { label: 'Períodos', icon: 'fas fa-calendar-check', route: '/periodos' },
     { label: 'Cobranza', icon: 'fas fa-money-bill-wave', route: '/cobranza' },
     { label: 'Presupuesto', icon: 'fas fa-chart-line', route: '/presupuesto' },
     { label: 'Reportes', icon: 'fas fa-chart-bar', route: '/reportes' }
