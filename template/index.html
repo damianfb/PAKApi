@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - PAK TRASLADOS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <span>🚐</span>
+        <span>PAK TRASLADOS</span>
+      </div>
+      <nav>
+        <ul class="sidebar-nav">
+          <li>
+            <a href="index.html" class="active">
+              <span class="nav-icon"><i class="fas fa-home"></i></span>
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li>
+            <a href="pages/cartera.html">
+              <span class="nav-icon"><i class="fas fa-users"></i></span>
+              <span>Cartera de Pacientes</span>
+            </a>
+          </li>
+          <li>
+            <a href="pages/pacientes.html">
+              <span class="nav-icon"><i class="fas fa-user-injured"></i></span>
+              <span>Pacientes</span>
+            </a>
+          </li>
+          <li>
+            <a href="pages/horarios.html">
+              <span class="nav-icon"><i class="fas fa-calendar-alt"></i></span>
+              <span>Horarios</span>
+            </a>
+          </li>
+          <li>
+            <a href="pages/facturacion.html">
+              <span class="nav-icon"><i class="fas fa-file-invoice-dollar"></i></span>
+              <span>Facturación</span>
+            </a>
+          </li>
+          <li>
+            <a href="pages/cobranza.html">
+              <span class="nav-icon"><i class="fas fa-money-bill-wave"></i></span>
+              <span>Cobranza</span>
+            </a>
+          </li>
+          <li>
+            <a href="pages/presupuesto.html">
+              <span class="nav-icon"><i class="fas fa-chart-line"></i></span>
+              <span>Presupuesto</span>
+            </a>
+          </li>
+          <li>
+            <a href="pages/reportes.html">
+              <span class="nav-icon"><i class="fas fa-chart-bar"></i></span>
+              <span>Reportes</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Header -->
+      <header class="header">
+        <div>
+          <h1>Dashboard</h1>
+          <p class="text-muted">Resumen general del sistema</p>
+        </div>
+        <div class="header-actions">
+          <span class="text-muted">Enero 2025</span>
+          <button class="btn btn-primary">
+            <i class="fas fa-plus"></i>
+            Nuevo Paciente
+          </button>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <div class="content">
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <span class="stat-label">Pacientes Activos</span>
+              <span class="stat-icon"><i class="fas fa-users" style="color: var(--primary);"></i></span>
+            </div>
+            <div class="stat-value">42</div>
+            <div class="stat-change positive">
+              <i class="fas fa-arrow-up"></i>
+              <span>+3 este mes</span>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <span class="stat-label">Facturación Mensual</span>
+              <span class="stat-icon"><i class="fas fa-dollar-sign" style="color: var(--secondary);"></i></span>
+            </div>
+            <div class="stat-value">$1.845.320</div>
+            <div class="stat-change positive">
+              <i class="fas fa-arrow-up"></i>
+              <span>+12% vs mes anterior</span>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <span class="stat-label">Cobranzas Pendientes</span>
+              <span class="stat-icon"><i class="fas fa-clock" style="color: var(--warning);"></i></span>
+            </div>
+            <div class="stat-value">$523.480</div>
+            <div class="stat-change negative">
+              <i class="fas fa-exclamation-triangle"></i>
+              <span>8 facturas pendientes</span>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <span class="stat-label">Km Recorridos</span>
+              <span class="stat-icon"><i class="fas fa-route" style="color: var(--info);"></i></span>
+            </div>
+            <div class="stat-value">2.847</div>
+            <div class="stat-change positive">
+              <i class="fas fa-arrow-up"></i>
+              <span>+180 km este mes</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Alertas -->
+        <div class="alert alert-warning">
+          <i class="fas fa-exclamation-triangle"></i>
+          <div>
+            <strong>Atención:</strong> Hay 3 facturas próximas a vencer en los próximos 7 días.
+          </div>
+        </div>
+
+        <!-- Grid de contenido -->
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: var(--spacing-xl); margin-top: var(--spacing-xl);">
+          
+          <!-- Distribución por Obra Social -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Distribución por Obra Social</h2>
+              <p class="card-subtitle">Pacientes activos por cobertura</p>
+            </div>
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Obra Social</th>
+                    <th>Pacientes</th>
+                    <th>% Total</th>
+                    <th>Facturación</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>OSECAC</strong></td>
+                    <td>15</td>
+                    <td><span class="badge badge-info">36%</span></td>
+                    <td>$668.450</td>
+                  </tr>
+                  <tr>
+                    <td><strong>OSMATA</strong></td>
+                    <td>10</td>
+                    <td><span class="badge badge-info">24%</span></td>
+                    <td>$445.230</td>
+                  </tr>
+                  <tr>
+                    <td><strong>OSPSA</strong></td>
+                    <td>7</td>
+                    <td><span class="badge badge-info">17%</span></td>
+                    <td>$311.890</td>
+                  </tr>
+                  <tr>
+                    <td><strong>PASTELEROS</strong></td>
+                    <td>4</td>
+                    <td><span class="badge badge-info">10%</span></td>
+                    <td>$178.120</td>
+                  </tr>
+                  <tr>
+                    <td><strong>SWISS MEDICAL</strong></td>
+                    <td>3</td>
+                    <td><span class="badge badge-info">7%</span></td>
+                    <td>$133.590</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Otros</strong></td>
+                    <td>3</td>
+                    <td><span class="badge badge-secondary">7%</span></td>
+                    <td>$108.040</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Accesos Rápidos -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Accesos Rápidos</h2>
+              <p class="card-subtitle">Acciones frecuentes</p>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: var(--spacing-md);">
+              <a href="pages/cartera.html" class="btn btn-primary" style="width: 100%; justify-content: center;">
+                <i class="fas fa-user-plus"></i>
+                Agregar Paciente
+              </a>
+              <a href="pages/facturacion.html" class="btn btn-secondary" style="width: 100%; justify-content: center;">
+                <i class="fas fa-file-invoice"></i>
+                Nueva Factura
+              </a>
+              <a href="pages/horarios.html" class="btn btn-secondary" style="width: 100%; justify-content: center;">
+                <i class="fas fa-calendar-check"></i>
+                Ver Horarios
+              </a>
+              <a href="pages/reportes.html" class="btn btn-secondary" style="width: 100%; justify-content: center;">
+                <i class="fas fa-download"></i>
+                Exportar Reporte
+              </a>
+            </div>
+
+            <hr style="margin: var(--spacing-lg) 0; border: none; border-top: 1px solid var(--border);">
+
+            <div class="card-header">
+              <h3 class="card-title" style="font-size: var(--font-size-base);">Actividad Reciente</h3>
+            </div>
+            <ul class="summary-list">
+              <li class="summary-item" style="flex-direction: column; align-items: flex-start; padding: var(--spacing-sm) 0;">
+                <div style="font-size: var(--font-size-sm); font-weight: 600;">Factura 0004-00001761</div>
+                <div style="font-size: var(--font-size-xs); color: var(--text-secondary);">OSECAC - $322.843 - Hace 2 horas</div>
+              </li>
+              <li class="summary-item" style="flex-direction: column; align-items: flex-start; padding: var(--spacing-sm) 0;">
+                <div style="font-size: var(--font-size-sm); font-weight: 600;">Pago recibido</div>
+                <div style="font-size: var(--font-size-xs); color: var(--text-secondary);">OSMATA - $156.220 - Hace 5 horas</div>
+              </li>
+              <li class="summary-item" style="flex-direction: column; align-items: flex-start; padding: var(--spacing-sm) 0;">
+                <div style="font-size: var(--font-size-sm); font-weight: 600;">Nuevo paciente</div>
+                <div style="font-size: var(--font-size-xs); color: var(--text-secondary);">CONSALVO ANTONINI - Ayer</div>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Top Pacientes por Liquidación -->
+        <div class="card" style="margin-top: var(--spacing-xl);">
+          <div class="card-header">
+            <h2 class="card-title">Top 10 Pacientes por Liquidación Mensual</h2>
+            <p class="card-subtitle">Pacientes con mayor facturación del mes</p>
+          </div>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Paciente</th>
+                  <th>Obra Social</th>
+                  <th>Km/día</th>
+                  <th>Días</th>
+                  <th>Dependencia</th>
+                  <th class="text-right">Monto Mensual</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td><strong>ALANIS TOMAS SEBASTIAN</strong></td>
+                  <td>OSMATA</td>
+                  <td>28</td>
+                  <td>20</td>
+                  <td><span class="badge badge-warning">C/DEPEN</span></td>
+                  <td class="text-right"><strong>$467.163</strong></td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td><strong>CONSALVO ANTONINI ABEL</strong></td>
+                  <td>OSECAC</td>
+                  <td>25</td>
+                  <td>20</td>
+                  <td><span class="badge badge-warning">C/DEPEN</span></td>
+                  <td class="text-right"><strong>$416.895</strong></td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td><strong>RODRIGUEZ MARIA SOL</strong></td>
+                  <td>OSPSA</td>
+                  <td>22</td>
+                  <td>20</td>
+                  <td><span class="badge badge-info">S/DEPEN</span></td>
+                  <td class="text-right"><strong>$271.753</strong></td>
+                </tr>
+                <tr>
+                  <td>4</td>
+                  <td><strong>MARTINEZ JUAN PABLO</strong></td>
+                  <td>OSECAC</td>
+                  <td>20</td>
+                  <td>20</td>
+                  <td><span class="badge badge-warning">C/DEPEN</span></td>
+                  <td class="text-right"><strong>$333.516</strong></td>
+                </tr>
+                <tr>
+                  <td>5</td>
+                  <td><strong>FERNANDEZ LUCAS GABRIEL</strong></td>
+                  <td>OSMATA</td>
+                  <td>18</td>
+                  <td>20</td>
+                  <td><span class="badge badge-info">S/DEPEN</span></td>
+                  <td class="text-right"><strong>$222.344</strong></td>
+                </tr>
+                <tr>
+                  <td>6</td>
+                  <td><strong>GOMEZ ANA LAURA</strong></td>
+                  <td>SWISS MEDICAL</td>
+                  <td>15</td>
+                  <td>20</td>
+                  <td><span class="badge badge-warning">C/DEPEN</span></td>
+                  <td class="text-right"><strong>$250.137</strong></td>
+                </tr>
+                <tr>
+                  <td>7</td>
+                  <td><strong>LOPEZ DIEGO MARTIN</strong></td>
+                  <td>PASTELEROS</td>
+                  <td>14</td>
+                  <td>20</td>
+                  <td><span class="badge badge-info">S/DEPEN</span></td>
+                  <td class="text-right"><strong>$172.933</strong></td>
+                </tr>
+                <tr>
+                  <td>8</td>
+                  <td><strong>SANCHEZ CARLA BEATRIZ</strong></td>
+                  <td>OSECAC</td>
+                  <td>12</td>
+                  <td>18</td>
+                  <td><span class="badge badge-warning">C/DEPEN</span></td>
+                  <td class="text-right"><strong>$180.097</strong></td>
+                </tr>
+                <tr>
+                  <td>9</td>
+                  <td><strong>DIAZ MATIAS EZEQUIEL</strong></td>
+                  <td>OSMATA</td>
+                  <td>11</td>
+                  <td>20</td>
+                  <td><span class="badge badge-info">S/DEPEN</span></td>
+                  <td class="text-right"><strong>$135.876</strong></td>
+                </tr>
+                <tr>
+                  <td>10</td>
+                  <td><strong>TORRES SOFIA VALENTINA</strong></td>
+                  <td>OSPSA</td>
+                  <td>10</td>
+                  <td>20</td>
+                  <td><span class="badge badge-warning">C/DEPEN</span></td>
+                  <td class="text-right"><strong>$166.758</strong></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>

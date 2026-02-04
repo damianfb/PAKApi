@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión de Pacientes - PAK TRASLADOS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../css/styles.css">
+  <style>
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      overflow-y: auto;
+    }
+    
+    .modal-overlay.active {
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+    
+    .modal {
+      background: white;
+      border-radius: 8px;
+      max-width: 900px;
+      width: 100%;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      margin: auto;
+    }
+    
+    .modal-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .modal-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin: 0;
+    }
+    
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--text-secondary);
+      padding: 0;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+    }
+    
+    .modal-close:hover {
+      background: var(--background);
+      color: var(--text-primary);
+    }
+    
+    .modal-body {
+      padding: 1.5rem;
+      max-height: calc(90vh - 160px);
+      overflow-y: auto;
+    }
+    
+    .modal-footer {
+      padding: 1.5rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+    }
+    
+    .form-section {
+      margin-bottom: 2rem;
+    }
+    
+    .form-section-title {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--primary);
+      color: var(--text-primary);
+    }
+    
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+    
+    .form-grid-full {
+      grid-column: 1 / -1;
+    }
+    
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .form-label {
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      color: var(--text-primary);
+    }
+    
+    .form-label.required::after {
+      content: " *";
+      color: var(--danger);
+    }
+    
+    .service-item {
+      background: var(--background);
+      padding: 1rem;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      margin-bottom: 1rem;
+    }
+    
+    .service-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    
+    .service-title {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    
+    .btn-icon {
+      padding: 0.5rem;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .action-buttons {
+      display: flex;
+      gap: 0.5rem;
+    }
+    
+    .billing-section {
+      background: var(--background);
+      padding: 1rem;
+      border-radius: 6px;
+      border-left: 3px solid var(--secondary);
+    }
+    
+    .billing-summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    
+    .billing-item {
+      padding: 0.75rem;
+      background: white;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+    }
+    
+    .billing-label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.25rem;
+    }
+    
+    .billing-value {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    
+    @media (max-width: 768px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .modal {
+        margin: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <span>🚐</span>
+        <span>PAK TRASLADOS</span>
+      </div>
+      <nav>
+        <ul class="sidebar-nav">
+          <li>
+            <a href="../index.html">
+              <span class="nav-icon"><i class="fas fa-home"></i></span>
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li>
+            <a href="cartera.html">
+              <span class="nav-icon"><i class="fas fa-users"></i></span>
+              <span>Cartera de Pacientes</span>
+            </a>
+          </li>
+          <li>
+            <a href="pacientes.html" class="active">
+              <span class="nav-icon"><i class="fas fa-user-injured"></i></span>
+              <span>Pacientes</span>
+            </a>
+          </li>
+          <li>
+            <a href="horarios.html">
+              <span class="nav-icon"><i class="fas fa-calendar-alt"></i></span>
+              <span>Horarios</span>
+            </a>
+          </li>
+          <li>
+            <a href="facturacion.html">
+              <span class="nav-icon"><i class="fas fa-file-invoice-dollar"></i></span>
+              <span>Facturación</span>
+            </a>
+          </li>
+          <li>
+            <a href="cobranza.html">
+              <span class="nav-icon"><i class="fas fa-money-bill-wave"></i></span>
+              <span>Cobranza</span>
+            </a>
+          </li>
+          <li>
+            <a href="presupuesto.html">
+              <span class="nav-icon"><i class="fas fa-chart-line"></i></span>
+              <span>Presupuesto</span>
+            </a>
+          </li>
+          <li>
+            <a href="reportes.html">
+              <span class="nav-icon"><i class="fas fa-chart-bar"></i></span>
+              <span>Reportes</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Header -->
+      <header class="header">
+        <div>
+          <h1>Gestión de Pacientes</h1>
+          <p class="text-muted">Alta, modificación y visualización de pacientes con detalle de facturación</p>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-secondary">
+            <i class="fas fa-download"></i>
+            Exportar
+          </button>
+          <button class="btn btn-primary" id="btn-nuevo-paciente">
+            <i class="fas fa-plus"></i>
+            Nuevo Paciente
+          </button>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <div class="content">
+        <!-- Filtros -->
+        <div class="filters">
+          <div class="filter-group">
+            <label class="filter-label">Buscar</label>
+            <input type="text" class="form-input" placeholder="Nombre, DNI o N°..." data-table-search="pacientes-table">
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">Obra Social</label>
+            <select class="form-select" id="filter-obra-social" data-table-filter="pacientes-table" data-filter-column="3">
+              <option value="todos">Todas</option>
+              <option value="osecac">OSECAC</option>
+              <option value="osmata">OSMATA</option>
+              <option value="ospsa">OSPSA</option>
+              <option value="osccptac">OSCCPTAC</option>
+              <option value="pasteleros">PASTELEROS</option>
+              <option value="apm">APM</option>
+              <option value="camioneros">CAMIONEROS</option>
+              <option value="swiss">SWISS MEDICAL</option>
+              <option value="otros">Otros</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">Dependencia</label>
+            <select class="form-select" id="filter-dependencia" data-table-filter="pacientes-table" data-filter-column="6">
+              <option value="todos">Todas</option>
+              <option value="c/depen">Con Dependencia</option>
+              <option value="s/depen">Sin Dependencia</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">Estado</label>
+            <select class="form-select" id="filter-estado" data-table-filter="pacientes-table" data-filter-column="8">
+              <option value="activo">Activo</option>
+              <option value="inactivo">Inactivo</option>
+              <option value="todos">Todos</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid" style="margin-bottom: var(--spacing-xl);">
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <span class="stat-label">Total Pacientes</span>
+              <span class="stat-icon"><i class="fas fa-user-injured" style="color: var(--primary);"></i></span>
+            </div>
+            <div class="stat-value">3</div>
+            <div class="stat-change positive">
+              <span>Activos</span>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <span class="stat-label">Con Dependencia</span>
+              <span class="stat-icon"><i class="fas fa-wheelchair" style="color: var(--warning);"></i></span>
+            </div>
+            <div class="stat-value">2</div>
+            <div class="stat-change">
+              <span>66.7%</span>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <span class="stat-label">Sin Dependencia</span>
+              <span class="stat-icon"><i class="fas fa-walking" style="color: var(--info);"></i></span>
+            </div>
+            <div class="stat-value">1</div>
+            <div class="stat-change">
+              <span>33.3%</span>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <span class="stat-label">Servicios Totales</span>
+              <span class="stat-icon"><i class="fas fa-route" style="color: var(--secondary);"></i></span>
+            </div>
+            <div class="stat-value">5</div>
+            <div class="stat-change positive">
+              <span>Promedio: 1.7/paciente</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabla de Pacientes -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Lista de Pacientes</h2>
+            <p class="card-subtitle">3 pacientes registrados</p>
+          </div>
+          
+          <div class="table-container">
+            <table id="pacientes-table">
+              <thead>
+                <tr>
+                  <th>N°</th>
+                  <th>Apellido y Nombre</th>
+                  <th>DNI</th>
+                  <th>Obra Social</th>
+                  <th>Teléfono</th>
+                  <th>Responsable</th>
+                  <th>Dependencia</th>
+                  <th>Servicios</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>2501</td>
+                  <td><strong>ALANIS TOMAS SEBASTIAN</strong></td>
+                  <td>55.284.684</td>
+                  <td>OSMATA</td>
+                  <td>(351) 555-1234</td>
+                  <td>María Alanis (Madre)</td>
+                  <td><span class="badge badge-warning">C/DEPEN</span></td>
+                  <td>2</td>
+                  <td><span class="badge badge-success">Activo</span></td>
+                  <td>
+                    <div class="action-buttons">
+                      <button class="btn btn-icon" title="Ver Detalle" aria-label="Ver detalle del paciente" onclick="verDetallePaciente(2501)">
+                        <i class="fas fa-eye"></i>
+                      </button>
+                      <button class="btn btn-icon" title="Editar" aria-label="Editar paciente" onclick="editarPaciente(2501)">
+                        <i class="fas fa-edit"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>2507</td>
+                  <td><strong>LOPEZ ALCAZAR JAZMIN</strong></td>
+                  <td>51.348.296</td>
+                  <td>OSCCPTAC</td>
+                  <td>(351) 555-5678</td>
+                  <td>Carmen Alcazar (Madre)</td>
+                  <td><span class="badge badge-info">S/DEPEN</span></td>
+                  <td>1</td>
+                  <td><span class="badge badge-success">Activo</span></td>
+                  <td>
+                    <div class="action-buttons">
+                      <button class="btn btn-icon" title="Ver Detalle" aria-label="Ver detalle del paciente" onclick="verDetallePaciente(2507)">
+                        <i class="fas fa-eye"></i>
+                      </button>
+                      <button class="btn btn-icon" title="Editar" aria-label="Editar paciente" onclick="editarPaciente(2507)">
+                        <i class="fas fa-edit"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>2567</td>
+                  <td><strong>CONSALVO ANTONINI ABEL</strong></td>
+                  <td>47.352.009</td>
+                  <td>OSECAC</td>
+                  <td>(351) 555-9012</td>
+                  <td>Laura Antonini (Madre)</td>
+                  <td><span class="badge badge-warning">C/DEPEN</span></td>
+                  <td>2</td>
+                  <td><span class="badge badge-success">Activo</span></td>
+                  <td>
+                    <div class="action-buttons">
+                      <button class="btn btn-icon" title="Ver Detalle" aria-label="Ver detalle del paciente" onclick="verDetallePaciente(2567)">
+                        <i class="fas fa-eye"></i>
+                      </button>
+                      <button class="btn btn-icon" title="Editar" aria-label="Editar paciente" onclick="editarPaciente(2567)">
+                        <i class="fas fa-edit"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal Nuevo/Editar Paciente -->
+  <div class="modal-overlay" id="modal-paciente" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title" id="modal-title">Nuevo Paciente</h2>
+        <button class="modal-close" onclick="cerrarModal()" aria-label="Cerrar modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="form-paciente">
+          <!-- Datos Personales -->
+          <div class="form-section">
+            <h3 class="form-section-title">Datos Personales</h3>
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label required">Número de Paciente</label>
+                <input type="text" class="form-input" id="numero-paciente" placeholder="Ej: 2501" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label required">DNI</label>
+                <input type="text" class="form-input" id="dni" placeholder="Ej: 55.284.684" required>
+              </div>
+              <div class="form-group form-grid-full">
+                <label class="form-label required">Apellido y Nombre</label>
+                <input type="text" class="form-input" id="apellido-nombre" placeholder="Ej: ALANIS TOMAS SEBASTIAN" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label required">Teléfono</label>
+                <input type="tel" class="form-input" id="telefono" placeholder="(351) 555-1234" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label required">Nombre del Responsable</label>
+                <input type="text" class="form-input" id="responsable" placeholder="Ej: María (Madre)" required>
+              </div>
+              <div class="form-group form-grid-full">
+                <label class="form-label required">Domicilio Particular</label>
+                <input type="text" class="form-input" id="domicilio" placeholder="Av. Colón 1234, Córdoba" required>
+              </div>
+            </div>
+          </div>
+
+          <!-- Obra Social -->
+          <div class="form-section">
+            <h3 class="form-section-title">Obra Social</h3>
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label required">Obra Social</label>
+                <select class="form-select" id="obra-social" required>
+                  <option value="">Seleccionar...</option>
+                  <option value="OSECAC">OSECAC</option>
+                  <option value="OSMATA">OSMATA</option>
+                  <option value="OSPSA">OSPSA</option>
+                  <option value="OSCCPTAC">OSCCPTAC</option>
+                  <option value="PASTELEROS">PASTELEROS</option>
+                  <option value="APM">APM</option>
+                  <option value="CAMIONEROS">CAMIONEROS</option>
+                  <option value="PARQUE SALUD">PARQUE SALUD</option>
+                  <option value="SWISS MEDICAL">SWISS MEDICAL</option>
+                  <option value="LUZ Y FZA">LUZ Y FZA</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label required">Número de Afiliado</label>
+                <input type="text" class="form-input" id="numero-afiliado" placeholder="Ej: 123456789" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label required">Condición de Dependencia</label>
+                <select class="form-select" id="dependencia" required>
+                  <option value="">Seleccionar...</option>
+                  <option value="C/DEPEN">Con Dependencia (C/DEPEN) - $833.79/km</option>
+                  <option value="S/DEPEN">Sin Dependencia (S/DEPEN) - $617.62/km</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Estado</label>
+                <select class="form-select" id="estado">
+                  <option value="activo">Activo</option>
+                  <option value="inactivo">Inactivo</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Servicios -->
+          <div class="form-section">
+            <h3 class="form-section-title">Servicios de Traslado</h3>
+            <div id="servicios-container">
+              <!-- Servicio 1 -->
+              <div class="service-item" data-service="1">
+                <div class="service-header">
+                  <span class="service-title">Servicio 1: Escuela/CET</span>
+                  <button type="button" class="btn btn-secondary btn-icon" onclick="eliminarServicio(1)" title="Eliminar servicio">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+                <div class="form-grid">
+                  <div class="form-group form-grid-full">
+                    <label class="form-label">Dirección Destino (Escuela)</label>
+                    <input type="text" class="form-input" name="direccion-1" placeholder="Ej: Escuela Especial, Av. Colón 5678">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Km Diario</label>
+                    <input type="number" class="form-input servicio-km" name="km-diario-1" placeholder="Ej: 28" step="0.1">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Días de Asistencia</label>
+                    <input type="text" class="form-input" name="dias-1" placeholder="Ej: L a V, o días específicos">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Número de AD (Autorización)</label>
+                    <input type="text" class="form-input" name="ad-1" placeholder="Ej: AD-2024-001">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Cantidad de Viajes Mensuales</label>
+                    <input type="number" class="form-input servicio-viajes" name="viajes-1" placeholder="Ej: 20" value="20">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <button type="button" class="btn btn-secondary" onclick="agregarServicio()">
+              <i class="fas fa-plus"></i>
+              Agregar Servicio
+            </button>
+          </div>
+
+          <!-- Cálculo de Facturación -->
+          <div class="form-section">
+            <h3 class="form-section-title">Detalle de Facturación Estimada</h3>
+            <div class="billing-section">
+              <p class="text-muted" style="margin-bottom: 1rem;">
+                <i class="fas fa-info-circle"></i>
+                Cálculo basado en Resolución 2/2025: C/DEPEN $833.79/km | S/DEPEN $617.62/km
+              </p>
+              <div class="billing-summary" id="billing-summary">
+                <div class="billing-item">
+                  <div class="billing-label">Valor por Km</div>
+                  <div class="billing-value">$0.00</div>
+                </div>
+                <div class="billing-item">
+                  <div class="billing-label">Km Totales/mes</div>
+                  <div class="billing-value">0</div>
+                </div>
+                <div class="billing-item">
+                  <div class="billing-label">Total Mensual</div>
+                  <div class="billing-value">$0.00</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="cerrarModal()">Cancelar</button>
+        <button type="submit" form="form-paciente" class="btn btn-primary">
+          <i class="fas fa-save"></i>
+          Guardar Paciente
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Detalle Paciente -->
+  <div class="modal-overlay" id="modal-detalle" role="dialog" aria-modal="true" aria-labelledby="modal-detalle-title">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title" id="modal-detalle-title">Detalle del Paciente</h2>
+        <button class="modal-close" onclick="cerrarModalDetalle()" aria-label="Cerrar modal">&times;</button>
+      </div>
+      <div class="modal-body" id="detalle-content">
+        <!-- El contenido se cargará dinámicamente -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="cerrarModalDetalle()">Cerrar</button>
+        <button type="button" class="btn btn-primary" onclick="editarDesdeDetalle()">
+          <i class="fas fa-edit"></i>
+          Editar Paciente
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/app.js"></script>
+  <script>
+    let servicioCounter = 1;
+    let pacienteActualId = null;
+
+    // Datos de ejemplo de pacientes
+    const pacientesData = {
+      2501: {
+        numero: "2501",
+        apellidoNombre: "ALANIS TOMAS SEBASTIAN",
+        dni: "55.284.684",
+        telefono: "(351) 555-1234",
+        responsable: "María Alanis (Madre)",
+        domicilio: "Av. Colón 1234, Córdoba",
+        obraSocial: "OSMATA",
+        numeroAfiliado: "123456789",
+        dependencia: "C/DEPEN",
+        estado: "activo",
+        servicios: [
+          {
+            tipo: "Escuela/CET",
+            direccion: "Escuela Especial, Av. Colón 5678",
+            kmDiario: 28,
+            dias: "L a V",
+            ad: "AD-2024-001",
+            viajes: 20
+          },
+          {
+            tipo: "Terapias/Tratamientos",
+            direccion: "Centro Terapéutico, Bv. San Juan 890",
+            kmDiario: 15,
+            dias: "L, Mi, V",
+            ad: "AD-2024-002",
+            viajes: 12
+          }
+        ]
+      },
+      2507: {
+        numero: "2507",
+        apellidoNombre: "LOPEZ ALCAZAR JAZMIN",
+        dni: "51.348.296",
+        telefono: "(351) 555-5678",
+        responsable: "Carmen Alcazar (Madre)",
+        domicilio: "Recta Martinoli 2890, Córdoba",
+        obraSocial: "OSCCPTAC",
+        numeroAfiliado: "987654321",
+        dependencia: "S/DEPEN",
+        estado: "activo",
+        servicios: [
+          {
+            tipo: "Escuela/CET",
+            direccion: "CET N°3, Av. Vélez Sarsfield 234",
+            kmDiario: 22,
+            dias: "L a V",
+            ad: "AD-2024-003",
+            viajes: 20
+          }
+        ]
+      },
+      2567: {
+        numero: "2567",
+        apellidoNombre: "CONSALVO ANTONINI ABEL",
+        dni: "47.352.009",
+        telefono: "(351) 555-9012",
+        responsable: "Laura Antonini (Madre)",
+        domicilio: "Bv. San Juan 567, Córdoba",
+        obraSocial: "OSECAC",
+        numeroAfiliado: "456789123",
+        dependencia: "C/DEPEN",
+        estado: "activo",
+        servicios: [
+          {
+            tipo: "Escuela/CET",
+            direccion: "Escuela José Hernández, Laprida 456",
+            kmDiario: 25,
+            dias: "L a V",
+            ad: "AD-2024-004",
+            viajes: 20
+          },
+          {
+            tipo: "Hidroterapia/PLIS",
+            direccion: "Centro de Hidroterapia, Duarte Quirós 123",
+            kmDiario: 10,
+            dias: "Ma, Ju",
+            ad: "AD-2024-005",
+            viajes: 8
+          }
+        ]
+      }
+    };
+
+    // Abrir modal nuevo paciente
+    document.getElementById('btn-nuevo-paciente').addEventListener('click', function() {
+      document.getElementById('modal-title').textContent = 'Nuevo Paciente';
+      document.getElementById('form-paciente').reset();
+      servicioCounter = 1;
+      document.getElementById('servicios-container').innerHTML = crearServicioHTML(1);
+      pacienteActualId = null;
+      document.getElementById('modal-paciente').classList.add('active');
+      agregarEventListenersFacturacion();
+      calcularFacturacion();
+    });
+
+    function cerrarModal() {
+      document.getElementById('modal-paciente').classList.remove('active');
+    }
+
+    function cerrarModalDetalle() {
+      document.getElementById('modal-detalle').classList.remove('active');
+    }
+
+    function agregarServicio() {
+      servicioCounter++;
+      const container = document.getElementById('servicios-container');
+      container.insertAdjacentHTML('beforeend', crearServicioHTML(servicioCounter));
+      // Agregar event listeners para calcular facturación
+      agregarEventListenersFacturacion();
+    }
+
+    function eliminarServicio(id) {
+      const servicio = document.querySelector(`[data-service="${id}"]`);
+      if (servicio) {
+        servicio.remove();
+        calcularFacturacion();
+      }
+    }
+
+    function crearServicioHTML(id) {
+      const tipos = ['Escuela/CET', 'Terapias/Tratamientos', 'Hidroterapia/PLIS', 'Otro'];
+      return `
+        <div class="service-item" data-service="${id}">
+          <div class="service-header">
+            <span class="service-title">Servicio ${id}</span>
+            <button type="button" class="btn btn-secondary btn-icon" onclick="eliminarServicio(${id})" title="Eliminar servicio">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+          <div class="form-grid">
+            <div class="form-group form-grid-full">
+              <label class="form-label">Tipo de Servicio</label>
+              <select class="form-select" name="tipo-${id}">
+                ${tipos.map(tipo => `<option value="${tipo}">${tipo}</option>`).join('')}
+              </select>
+            </div>
+            <div class="form-group form-grid-full">
+              <label class="form-label">Dirección Destino</label>
+              <input type="text" class="form-input" name="direccion-${id}" placeholder="Dirección del destino">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Km Diario</label>
+              <input type="number" class="form-input servicio-km" name="km-diario-${id}" placeholder="Ej: 28" step="0.1">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Días de Asistencia</label>
+              <input type="text" class="form-input" name="dias-${id}" placeholder="Ej: L a V">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Número de AD (Autorización)</label>
+              <input type="text" class="form-input" name="ad-${id}" placeholder="Ej: AD-2024-001">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Cantidad de Viajes Mensuales</label>
+              <input type="number" class="form-input servicio-viajes" name="viajes-${id}" placeholder="Ej: 20" value="20">
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function agregarEventListenersFacturacion() {
+      // Remove existing listener from dependencia to avoid duplicates
+      const dependenciaEl = document.getElementById('dependencia');
+      const oldListener = dependenciaEl.onchange;
+      dependenciaEl.onchange = null;
+      dependenciaEl.addEventListener('change', calcularFacturacion);
+      
+      // Listeners para campos de km y viajes (solo para nuevos elementos)
+      document.querySelectorAll('.servicio-km, .servicio-viajes').forEach(input => {
+        // Remove existing listener if any
+        input.removeEventListener('input', calcularFacturacion);
+        input.addEventListener('input', calcularFacturacion);
+      });
+    }
+
+    function calcularFacturacion() {
+      const dependencia = document.getElementById('dependencia').value;
+      const valorKm = dependencia === 'C/DEPEN' ? 833.79 : dependencia === 'S/DEPEN' ? 617.62 : 0;
+      
+      let kmTotales = 0;
+      document.querySelectorAll('.servicio-km').forEach(input => {
+        const km = parseFloat(input.value) || 0;
+        const viajesInput = input.closest('.form-grid').querySelector('.servicio-viajes');
+        const viajes = parseFloat(viajesInput.value) || 0;
+        kmTotales += km * viajes;
+      });
+
+      const totalMensual = kmTotales * valorKm;
+
+      // Actualizar el resumen
+      const summary = document.getElementById('billing-summary');
+      summary.innerHTML = `
+        <div class="billing-item">
+          <div class="billing-label">Valor por Km</div>
+          <div class="billing-value">$${valorKm.toFixed(2)}</div>
+        </div>
+        <div class="billing-item">
+          <div class="billing-label">Km Totales/mes</div>
+          <div class="billing-value">${kmTotales.toFixed(1)}</div>
+        </div>
+        <div class="billing-item">
+          <div class="billing-label">Total Mensual</div>
+          <div class="billing-value">$${totalMensual.toLocaleString('es-AR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+        </div>
+      `;
+    }
+
+    // Form submit
+    document.getElementById('form-paciente').addEventListener('submit', function(e) {
+      e.preventDefault();
+      alert('Paciente guardado correctamente (funcionalidad de demostración)');
+      cerrarModal();
+    });
+
+    function editarPaciente(id) {
+      pacienteActualId = id;
+      const paciente = pacientesData[id];
+      
+      if (!paciente) {
+        alert('Paciente no encontrado');
+        return;
+      }
+
+      document.getElementById('modal-title').textContent = 'Editar Paciente';
+      
+      // Llenar datos personales
+      document.getElementById('numero-paciente').value = paciente.numero;
+      document.getElementById('dni').value = paciente.dni;
+      document.getElementById('apellido-nombre').value = paciente.apellidoNombre;
+      document.getElementById('telefono').value = paciente.telefono;
+      document.getElementById('responsable').value = paciente.responsable;
+      document.getElementById('domicilio').value = paciente.domicilio;
+      
+      // Llenar obra social
+      document.getElementById('obra-social').value = paciente.obraSocial;
+      document.getElementById('numero-afiliado').value = paciente.numeroAfiliado;
+      document.getElementById('dependencia').value = paciente.dependencia;
+      document.getElementById('estado').value = paciente.estado;
+      
+      // Llenar servicios
+      const container = document.getElementById('servicios-container');
+      container.innerHTML = '';
+      servicioCounter = 0;
+      
+      paciente.servicios.forEach((servicio, index) => {
+        servicioCounter++;
+        container.insertAdjacentHTML('beforeend', crearServicioHTML(servicioCounter));
+        
+        // Llenar datos del servicio
+        document.querySelector(`[name="tipo-${servicioCounter}"]`).value = servicio.tipo;
+        document.querySelector(`[name="direccion-${servicioCounter}"]`).value = servicio.direccion;
+        document.querySelector(`[name="km-diario-${servicioCounter}"]`).value = servicio.kmDiario;
+        document.querySelector(`[name="dias-${servicioCounter}"]`).value = servicio.dias;
+        document.querySelector(`[name="ad-${servicioCounter}"]`).value = servicio.ad;
+        document.querySelector(`[name="viajes-${servicioCounter}"]`).value = servicio.viajes;
+      });
+      
+      agregarEventListenersFacturacion();
+      calcularFacturacion();
+      document.getElementById('modal-paciente').classList.add('active');
+    }
+
+    function verDetallePaciente(id) {
+      const paciente = pacientesData[id];
+      
+      if (!paciente) {
+        alert('Paciente no encontrado');
+        return;
+      }
+
+      pacienteActualId = id;
+      
+      const valorKm = paciente.dependencia === 'C/DEPEN' ? 833.79 : 617.62;
+      let totalKm = 0;
+      let serviciosHTML = '';
+      
+      paciente.servicios.forEach((servicio, index) => {
+        const kmMensual = servicio.kmDiario * servicio.viajes;
+        const montoServicio = kmMensual * valorKm;
+        totalKm += kmMensual;
+        
+        serviciosHTML += `
+          <div class="service-item">
+            <div class="service-header">
+              <span class="service-title">${servicio.tipo}</span>
+              <span class="badge badge-info">AD: ${servicio.ad}</span>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; font-size: 0.875rem;">
+              <div>
+                <strong>Dirección:</strong><br>
+                ${servicio.direccion}
+              </div>
+              <div>
+                <strong>Km Diario:</strong> ${servicio.kmDiario} km<br>
+                <strong>Días:</strong> ${servicio.dias}<br>
+                <strong>Viajes/mes:</strong> ${servicio.viajes}
+              </div>
+              <div>
+                <strong>Km Mensual:</strong> ${kmMensual.toFixed(1)} km
+              </div>
+              <div>
+                <strong>Monto Mensual:</strong><br>
+                <span style="font-size: 1.1rem; font-weight: 600; color: var(--secondary);">
+                  $${montoServicio.toLocaleString('es-AR', {minimumFractionDigits: 2})}
+                </span>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+      
+      const totalMensual = totalKm * valorKm;
+      
+      const content = `
+        <div class="form-section">
+          <h3 class="form-section-title">Información Personal</h3>
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; font-size: 0.875rem;">
+            <div><strong>N° Paciente:</strong> ${paciente.numero}</div>
+            <div><strong>DNI:</strong> ${paciente.dni}</div>
+            <div style="grid-column: 1 / -1;"><strong>Nombre:</strong> ${paciente.apellidoNombre}</div>
+            <div><strong>Teléfono:</strong> ${paciente.telefono}</div>
+            <div><strong>Responsable:</strong> ${paciente.responsable}</div>
+            <div style="grid-column: 1 / -1;"><strong>Domicilio:</strong> ${paciente.domicilio}</div>
+          </div>
+        </div>
+        
+        <div class="form-section">
+          <h3 class="form-section-title">Cobertura Social</h3>
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; font-size: 0.875rem;">
+            <div><strong>Obra Social:</strong> ${paciente.obraSocial}</div>
+            <div><strong>N° Afiliado:</strong> ${paciente.numeroAfiliado}</div>
+            <div>
+              <strong>Dependencia:</strong> 
+              <span class="badge ${paciente.dependencia === 'C/DEPEN' ? 'badge-warning' : 'badge-info'}">
+                ${paciente.dependencia}
+              </span>
+            </div>
+            <div>
+              <strong>Estado:</strong> 
+              <span class="badge badge-success">
+                ${paciente.estado === 'activo' ? 'Activo' : 'Inactivo'}
+              </span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-section">
+          <h3 class="form-section-title">Servicios de Traslado</h3>
+          ${serviciosHTML}
+        </div>
+        
+        <div class="form-section">
+          <h3 class="form-section-title">Resumen de Facturación</h3>
+          <div class="billing-section">
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1rem;">
+              <div>
+                <div class="billing-label">Valor por Km</div>
+                <div style="font-size: 1.25rem; font-weight: 600;">$${valorKm.toFixed(2)}</div>
+              </div>
+              <div>
+                <div class="billing-label">Total Km/mes</div>
+                <div style="font-size: 1.25rem; font-weight: 600;">${totalKm.toFixed(1)} km</div>
+              </div>
+              <div>
+                <div class="billing-label">Total Mensual</div>
+                <div style="font-size: 1.5rem; font-weight: 700; color: var(--secondary);">
+                  $${totalMensual.toLocaleString('es-AR', {minimumFractionDigits: 2})}
+                </div>
+              </div>
+            </div>
+            <p class="text-muted" style="font-size: 0.75rem; margin: 0;">
+              <i class="fas fa-info-circle"></i>
+              Cálculo basado en Resolución 2/2025
+            </p>
+          </div>
+        </div>
+        
+        <div class="form-section">
+          <h3 class="form-section-title">Historial de Facturación</h3>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Período</th>
+                  <th>Factura N°</th>
+                  <th>Monto</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Enero 2025</td>
+                  <td>0004-00001770</td>
+                  <td><strong>$${totalMensual.toLocaleString('es-AR', {minimumFractionDigits: 2})}</strong></td>
+                  <td><span class="badge badge-success">Cobrado</span></td>
+                </tr>
+                <tr>
+                  <td>Diciembre 2024</td>
+                  <td>0004-00001761</td>
+                  <td><strong>$${totalMensual.toLocaleString('es-AR', {minimumFractionDigits: 2})}</strong></td>
+                  <td><span class="badge badge-success">Cobrado</span></td>
+                </tr>
+                <tr>
+                  <td>Noviembre 2024</td>
+                  <td>0004-00001752</td>
+                  <td><strong>$${totalMensual.toLocaleString('es-AR', {minimumFractionDigits: 2})}</strong></td>
+                  <td><span class="badge badge-warning">Pendiente</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+      
+      document.getElementById('detalle-content').innerHTML = content;
+      document.getElementById('modal-detalle').classList.add('active');
+    }
+
+    function editarDesdeDetalle() {
+      cerrarModalDetalle();
+      editarPaciente(pacienteActualId);
+    }
+
+    // Inicializar event listeners
+    agregarEventListenersFacturacion();
+    
+    // Cerrar modal al hacer clic fuera
+    document.getElementById('modal-paciente').addEventListener('click', function(e) {
+      if (e.target === this) {
+        cerrarModal();
+      }
+    });
+    
+    document.getElementById('modal-detalle').addEventListener('click', function(e) {
+      if (e.target === this) {
+        cerrarModalDetalle();
+      }
+    });
+  </script>
+</body>
+</html>

@@ -4,6 +4,7 @@ import { LoginComponent } from './core/auth/login/login.component';
 import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
 import { DashboardComponent } from './features/dashboard/dashboard.component';
 import { PacientesListComponent } from './features/pacientes/pacientes-list/pacientes-list.component';
+import { CarteraListComponent } from './features/cartera/cartera-list/cartera-list.component';
 
 export const routes: Routes = [
   {
@@ -23,6 +24,10 @@ export const routes: Routes = [
       {
         path: 'dashboard',
         component: DashboardComponent
+      },
+      {
+        path: 'cartera',
+        component: CarteraListComponent
       },
       {
         path: 'pacientes',

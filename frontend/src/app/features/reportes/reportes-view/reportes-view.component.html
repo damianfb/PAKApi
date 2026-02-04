@@ -1,12 +1,149 @@
-<div class="container">
-  <h1>Reportes y Analíticas</h1>
-  <p>Reportes y métricas del sistema</p>
-  
-  <mat-card>
-    <mat-card-content>
-      <p><mat-icon>assessment</mat-icon> Facturación mensual por obra social</p>
-      <p><mat-icon>directions_car</mat-icon> Km recorridos por chofer</p>
-      <p><mat-icon>show_chart</mat-icon> Rentabilidad por paciente</p>
-    </mat-card-content>
-  </mat-card>
+<!-- Stats -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-card-header">
+      <span class="stat-label">Reportes Generados</span>
+      <span class="stat-icon"><i class="fas fa-file-alt" style="color: var(--primary);"></i></span>
+    </div>
+    <div class="stat-value">{{ reportesGenerados }}</div>
+    <div class="stat-change">
+      <span>Este mes</span>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-card-header">
+      <span class="stat-label">Pendientes</span>
+      <span class="stat-icon"><i class="fas fa-clock" style="color: var(--warning);"></i></span>
+    </div>
+    <div class="stat-value">{{ reportesPendientes }}</div>
+    <div class="stat-change">
+      <span>En cola de generación</span>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-card-header">
+      <span class="stat-label">Programados</span>
+      <span class="stat-icon"><i class="fas fa-calendar-check" style="color: var(--info);"></i></span>
+    </div>
+    <div class="stat-value">{{ reportesProgramados }}</div>
+    <div class="stat-change">
+      <span>Ejecución automática</span>
+    </div>
+  </div>
+</div>
+
+<!-- Filtros -->
+<div class="filters">
+  <div class="filter-group">
+    <label class="filter-label">Buscar Reporte</label>
+    <div class="search-input">
+      <i class="fas fa-search"></i>
+      <input type="text" class="form-input" placeholder="Nombre o descripción..." 
+             [(ngModel)]="searchText" (ngModelChange)="filterReportes()">
+    </div>
+  </div>
+  <div class="filter-group">
+    <label class="filter-label">Categoría</label>
+    <select class="form-select" [(ngModel)]="selectedCategoria" (ngModelChange)="filterReportes()">
+      <option value="todos">Todas las categorías</option>
+      @for (cat of categorias; track cat) {
+        <option [value]="cat.toLowerCase()">{{ cat }}</option>
+      }
+    </select>
+  </div>
+</div>
+
+<!-- Grid de Contenido -->
+<div class="reportes-grid">
+  <!-- Reportes Disponibles -->
+  <div class="card main-card">
+    <div class="card-header">
+      <h2 class="card-title">Reportes Disponibles</h2>
+      <p class="card-subtitle">Seleccione un reporte para generar</p>
+    </div>
+    
+    <div class="reportes-list">
+      @for (reporte of filteredReportes; track reporte.id) {
+        <div class="reporte-item">
+          <div class="reporte-icon">
+            <i class="fas {{ reporte.icono }}"></i>
+          </div>
+          <div class="reporte-info">
+            <h4 class="reporte-nombre">{{ reporte.nombre }}</h4>
+            <p class="reporte-descripcion">{{ reporte.descripcion }}</p>
+            <div class="reporte-meta">
+              <span class="badge badge-secondary">{{ reporte.categoria }}</span>
+              @if (reporte.ultimaGeneracion) {
+                <span class="ultima-gen">
+                  <i class="fas fa-history"></i>
+                  Última: {{ reporte.ultimaGeneracion | date:'dd/MM/yyyy' }}
+                </span>
+              }
+            </div>
+          </div>
+          <div class="reporte-actions">
+            <button class="btn btn-primary btn-sm" (click)="generarReporte(reporte, 'PDF')">
+              <i class="fas fa-file-pdf"></i>
+              PDF
+            </button>
+            <button class="btn btn-secondary btn-sm" (click)="generarReporte(reporte, 'Excel')">
+              <i class="fas fa-file-excel"></i>
+              Excel
+            </button>
+            <button class="btn-icon" (click)="programarReporte(reporte)" title="Programar">
+              <i class="fas fa-calendar-plus"></i>
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Reportes Recientes -->
+  <div class="card side-card">
+    <div class="card-header d-flex justify-between align-center">
+      <div>
+        <h2 class="card-title">Reportes Recientes</h2>
+        <p class="card-subtitle">Últimos generados</p>
+      </div>
+      <button class="btn btn-link" (click)="verHistorial()">Ver todos</button>
+    </div>
+    
+    <ul class="recientes-list">
+      @for (reciente of reportesRecientes; track reciente.id) {
+        <li class="reciente-item">
+          <div class="reciente-icon" [class.pdf]="reciente.formato === 'PDF'" [class.excel]="reciente.formato === 'Excel'">
+            <i class="fas" [class.fa-file-pdf]="reciente.formato === 'PDF'" [class.fa-file-excel]="reciente.formato === 'Excel'"></i>
+          </div>
+          <div class="reciente-info">
+            <span class="reciente-nombre">{{ reciente.nombre }}</span>
+            <span class="reciente-meta">{{ reciente.fechaGeneracion | date:'dd/MM HH:mm' }} · {{ reciente.tamanio }}</span>
+          </div>
+          <button class="btn-icon" (click)="descargarReporte(reciente)" title="Descargar">
+            <i class="fas fa-download"></i>
+          </button>
+        </li>
+      }
+    </ul>
+    
+    <hr style="margin: var(--spacing-lg) 0; border: none; border-top: 1px solid var(--border);">
+    
+    <div class="quick-stats">
+      <h4 class="quick-stats-title">Estadísticas Rápidas</h4>
+      <div class="quick-stat-item">
+        <span class="quick-stat-label">Total PDF este mes</span>
+        <span class="quick-stat-value">28</span>
+      </div>
+      <div class="quick-stat-item">
+        <span class="quick-stat-label">Total Excel este mes</span>
+        <span class="quick-stat-value">17</span>
+      </div>
+      <div class="quick-stat-item">
+        <span class="quick-stat-label">Espacio utilizado</span>
+        <span class="quick-stat-value">156 MB</span>
+      </div>
+    </div>
+  </div>
 </div>

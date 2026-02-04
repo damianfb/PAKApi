@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reportes - PAK TRASLADOS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <span>🚐</span>
+        <span>PAK TRASLADOS</span>
+      </div>
+      <nav>
+        <ul class="sidebar-nav">
+          <li>
+            <a href="../index.html">
+              <span class="nav-icon"><i class="fas fa-home"></i></span>
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li>
+            <a href="cartera.html">
+              <span class="nav-icon"><i class="fas fa-users"></i></span>
+              <span>Cartera de Pacientes</span>
+            </a>
+          </li>
+          <li>
+            <a href="pacientes.html">
+              <span class="nav-icon"><i class="fas fa-user-injured"></i></span>
+              <span>Pacientes</span>
+            </a>
+          </li>
+          <li>
+            <a href="horarios.html">
+              <span class="nav-icon"><i class="fas fa-calendar-alt"></i></span>
+              <span>Horarios</span>
+            </a>
+          </li>
+          <li>
+            <a href="facturacion.html">
+              <span class="nav-icon"><i class="fas fa-file-invoice-dollar"></i></span>
+              <span>Facturación</span>
+            </a>
+          </li>
+          <li>
+            <a href="cobranza.html">
+              <span class="nav-icon"><i class="fas fa-money-bill-wave"></i></span>
+              <span>Cobranza</span>
+            </a>
+          </li>
+          <li>
+            <a href="presupuesto.html">
+              <span class="nav-icon"><i class="fas fa-chart-line"></i></span>
+              <span>Presupuesto</span>
+            </a>
+          </li>
+          <li>
+            <a href="reportes.html" class="active">
+              <span class="nav-icon"><i class="fas fa-chart-bar"></i></span>
+              <span>Reportes</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Header -->
+      <header class="header">
+        <div>
+          <h1>Reportes y Estadísticas</h1>
+          <p class="text-muted">Informes y análisis del negocio</p>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-secondary">
+            <i class="fas fa-calendar"></i>
+            Cambiar Período
+          </button>
+          <button class="btn btn-primary">
+            <i class="fas fa-download"></i>
+            Exportar Todo
+          </button>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <div class="content">
+        <!-- Filtros de Período -->
+        <div class="filters">
+          <div class="filter-group">
+            <label class="filter-label">Período de Análisis</label>
+            <select class="form-select">
+              <option>Enero 2025</option>
+              <option>Diciembre 2024</option>
+              <option>Último Trimestre</option>
+              <option>Último Semestre</option>
+              <option>Año 2024 Completo</option>
+              <option>Año 2025 a la fecha</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">Tipo de Reporte</label>
+            <select class="form-select">
+              <option value="todos">Todos los reportes</option>
+              <option value="operacional">Operacional</option>
+              <option value="financiero">Financiero</option>
+              <option value="comercial">Comercial</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">Formato de Exportación</label>
+            <select class="form-select">
+              <option value="pdf">PDF</option>
+              <option value="excel">Excel (.xlsx)</option>
+              <option value="csv">CSV</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Grid de Reportes Disponibles -->
+        <div class="card" style="margin-bottom: var(--spacing-xl);">
+          <div class="card-header">
+            <h2 class="card-title">Reportes Disponibles</h2>
+            <p class="card-subtitle">Seleccione el reporte que desea generar</p>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--spacing-lg); padding: var(--spacing-lg);">
+            
+            <!-- Reporte 1 -->
+            <div style="border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--spacing-lg); background-color: var(--bg-secondary);">
+              <div style="display: flex; align-items: center; gap: var(--spacing-md); margin-bottom: var(--spacing-md);">
+                <div style="font-size: var(--font-size-3xl); color: var(--primary);">
+                  <i class="fas fa-file-invoice"></i>
+                </div>
+                <div>
+                  <h3 style="font-size: var(--font-size-lg); font-weight: 600;">Liquidación Mensual</h3>
+                  <p style="font-size: var(--font-size-sm); color: var(--text-secondary);">Detalle completo por paciente</p>
+                </div>
+              </div>
+              <p style="font-size: var(--font-size-sm); margin-bottom: var(--spacing-md);">
+                Reporte detallado de facturación mensual por paciente, incluyendo kilómetros, días de asistencia y montos.
+              </p>
+              <button class="btn btn-primary" style="width: 100%; justify-content: center;">
+                <i class="fas fa-download"></i> Generar Reporte
+              </button>
+            </div>
+
+            <!-- Reporte 2 -->
+            <div style="border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--spacing-lg); background-color: var(--bg-secondary);">
+              <div style="display: flex; align-items: center; gap: var(--spacing-md); margin-bottom: var(--spacing-md);">
+                <div style="font-size: var(--font-size-3xl); color: var(--secondary);">
+                  <i class="fas fa-hospital"></i>
+                </div>
+                <div>
+                  <h3 style="font-size: var(--font-size-lg); font-weight: 600;">Resumen por Obra Social</h3>
+                  <p style="font-size: var(--font-size-sm); color: var(--text-secondary);">Facturación y cobranzas</p>
+                </div>
+              </div>
+              <p style="font-size: var(--font-size-sm); margin-bottom: var(--spacing-md);">
+                Análisis de facturación, cobranzas y saldos pendientes agrupados por obra social.
+              </p>
+              <button class="btn btn-primary" style="width: 100%; justify-content: center;">
+                <i class="fas fa-download"></i> Generar Reporte
+              </button>
+            </div>
+
+            <!-- Reporte 3 -->
+            <div style="border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--spacing-lg); background-color: var(--bg-secondary);">
+              <div style="display: flex; align-items: center; gap: var(--spacing-md); margin-bottom: var(--spacing-md);">
+                <div style="font-size: var(--font-size-3xl); color: var(--info);">
+                  <i class="fas fa-user-tie"></i>
+                </div>
+                <div>
+                  <h3 style="font-size: var(--font-size-lg); font-weight: 600;">Rendimiento por Chofer</h3>
+                  <p style="font-size: var(--font-size-sm); color: var(--text-secondary);">Viajes y kilómetros</p>
+                </div>
+              </div>
+              <p style="font-size: var(--font-size-sm); margin-bottom: var(--spacing-md);">
+                Estadísticas de viajes realizados, kilómetros recorridos y pacientes atendidos por chofer.
+              </p>
+              <button class="btn btn-primary" style="width: 100%; justify-content: center;">
+                <i class="fas fa-download"></i> Generar Reporte
+              </button>
+            </div>
+
+            <!-- Reporte 4 -->
+            <div style="border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--spacing-lg); background-color: var(--bg-secondary);">
+              <div style="display: flex; align-items: center; gap: var(--spacing-md); margin-bottom: var(--spacing-md);">
+                <div style="font-size: var(--font-size-3xl); color: var(--warning);">
+                  <i class="fas fa-money-check-alt"></i>
+                </div>
+                <div>
+                  <h3 style="font-size: var(--font-size-lg); font-weight: 600;">Estado de Cobranzas</h3>
+                  <p style="font-size: var(--font-size-sm); color: var(--text-secondary);">Pendientes y vencidas</p>
+                </div>
+              </div>
+              <p style="font-size: var(--font-size-sm); margin-bottom: var(--spacing-md);">
+                Listado de facturas pendientes de cobro, vencidas y estado de seguimiento.
+              </p>
+              <button class="btn btn-primary" style="width: 100%; justify-content: center;">
+                <i class="fas fa-download"></i> Generar Reporte
+              </button>
+            </div>
+
+            <!-- Reporte 5 -->
+            <div style="border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--spacing-lg); background-color: var(--bg-secondary);">
+              <div style="display: flex; align-items: center; gap: var(--spacing-md); margin-bottom: var(--spacing-md);">
+                <div style="font-size: var(--font-size-3xl); color: var(--danger);">
+                  <i class="fas fa-chart-line"></i>
+                </div>
+                <div>
+                  <h3 style="font-size: var(--font-size-lg); font-weight: 600;">Balance Financiero</h3>
+                  <p style="font-size: var(--font-size-sm); color: var(--text-secondary);">Ingresos vs Egresos</p>
+                </div>
+              </div>
+              <p style="font-size: var(--font-size-sm); margin-bottom: var(--spacing-md);">
+                Resumen de ingresos, egresos, resultado y márgenes del período seleccionado.
+              </p>
+              <button class="btn btn-primary" style="width: 100%; justify-content: center;">
+                <i class="fas fa-download"></i> Generar Reporte
+              </button>
+            </div>
+
+            <!-- Reporte 6 -->
+            <div style="border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--spacing-lg); background-color: var(--bg-secondary);">
+              <div style="display: flex; align-items: center; gap: var(--spacing-md); margin-bottom: var(--spacing-md);">
+                <div style="font-size: var(--font-size-3xl); color: var(--primary);">
+                  <i class="fas fa-route"></i>
+                </div>
+                <div>
+                  <h3 style="font-size: var(--font-size-lg); font-weight: 600;">Kilómetros Recorridos</h3>
+                  <p style="font-size: var(--font-size-sm); color: var(--text-secondary);">Por chofer y período</p>
+                </div>
+              </div>
+              <p style="font-size: var(--font-size-sm); margin-bottom: var(--spacing-md);">
+                Análisis de kilómetros recorridos, distribución por chofer y comparativas.
+              </p>
+              <button class="btn btn-primary" style="width: 100%; justify-content: center;">
+                <i class="fas fa-download"></i> Generar Reporte
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Estadísticas Rápidas -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-xl);">
+          
+          <!-- Estadísticas Generales -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Estadísticas del Período</h2>
+              <p class="card-subtitle">Enero 2025</p>
+            </div>
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Indicador</th>
+                    <th>Valor</th>
+                    <th>Variación</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Pacientes Activos</strong></td>
+                    <td>42</td>
+                    <td><span class="badge badge-success">+7%</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Viajes Realizados</strong></td>
+                    <td>2.520</td>
+                    <td><span class="badge badge-success">+5%</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Km Recorridos</strong></td>
+                    <td>15.680</td>
+                    <td><span class="badge badge-success">+8%</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Facturación</strong></td>
+                    <td>$1.845.320</td>
+                    <td><span class="badge badge-success">+12%</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Cobranzas</strong></td>
+                    <td>$523.480</td>
+                    <td><span class="badge badge-warning">-5%</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Resultado</strong></td>
+                    <td>$857.870</td>
+                    <td><span class="badge badge-success">+15%</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Margen Operativo</strong></td>
+                    <td>46%</td>
+                    <td><span class="badge badge-success">+2 pp</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Tasa de Cobro</strong></td>
+                    <td>28%</td>
+                    <td><span class="badge badge-danger">-15 pp</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Top Indicadores -->
+          <div>
+            <!-- Obras Sociales -->
+            <div class="card" style="margin-bottom: var(--spacing-xl);">
+              <div class="card-header">
+                <h2 class="card-title">Top Obras Sociales</h2>
+                <p class="card-subtitle">Por facturación</p>
+              </div>
+              <div class="table-container">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Puesto</th>
+                      <th>Obra Social</th>
+                      <th>Monto</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><span class="badge badge-warning">🥇</span></td>
+                      <td><strong>OSECAC</strong></td>
+                      <td>$668.450</td>
+                    </tr>
+                    <tr>
+                      <td><span class="badge badge-secondary">🥈</span></td>
+                      <td><strong>OSMATA</strong></td>
+                      <td>$445.230</td>
+                    </tr>
+                    <tr>
+                      <td><span class="badge badge-warning">🥉</span></td>
+                      <td><strong>OSPSA</strong></td>
+                      <td>$311.890</td>
+                    </tr>
+                    <tr>
+                      <td>4</td>
+                      <td>SWISS MEDICAL</td>
+                      <td>$222.825</td>
+                    </tr>
+                    <tr>
+                      <td>5</td>
+                      <td>PASTELEROS</td>
+                      <td>$140.234</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Top Pacientes -->
+            <div class="card">
+              <div class="card-header">
+                <h2 class="card-title">Top Pacientes</h2>
+                <p class="card-subtitle">Por facturación mensual</p>
+              </div>
+              <div class="table-container">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Puesto</th>
+                      <th>Paciente</th>
+                      <th>Monto</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><span class="badge badge-warning">🥇</span></td>
+                      <td><strong>ALANIS TOMAS</strong></td>
+                      <td>$467.163</td>
+                    </tr>
+                    <tr>
+                      <td><span class="badge badge-secondary">🥈</span></td>
+                      <td><strong>CONSALVO ABEL</strong></td>
+                      <td>$416.895</td>
+                    </tr>
+                    <tr>
+                      <td><span class="badge badge-warning">🥉</span></td>
+                      <td><strong>MARTINEZ JUAN</strong></td>
+                      <td>$333.516</td>
+                    </tr>
+                    <tr>
+                      <td>4</td>
+                      <td>RODRIGUEZ MARIA</td>
+                      <td>$271.753</td>
+                    </tr>
+                    <tr>
+                      <td>5</td>
+                      <td>GOMEZ ANA</td>
+                      <td>$250.137</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Alertas y Recomendaciones -->
+        <div class="card" style="margin-top: var(--spacing-xl);">
+          <div class="card-header">
+            <h2 class="card-title">Alertas y Recomendaciones</h2>
+            <p class="card-subtitle">Aspectos que requieren atención</p>
+          </div>
+          <div style="padding: var(--spacing-lg);">
+            <div class="alert alert-warning" style="margin-bottom: var(--spacing-md);">
+              <i class="fas fa-exclamation-triangle"></i>
+              <div>
+                <strong>Cobranzas Bajas:</strong> La tasa de cobro del mes es del 28%, significativamente inferior al promedio del 65%. Se recomienda intensificar gestiones de cobro.
+              </div>
+            </div>
+            <div class="alert alert-warning" style="margin-bottom: var(--spacing-md);">
+              <i class="fas fa-exclamation-triangle"></i>
+              <div>
+                <strong>Facturas Vencidas:</strong> Hay 4 facturas con más de 60 días de vencimiento por un total de $387.654. Considerar acciones legales o reclamos formales.
+              </div>
+            </div>
+            <div class="alert alert-info" style="margin-bottom: var(--spacing-md);">
+              <i class="fas fa-info-circle"></i>
+              <div>
+                <strong>Crecimiento Positivo:</strong> La facturación del mes creció un 12% respecto al mes anterior, superando las expectativas.
+              </div>
+            </div>
+            <div class="alert alert-success">
+              <i class="fas fa-check-circle"></i>
+              <div>
+                <strong>Margen Saludable:</strong> El margen operativo se mantiene en 46%, por encima del objetivo del 40%. Excelente gestión de costos.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="../js/app.js"></script>
+</body>
+</html>

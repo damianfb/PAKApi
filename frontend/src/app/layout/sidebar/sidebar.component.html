@@ -1,15 +1,20 @@
-<div class="sidebar-header">
-  <h2>Menú</h2>
-</div>
-
-<mat-nav-list>
-  @for (item of menuItems; track item.route) {
-    <a 
-      mat-list-item 
-      [routerLink]="item.route"
-      routerLinkActive="active-link">
-      <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
-      <span matListItemTitle>{{ item.label }}</span>
-    </a>
-  }
-</mat-nav-list>
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <span>🚐</span>
+    <span>PAK TRASLADOS</span>
+  </div>
+  <nav>
+    <ul class="sidebar-nav">
+      @for (item of menuItems; track item.route) {
+        <li>
+          <a [routerLink]="item.route" 
+             routerLinkActive="active"
+             [routerLinkActiveOptions]="{exact: item.route === '/dashboard'}">
+            <span class="nav-icon"><i [class]="item.icon"></i></span>
+            <span>{{ item.label }}</span>
+          </a>
+        </li>
+      }
+    </ul>
+  </nav>
+</aside>

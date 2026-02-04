@@ -1,12 +1,164 @@
-<div class="container">
-  <h1>Facturación</h1>
-  <p>Gestión y generación de facturas</p>
-  
-  <mat-card>
-    <mat-card-content>
-      <p><mat-icon>receipt</mat-icon> Generación automática de facturas</p>
-      <p><mat-icon>calculate</mat-icon> Cálculo de km y montos</p>
-      <p><mat-icon>picture_as_pdf</mat-icon> Exportación a PDF</p>
-    </mat-card-content>
-  </mat-card>
+<!-- Stats -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-card-header">
+      <span class="stat-label">Total Facturado</span>
+      <span class="stat-icon"><i class="fas fa-file-invoice" style="color: var(--primary);"></i></span>
+    </div>
+    <div class="stat-value">{{ totalFacturado | currency:'ARS':'symbol-narrow':'1.0-0' }}</div>
+    <div class="stat-change positive">
+      <i class="fas fa-arrow-up"></i>
+      <span>+12% vs mes anterior</span>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-card-header">
+      <span class="stat-label">Facturas Emitidas</span>
+      <span class="stat-icon"><i class="fas fa-receipt" style="color: var(--secondary);"></i></span>
+    </div>
+    <div class="stat-value">{{ facturasEmitidas }}</div>
+    <div class="stat-change">
+      <span>Este mes</span>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-card-header">
+      <span class="stat-label">Pendientes AFIP</span>
+      <span class="stat-icon"><i class="fas fa-clock" style="color: var(--warning);"></i></span>
+    </div>
+    <div class="stat-value">{{ pendientesAfip }}</div>
+    <div class="stat-change negative">
+      <i class="fas fa-exclamation-triangle"></i>
+      <span>Requieren CAE</span>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-card-header">
+      <span class="stat-label">Promedio por Factura</span>
+      <span class="stat-icon"><i class="fas fa-calculator" style="color: var(--info);"></i></span>
+    </div>
+    <div class="stat-value">{{ promedioFactura | currency:'ARS':'symbol-narrow':'1.0-0' }}</div>
+    <div class="stat-change">
+      <span>Enero 2025</span>
+    </div>
+  </div>
 </div>
+
+<!-- Alertas -->
+<div class="alert alert-info">
+  <i class="fas fa-info-circle"></i>
+  <div>
+    <strong>Información:</strong> Las facturas con estado "Pendiente AFIP" requieren obtener el CAE (Código de Autorización Electrónico).
+  </div>
+</div>
+
+<!-- Filtros -->
+<div class="filters">
+  <div class="filter-group">
+    <label class="filter-label">Período</label>
+    <select class="form-select" [(ngModel)]="selectedPeriodo">
+      @for (periodo of periodos; track periodo) {
+        <option [value]="periodo">{{ periodo }}</option>
+      }
+    </select>
+  </div>
+  <div class="filter-group">
+    <label class="filter-label">Obra Social</label>
+    <select class="form-select" [(ngModel)]="selectedObraSocial">
+      <option value="todos">Todas</option>
+      @for (os of obrasSociales; track os) {
+        <option [value]="os.toLowerCase()">{{ os }}</option>
+      }
+    </select>
+  </div>
+  <div class="filter-group">
+    <label class="filter-label">Estado</label>
+    <select class="form-select" [(ngModel)]="selectedEstado">
+      <option value="todos">Todos</option>
+      <option value="emitida">Emitida</option>
+      <option value="pendiente">Pendiente AFIP</option>
+      <option value="anulada">Anulada</option>
+    </select>
+  </div>
+  <div class="filter-group">
+    <label class="filter-label">Buscar</label>
+    <input type="text" class="form-input" placeholder="N° Factura o CUIT..." [(ngModel)]="searchTerm">
+  </div>
+</div>
+
+<!-- Tabla de Facturas -->
+<div class="card">
+  <div class="card-header d-flex justify-between align-center">
+    <div>
+      <h2 class="card-title">Facturas Emitidas</h2>
+      <p class="card-subtitle">Listado completo de facturación</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-secondary" (click)="exportData()">
+        <i class="fas fa-download"></i>
+        Exportar
+      </button>
+      <button class="btn btn-primary" (click)="openNewFacturaModal()">
+        <i class="fas fa-plus"></i>
+        Nueva Factura
+      </button>
+    </div>
+  </div>
+  
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Factura N°</th>
+          <th>Fecha</th>
+          <th>Obra Social</th>
+          <th>CUIT</th>
+          <th>Cant. Pacientes</th>
+          <th class="text-right">Monto</th>
+          <th>CAE</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (factura of filteredFacturas; track factura.id) {
+          <tr>
+            <td><strong>{{ factura.numero }}</strong></td>
+            <td>{{ factura.fecha | date:'dd/MM/yyyy' }}</td>
+            <td>{{ factura.obraSocial }}</td>
+            <td>{{ factura.cuit }}</td>
+            <td>{{ factura.cantidad }}</td>
+            <td class="text-right">{{ factura.monto | currency:'ARS':'symbol-narrow':'1.0-0' }}</td>
+            <td>{{ factura.cae || '-' }}</td>
+            <td>
+              <span [class]="getEstadoBadgeClass(factura.estado)">
+                {{ getEstadoLabel(factura.estado) }}
+              </span>
+            </td>
+            <td>
+              <div class="action-buttons">
+                <button class="btn btn-sm btn-secondary btn-icon" (click)="viewFactura(factura)" title="Ver detalle">
+                  <i class="fas fa-eye"></i>
+                </button>
+                <button class="btn btn-sm btn-secondary btn-icon" (click)="downloadPdf(factura)" title="Descargar PDF">
+                  <i class="fas fa-file-pdf"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="9" class="text-center" style="padding: var(--spacing-xl);">
+              <i class="fas fa-file-invoice" style="font-size: 3rem; color: var(--text-light); margin-bottom: var(--spacing-md);"></i>
+              <p class="text-muted">No se encontraron facturas</p>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+

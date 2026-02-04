@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cobranza - PAK TRASLADOS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <span>🚐</span>
+        <span>PAK TRASLADOS</span>
+      </div>
+      <nav>
+        <ul class="sidebar-nav">
+          <li>
+            <a href="../index.html">
+              <span class="nav-icon"><i class="fas fa-home"></i></span>
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li>
+            <a href="cartera.html">
+              <span class="nav-icon"><i class="fas fa-users"></i></span>
+              <span>Cartera de Pacientes</span>
+            </a>
+          </li>
+          <li>
+            <a href="pacientes.html">
+              <span class="nav-icon"><i class="fas fa-user-injured"></i></span>
+              <span>Pacientes</span>
+            </a>
+          </li>
+          <li>
+            <a href="horarios.html">
+              <span class="nav-icon"><i class="fas fa-calendar-alt"></i></span>
+              <span>Horarios</span>
+            </a>
+          </li>
+          <li>
+            <a href="facturacion.html">
+              <span class="nav-icon"><i class="fas fa-file-invoice-dollar"></i></span>
+              <span>Facturación</span>
+            </a>
+          </li>
+          <li>
+            <a href="cobranza.html" class="active">
+              <span class="nav-icon"><i class="fas fa-money-bill-wave"></i></span>
+              <span>Cobranza</span>
+            </a>
+          </li>
+          <li>
+            <a href="presupuesto.html">
+              <span class="nav-icon"><i class="fas fa-chart-line"></i></span>
+              <span>Presupuesto</span>
+            </a>
+          </li>
+          <li>
+            <a href="reportes.html">
+              <span class="nav-icon"><i class="fas fa-chart-bar"></i></span>
+              <span>Reportes</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Header -->
+      <header class="header">
+        <div>
+          <h1>Gestión de Cobranza</h1>
+          <p class="text-muted">Seguimiento de pagos y comisiones</p>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-secondary">
+            <i class="fas fa-download"></i>
+            Exportar
+          </button>
+          <button class="btn btn-primary">
+            <i class="fas fa-plus"></i>
+            Registrar Pago
+          </button>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <div class="content">
+        <!-- Stats -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <span class="stat-label">Total a Cobrar</span>
+              <span class="stat-icon"><i class="fas fa-hand-holding-usd" style="color: var(--primary);"></i></span>
+            </div>
+            <div class="stat-value">$1.321.840</div>
+            <div class="stat-change">
+              <span>Facturación pendiente</span>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <span class="stat-label">Cobrado Este Mes</span>
+              <span class="stat-icon"><i class="fas fa-check-circle" style="color: var(--secondary);"></i></span>
+            </div>
+            <div class="stat-value">$523.480</div>
+            <div class="stat-change positive">
+              <i class="fas fa-arrow-up"></i>
+              <span>8 pagos recibidos</span>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <span class="stat-label">Pendiente de Cobro</span>
+              <span class="stat-icon"><i class="fas fa-clock" style="color: var(--warning);"></i></span>
+            </div>
+            <div class="stat-value">$798.360</div>
+            <div class="stat-change negative">
+              <i class="fas fa-exclamation-triangle"></i>
+              <span>16 facturas pendientes</span>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <span class="stat-label">Comisiones Generadas</span>
+              <span class="stat-icon"><i class="fas fa-percent" style="color: var(--info);"></i></span>
+            </div>
+            <div class="stat-value">$15.705</div>
+            <div class="stat-change">
+              <span>3% sobre cobrado</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Alertas -->
+        <div class="alert alert-warning">
+          <i class="fas fa-exclamation-triangle"></i>
+          <div>
+            <strong>Atención:</strong> Hay 4 facturas con más de 60 días de vencimiento. Se recomienda gestionar el cobro.
+          </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="filters">
+          <div class="filter-group">
+            <label class="filter-label">Período</label>
+            <select class="form-select">
+              <option>Enero 2025</option>
+              <option>Diciembre 2024</option>
+              <option>Noviembre 2024</option>
+              <option>Todos los períodos</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">Obra Social</label>
+            <select class="form-select">
+              <option value="todos">Todas</option>
+              <option value="osecac">OSECAC</option>
+              <option value="osmata">OSMATA</option>
+              <option value="ospsa">OSPSA</option>
+              <option value="pasteleros">PASTELEROS</option>
+              <option value="swiss">SWISS MEDICAL</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">Estado</label>
+            <select class="form-select">
+              <option value="todos">Todos</option>
+              <option value="pendiente">Pendiente</option>
+              <option value="pagado">Pagado</option>
+              <option value="parcial">Pago Parcial</option>
+              <option value="vencido">Vencido</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">Buscar</label>
+            <input type="text" class="form-input" placeholder="N° Factura o Recibo...">
+          </div>
+        </div>
+
+        <!-- Tabla de Cobranzas -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Estado de Cobranzas</h2>
+            <p class="card-subtitle">Seguimiento de pagos por factura</p>
+          </div>
+          
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>N° Factura</th>
+                  <th>Obra Social</th>
+                  <th>Fecha Factura</th>
+                  <th>Vencimiento</th>
+                  <th>Importe</th>
+                  <th>Pagado</th>
+                  <th>Saldo</th>
+                  <th>Fecha Pago</th>
+                  <th>N° Recibo</th>
+                  <th>Comisión 3%</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>0004-00001761</strong></td>
+                  <td>OSECAC</td>
+                  <td>15/01/2025</td>
+                  <td>14/02/2025</td>
+                  <td>$322.843,49</td>
+                  <td>$322.843,49</td>
+                  <td>$0,00</td>
+                  <td>28/01/2025</td>
+                  <td>REC-001234</td>
+                  <td>$9.685,30</td>
+                  <td><span class="badge badge-success">Pagado</span></td>
+                </tr>
+                <tr>
+                  <td><strong>0004-00001762</strong></td>
+                  <td>OSMATA</td>
+                  <td>16/01/2025</td>
+                  <td>15/02/2025</td>
+                  <td>$268.550,20</td>
+                  <td>$0,00</td>
+                  <td>$268.550,20</td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>$0,00</td>
+                  <td><span class="badge badge-warning">Pendiente</span></td>
+                </tr>
+                <tr>
+                  <td><strong>0004-00001763</strong></td>
+                  <td>OSPSA</td>
+                  <td>17/01/2025</td>
+                  <td>16/02/2025</td>
+                  <td>$156.780,80</td>
+                  <td>$156.780,80</td>
+                  <td>$0,00</td>
+                  <td>27/01/2025</td>
+                  <td>REC-001235</td>
+                  <td>$4.703,42</td>
+                  <td><span class="badge badge-success">Pagado</span></td>
+                </tr>
+                <tr>
+                  <td><strong>0004-00001764</strong></td>
+                  <td>OSECAC</td>
+                  <td>18/01/2025</td>
+                  <td>17/02/2025</td>
+                  <td>$189.234,60</td>
+                  <td>$0,00</td>
+                  <td>$189.234,60</td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>$0,00</td>
+                  <td><span class="badge badge-warning">Pendiente</span></td>
+                </tr>
+                <tr>
+                  <td><strong>0004-00001765</strong></td>
+                  <td>SWISS MEDICAL</td>
+                  <td>19/01/2025</td>
+                  <td>18/02/2025</td>
+                  <td>$133.590,50</td>
+                  <td>$0,00</td>
+                  <td>$133.590,50</td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>$0,00</td>
+                  <td><span class="badge badge-warning">Pendiente</span></td>
+                </tr>
+                <tr>
+                  <td><strong>0004-00001766</strong></td>
+                  <td>PASTELEROS</td>
+                  <td>20/01/2025</td>
+                  <td>19/02/2025</td>
+                  <td>$98.650,40</td>
+                  <td>$98.650,40</td>
+                  <td>$0,00</td>
+                  <td>26/01/2025</td>
+                  <td>REC-001236</td>
+                  <td>$2.959,51</td>
+                  <td><span class="badge badge-success">Pagado</span></td>
+                </tr>
+                <tr>
+                  <td><strong>0004-00001767</strong></td>
+                  <td>OSMATA</td>
+                  <td>21/01/2025</td>
+                  <td>20/02/2025</td>
+                  <td>$176.680,30</td>
+                  <td>$0,00</td>
+                  <td>$176.680,30</td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>$0,00</td>
+                  <td><span class="badge badge-warning">Pendiente</span></td>
+                </tr>
+                <tr>
+                  <td><strong>0004-00001768</strong></td>
+                  <td>OSPSA</td>
+                  <td>22/01/2025</td>
+                  <td>21/02/2025</td>
+                  <td>$155.109,50</td>
+                  <td>$0,00</td>
+                  <td>$155.109,50</td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>$0,00</td>
+                  <td><span class="badge badge-warning">Pendiente</span></td>
+                </tr>
+                <tr>
+                  <td><strong>0004-00001747</strong></td>
+                  <td>OSECAC</td>
+                  <td>12/12/2024</td>
+                  <td>11/01/2025</td>
+                  <td>$287.543,20</td>
+                  <td>$150.000,00</td>
+                  <td>$137.543,20</td>
+                  <td>05/01/2025</td>
+                  <td>REC-001220</td>
+                  <td>$4.500,00</td>
+                  <td><span class="badge badge-info">Pago Parcial</span></td>
+                </tr>
+                <tr>
+                  <td><strong>0004-00001735</strong></td>
+                  <td>OSMATA</td>
+                  <td>20/11/2024</td>
+                  <td>20/12/2024</td>
+                  <td>$198.765,40</td>
+                  <td>$0,00</td>
+                  <td>$198.765,40</td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>$0,00</td>
+                  <td><span class="badge badge-danger">Vencido 40 días</span></td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr style="background-color: var(--bg-secondary); font-weight: bold;">
+                  <td colspan="4" class="text-right">TOTALES:</td>
+                  <td><strong>$1.987.748,39</strong></td>
+                  <td><strong>$728.274,69</strong></td>
+                  <td><strong>$1.259.473,70</strong></td>
+                  <td colspan="2"></td>
+                  <td><strong>$21.848,23</strong></td>
+                  <td></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <!-- Paginación -->
+          <div class="pagination">
+            <a href="#" class="page-link active">1</a>
+            <a href="#" class="page-link">2</a>
+            <a href="#" class="page-link">3</a>
+            <a href="#" class="page-link">Siguiente</a>
+          </div>
+        </div>
+
+        <!-- Grid de Resúmenes -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-xl); margin-top: var(--spacing-xl);">
+          
+          <!-- Resumen por Obra Social -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Cobranza por Obra Social</h2>
+              <p class="card-subtitle">Estado de cobros por entidad</p>
+            </div>
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Obra Social</th>
+                    <th>A Cobrar</th>
+                    <th>Cobrado</th>
+                    <th>% Cobrado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>OSECAC</strong></td>
+                    <td>$799.621,29</td>
+                    <td>$472.843,49</td>
+                    <td><span class="badge badge-success">59%</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>OSMATA</strong></td>
+                    <td>$643.995,90</td>
+                    <td>$0,00</td>
+                    <td><span class="badge badge-danger">0%</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>OSPSA</strong></td>
+                    <td>$311.890,30</td>
+                    <td>$156.780,80</td>
+                    <td><span class="badge badge-warning">50%</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>SWISS MEDICAL</strong></td>
+                    <td>$133.590,50</td>
+                    <td>$0,00</td>
+                    <td><span class="badge badge-danger">0%</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>PASTELEROS</strong></td>
+                    <td>$98.650,40</td>
+                    <td>$98.650,40</td>
+                    <td><span class="badge badge-success">100%</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Comisiones -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Detalle de Comisiones</h2>
+              <p class="card-subtitle">Comisiones 3% sobre cobros</p>
+            </div>
+            <ul class="summary-list">
+              <li class="summary-item">
+                <span class="summary-label">Total Cobrado</span>
+                <span class="summary-value">$728.274,69</span>
+              </li>
+              <li class="summary-item">
+                <span class="summary-label">Comisión 3%</span>
+                <span class="summary-value" style="color: var(--secondary);">$21.848,23</span>
+              </li>
+              <li class="summary-item">
+                <span class="summary-label">Neto a Recibir</span>
+                <span class="summary-value">$706.426,46</span>
+              </li>
+            </ul>
+
+            <hr style="margin: var(--spacing-lg) 0; border: none; border-top: 1px solid var(--border);">
+
+            <div class="card-header">
+              <h3 class="card-title" style="font-size: var(--font-size-base);">Histórico de Comisiones</h3>
+            </div>
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Mes</th>
+                    <th>Cobrado</th>
+                    <th>Comisión</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Enero 2025</td>
+                    <td>$523.480,00</td>
+                    <td>$15.704,40</td>
+                  </tr>
+                  <tr>
+                    <td>Diciembre 2024</td>
+                    <td>$458.230,50</td>
+                    <td>$13.746,92</td>
+                  </tr>
+                  <tr>
+                    <td>Noviembre 2024</td>
+                    <td>$389.654,80</td>
+                    <td>$11.689,64</td>
+                  </tr>
+                  <tr>
+                    <td>Octubre 2024</td>
+                    <td>$412.987,60</td>
+                    <td>$12.389,63</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="../js/app.js"></script>
+</body>
+</html>
