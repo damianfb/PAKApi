@@ -1,0 +1,211 @@
+<!-- Stats -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-card-header">
+      <span class="stat-label">Total Períodos</span>
+      <span class="stat-icon"><i class="fas fa-calendar" style="color: var(--primary);"></i></span>
+    </div>
+    <div class="stat-value">{{ totalPeriodos }}</div>
+    <div class="stat-change">
+      <span>Año {{ selectedAnio }}</span>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-card-header">
+      <span class="stat-label">Períodos Abiertos</span>
+      <span class="stat-icon"><i class="fas fa-lock-open" style="color: var(--success);"></i></span>
+    </div>
+    <div class="stat-value">{{ periodosAbiertos }}</div>
+    <div class="stat-change positive">
+      <i class="fas fa-check-circle"></i>
+      <span>Activos para facturar</span>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-card-header">
+      <span class="stat-label">Períodos Cerrados</span>
+      <span class="stat-icon"><i class="fas fa-lock" style="color: var(--text-light);"></i></span>
+    </div>
+    <div class="stat-value">{{ periodosCerrados }}</div>
+    <div class="stat-change">
+      <span>Finalizados</span>
+    </div>
+  </div>
+</div>
+
+<!-- Alerta informativa -->
+<div class="alert alert-info">
+  <i class="fas fa-info-circle"></i>
+  <div>
+    <strong>Información:</strong> Los períodos de facturación definen los meses disponibles para generar facturas. 
+    Un período cerrado no permite crear nuevas facturas.
+  </div>
+</div>
+
+<!-- Filtros -->
+<div class="filters">
+  <div class="filter-group">
+    <label class="filter-label">Año</label>
+    <select class="form-select" [(ngModel)]="selectedAnio" (ngModelChange)="onFilterChange()">
+      @for (anio of anios; track anio) {
+        <option [value]="anio">{{ anio }}</option>
+      }
+    </select>
+  </div>
+  <div class="filter-group">
+    <label class="filter-label">Estado</label>
+    <select class="form-select" [(ngModel)]="selectedEstado" (ngModelChange)="onFilterChange()">
+      <option value="todos">Todos</option>
+      <option value="abierto">Abiertos</option>
+      <option value="cerrado">Cerrados</option>
+    </select>
+  </div>
+  <div class="filter-group" style="align-self: flex-end; margin-left: auto;">
+    <button class="btn btn-primary" (click)="openNewPeriodoModal()">
+      <i class="fas fa-plus"></i>
+      Nuevo Período
+    </button>
+  </div>
+</div>
+
+<!-- Tabla de Períodos -->
+<div class="card">
+  <div class="card-header">
+    <h2 class="card-title">Períodos de Facturación</h2>
+    <p class="card-subtitle">{{ periodos().length }} período(s) encontrado(s)</p>
+  </div>
+  
+  @if (loading()) {
+    <div class="loading-container">
+      <i class="fas fa-spinner fa-spin fa-2x"></i>
+      <p>Cargando períodos...</p>
+    </div>
+  } @else {
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Período</th>
+            <th>Mes</th>
+            <th>Año</th>
+            <th>Fecha Inicio</th>
+            <th>Fecha Fin</th>
+            <th>Estado</th>
+            <th>Observaciones</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (periodo of periodos(); track periodo.id) {
+            <tr>
+              <td><strong>{{ formatPeriodo(periodo) }}</strong></td>
+              <td>{{ getMesLabel(periodo.mes) }}</td>
+              <td>{{ periodo.anio }}</td>
+              <td>{{ periodo.fecha_inicio | date:'dd/MM/yyyy' }}</td>
+              <td>{{ periodo.fecha_fin | date:'dd/MM/yyyy' }}</td>
+              <td>
+                <span [class]="getEstadoBadgeClass(periodo.cerrado)">
+                  {{ getEstadoLabel(periodo.cerrado) }}
+                </span>
+              </td>
+              <td>{{ periodo.observaciones || '-' }}</td>
+              <td>
+                <div class="action-buttons">
+                  <button class="btn btn-sm btn-secondary btn-icon" (click)="editPeriodo(periodo)" title="Editar">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  @if (!periodo.cerrado) {
+                    <button class="btn btn-sm btn-warning btn-icon" (click)="cerrarPeriodo(periodo)" title="Cerrar período">
+                      <i class="fas fa-lock"></i>
+                    </button>
+                  } @else {
+                    <button class="btn btn-sm btn-success btn-icon" (click)="abrirPeriodo(periodo)" title="Reabrir período">
+                      <i class="fas fa-lock-open"></i>
+                    </button>
+                  }
+                  <button class="btn btn-sm btn-danger btn-icon" (click)="deletePeriodo(periodo)" title="Eliminar">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="8" class="text-center" style="padding: var(--spacing-xl);">
+                <i class="fas fa-calendar-times" style="font-size: 3rem; color: var(--text-light); margin-bottom: var(--spacing-md);"></i>
+                <p class="text-muted">No se encontraron períodos para el año {{ selectedAnio }}</p>
+                <button class="btn btn-primary" (click)="openNewPeriodoModal()">
+                  <i class="fas fa-plus"></i> Crear Período
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
+
+<!-- Modal de Crear/Editar Período -->
+@if (showModal) {
+  <div class="modal-overlay" (click)="closeModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>
+          @if (modalMode === 'create') {
+            <i class="fas fa-plus-circle"></i> Nuevo Período
+          } @else {
+            <i class="fas fa-edit"></i> Editar Período
+          }
+        </h2>
+        <button class="btn-close" (click)="closeModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form class="periodo-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Mes *</label>
+              <select class="form-select" [(ngModel)]="formMes" name="mes" [disabled]="modalMode === 'edit'">
+                @for (mes of meses; track mes.value) {
+                  <option [value]="mes.value">{{ mes.label }}</option>
+                }
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Año *</label>
+              <select class="form-select" [(ngModel)]="formAnio" name="anio" [disabled]="modalMode === 'edit'">
+                @for (anio of anios; track anio) {
+                  <option [value]="anio">{{ anio }}</option>
+                }
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Observaciones</label>
+            <textarea class="form-input" rows="3" placeholder="Observaciones adicionales..."
+                      [(ngModel)]="formObservaciones" name="observaciones"></textarea>
+          </div>
+
+          @if (modalMode === 'create') {
+            <div class="alert alert-warning" style="margin-top: var(--spacing-md);">
+              <i class="fas fa-exclamation-triangle"></i>
+              <span>Las fechas de inicio y fin se calcularán automáticamente según el mes y año seleccionados.</span>
+            </div>
+          }
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeModal()">Cancelar</button>
+        <button class="btn btn-primary" (click)="savePeriodo()">
+          <i class="fas fa-save"></i>
+          {{ modalMode === 'create' ? 'Crear Período' : 'Guardar Cambios' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

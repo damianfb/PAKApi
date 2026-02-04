@@ -1,80 +1,327 @@
-<div class="pacientes-container">
-  <div class="header">
-    <h1>Gestión de Pacientes</h1>
-    <button mat-raised-button color="primary">
-      <mat-icon>add</mat-icon>
+<!-- Stats -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-card-header">
+      <span class="stat-label">Total Pacientes</span>
+      <span class="stat-icon"><i class="fas fa-users" style="color: var(--primary);"></i></span>
+    </div>
+    <div class="stat-value">{{ totalPacientes }}</div>
+    <div class="stat-change">
+      <span>Registrados en el sistema</span>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-card-header">
+      <span class="stat-label">Pacientes Activos</span>
+      <span class="stat-icon"><i class="fas fa-user-check" style="color: var(--secondary);"></i></span>
+    </div>
+    <div class="stat-value">{{ pacientesActivos }}</div>
+    <div class="stat-change positive">
+      <i class="fas fa-check-circle"></i>
+      <span>En servicio activo</span>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-card-header">
+      <span class="stat-label">Con Dependencia</span>
+      <span class="stat-icon"><i class="fas fa-wheelchair" style="color: var(--warning);"></i></span>
+    </div>
+    <div class="stat-value">{{ pacientesConDependencia }}</div>
+    <div class="stat-change">
+      <span>Requieren asistencia</span>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-card-header">
+      <span class="stat-label">Obras Sociales</span>
+      <span class="stat-icon"><i class="fas fa-building" style="color: var(--info);"></i></span>
+    </div>
+    <div class="stat-value">{{ obrasSocialesCount }}</div>
+    <div class="stat-change">
+      <span>Coberturas diferentes</span>
+    </div>
+  </div>
+</div>
+
+<!-- Filtros -->
+<div class="filters">
+  <div class="filter-group">
+    <label class="filter-label">Buscar Paciente</label>
+    <div class="search-input">
+      <i class="fas fa-search"></i>
+      <input type="text" class="form-input" placeholder="Nombre, DNI o teléfono..." 
+             [(ngModel)]="searchTerm">
+    </div>
+  </div>
+  <div class="filter-group">
+    <label class="filter-label">Obra Social</label>
+    <select class="form-select" [(ngModel)]="selectedObraSocial">
+      <option value="todos">Todas</option>
+      @for (os of obrasSociales; track os) {
+        <option [value]="os.toLowerCase()">{{ os }}</option>
+      }
+    </select>
+  </div>
+  <div class="filter-group">
+    <label class="filter-label">Estado</label>
+    <select class="form-select" [(ngModel)]="selectedEstado">
+      <option value="todos">Todos</option>
+      <option value="activo">Activos</option>
+      <option value="inactivo">Inactivos</option>
+    </select>
+  </div>
+  <div class="filter-group" style="align-self: flex-end;">
+    <button class="btn btn-primary" (click)="openNewPacienteModal()">
+      <i class="fas fa-plus"></i>
       Nuevo Paciente
     </button>
   </div>
+</div>
 
-  <mat-form-field appearance="outline" class="search-field">
-    <mat-label>Buscar paciente</mat-label>
-    <input matInput placeholder="Nombre, DNI, etc.">
-    <mat-icon matPrefix>search</mat-icon>
-  </mat-form-field>
-
+<!-- Tabla de Pacientes -->
+<div class="card">
+  <div class="card-header">
+    <h2 class="card-title">Listado de Pacientes</h2>
+    <p class="card-subtitle">{{ filteredPacientes.length }} paciente(s) encontrado(s)</p>
+  </div>
+  
   @if (loading()) {
     <div class="loading-container">
-      <mat-spinner></mat-spinner>
+      <i class="fas fa-spinner fa-spin fa-2x"></i>
+      <p>Cargando pacientes...</p>
     </div>
   } @else {
     <div class="table-container">
-      <table mat-table [dataSource]="pacientes()" class="mat-elevation-z2">
-        <ng-container matColumnDef="nombre">
-          <th mat-header-cell *matHeaderCellDef>Nombre Completo</th>
-          <td mat-cell *matCellDef="let paciente">
-            {{ paciente.apellido }}, {{ paciente.nombre }}
-          </td>
-        </ng-container>
-
-        <ng-container matColumnDef="dni">
-          <th mat-header-cell *matHeaderCellDef>DNI</th>
-          <td mat-cell *matCellDef="let paciente">{{ paciente.dni }}</td>
-        </ng-container>
-
-        <ng-container matColumnDef="telefono">
-          <th mat-header-cell *matHeaderCellDef>Teléfono</th>
-          <td mat-cell *matCellDef="let paciente">{{ paciente.telefono || '-' }}</td>
-        </ng-container>
-
-        <ng-container matColumnDef="direccion">
-          <th mat-header-cell *matHeaderCellDef>Dirección</th>
-          <td mat-cell *matCellDef="let paciente">
-            {{ paciente.direccion_particular }}, {{ paciente.localidad }}
-          </td>
-        </ng-container>
-
-        <ng-container matColumnDef="activo">
-          <th mat-header-cell *matHeaderCellDef>Estado</th>
-          <td mat-cell *matCellDef="let paciente">
-            <mat-chip [class.active]="paciente.activo" [class.inactive]="!paciente.activo">
-              {{ paciente.activo ? 'Activo' : 'Inactivo' }}
-            </mat-chip>
-          </td>
-        </ng-container>
-
-        <ng-container matColumnDef="acciones">
-          <th mat-header-cell *matHeaderCellDef>Acciones</th>
-          <td mat-cell *matCellDef="let paciente">
-            <button mat-icon-button color="primary">
-              <mat-icon>visibility</mat-icon>
-            </button>
-            <button mat-icon-button color="accent">
-              <mat-icon>edit</mat-icon>
-            </button>
-          </td>
-        </ng-container>
-
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      <table>
+        <thead>
+          <tr>
+            <th>Paciente</th>
+            <th>DNI</th>
+            <th>Teléfono</th>
+            <th>Dirección</th>
+            <th>Obra Social</th>
+            <th>Dependencia</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (paciente of filteredPacientes; track paciente.id) {
+            <tr>
+              <td>
+                <div class="paciente-info">
+                  <strong>{{ paciente.apellido }}, {{ paciente.nombre }}</strong>
+                </div>
+              </td>
+              <td>{{ paciente.dni }}</td>
+              <td>{{ paciente.telefono || '-' }}</td>
+              <td>
+                <span class="direccion-text">{{ paciente.direccion_particular }}, {{ paciente.localidad }}</span>
+              </td>
+              <td><span class="badge badge-secondary">{{ paciente.obraSocial }}</span></td>
+              <td>
+                <span class="badge" [class.badge-warning]="paciente.tipo_dependencia === 'C/DEPEN'" 
+                      [class.badge-info]="paciente.tipo_dependencia === 'S/DEPEN'">
+                  {{ paciente.tipo_dependencia }}
+                </span>
+              </td>
+              <td>
+                <span class="badge" [class.badge-success]="paciente.activo" [class.badge-danger]="!paciente.activo">
+                  {{ paciente.activo ? 'Activo' : 'Inactivo' }}
+                </span>
+              </td>
+              <td>
+                <div class="table-actions">
+                  <button class="btn-icon" (click)="viewPaciente(paciente)" title="Ver detalle">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                  <button class="btn-icon" (click)="editPaciente(paciente)" title="Editar">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="8" class="empty-state">
+                <i class="fas fa-user-slash"></i>
+                <p>No se encontraron pacientes</p>
+              </td>
+            </tr>
+          }
+        </tbody>
       </table>
     </div>
-
-    @if (pacientes().length === 0) {
-      <div class="no-data">
-        <mat-icon>info</mat-icon>
-        <p>No hay pacientes registrados</p>
-      </div>
-    }
   }
 </div>
+
+<!-- Modal de Paciente -->
+@if (showModal) {
+  <div class="modal-overlay" (click)="closeModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>
+          @if (modalMode === 'create') {
+            <i class="fas fa-user-plus"></i> Nuevo Paciente
+          } @else if (modalMode === 'edit') {
+            <i class="fas fa-edit"></i> Editar Paciente
+          } @else {
+            <i class="fas fa-user"></i> Detalle del Paciente
+          }
+        </h2>
+        <button class="btn-close" (click)="closeModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        @if (modalMode === 'view' && selectedPaciente) {
+          <!-- Vista de detalle -->
+          <div class="detail-grid">
+            <div class="detail-section">
+              <h3><i class="fas fa-user"></i> Datos Personales</h3>
+              <div class="detail-row">
+                <span class="detail-label">Nombre Completo:</span>
+                <span class="detail-value">{{ selectedPaciente.apellido }}, {{ selectedPaciente.nombre }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">DNI:</span>
+                <span class="detail-value">{{ selectedPaciente.dni }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Teléfono:</span>
+                <span class="detail-value">{{ selectedPaciente.telefono || 'No registrado' }}</span>
+              </div>
+            </div>
+            
+            <div class="detail-section">
+              <h3><i class="fas fa-map-marker-alt"></i> Dirección</h3>
+              <div class="detail-row">
+                <span class="detail-label">Dirección:</span>
+                <span class="detail-value">{{ selectedPaciente.direccion_particular }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Localidad:</span>
+                <span class="detail-value">{{ selectedPaciente.localidad }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Provincia:</span>
+                <span class="detail-value">{{ selectedPaciente.provincia }}</span>
+              </div>
+            </div>
+            
+            <div class="detail-section">
+              <h3><i class="fas fa-hospital"></i> Cobertura Médica</h3>
+              <div class="detail-row">
+                <span class="detail-label">Obra Social:</span>
+                <span class="detail-value">{{ selectedPaciente.obraSocial }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Dependencia:</span>
+                <span class="detail-value">
+                  <span class="badge" [class.badge-warning]="selectedPaciente.tipo_dependencia === 'C/DEPEN'" 
+                        [class.badge-info]="selectedPaciente.tipo_dependencia === 'S/DEPEN'">
+                    {{ selectedPaciente.tipo_dependencia === 'C/DEPEN' ? 'Con Dependencia' : 'Sin Dependencia' }}
+                  </span>
+                </span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Estado:</span>
+                <span class="detail-value">
+                  <span class="badge" [class.badge-success]="selectedPaciente.activo" [class.badge-danger]="!selectedPaciente.activo">
+                    {{ selectedPaciente.activo ? 'Activo' : 'Inactivo' }}
+                  </span>
+                </span>
+              </div>
+            </div>
+          </div>
+        } @else {
+          <!-- Formulario de creación/edición -->
+          <form class="paciente-form">
+            <div class="form-section">
+              <h3>Datos Personales</h3>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Nombre *</label>
+                  <input type="text" class="form-input" placeholder="Nombre" [value]="selectedPaciente?.nombre || ''">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Apellido *</label>
+                  <input type="text" class="form-input" placeholder="Apellido" [value]="selectedPaciente?.apellido || ''">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">DNI *</label>
+                  <input type="text" class="form-input" placeholder="12345678" [value]="selectedPaciente?.dni || ''">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Teléfono</label>
+                  <input type="text" class="form-input" placeholder="(351) 555-1234" [value]="selectedPaciente?.telefono || ''">
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h3>Dirección</h3>
+              <div class="form-group">
+                <label class="form-label">Dirección *</label>
+                <input type="text" class="form-input" placeholder="Calle y número" [value]="selectedPaciente?.direccion_particular || ''">
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Localidad *</label>
+                  <input type="text" class="form-input" placeholder="Localidad" [value]="selectedPaciente?.localidad || ''">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Provincia *</label>
+                  <select class="form-select">
+                    <option value="Córdoba" selected>Córdoba</option>
+                    <option value="Buenos Aires">Buenos Aires</option>
+                    <option value="Santa Fe">Santa Fe</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h3>Cobertura Médica</h3>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Obra Social *</label>
+                  <select class="form-select">
+                    @for (os of obrasSociales; track os) {
+                      <option [value]="os" [selected]="selectedPaciente?.obraSocial === os">{{ os }}</option>
+                    }
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Tipo de Dependencia *</label>
+                  <select class="form-select">
+                    <option value="C/DEPEN" [selected]="selectedPaciente?.tipo_dependencia === 'C/DEPEN'">Con Dependencia</option>
+                    <option value="S/DEPEN" [selected]="selectedPaciente?.tipo_dependencia === 'S/DEPEN'">Sin Dependencia</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </form>
+        }
+      </div>
+      <div class="modal-footer">
+        @if (modalMode === 'view') {
+          <button class="btn btn-secondary" (click)="closeModal()">Cerrar</button>
+          <button class="btn btn-primary" (click)="editPaciente(selectedPaciente!)">
+            <i class="fas fa-edit"></i> Editar
+          </button>
+        } @else {
+          <button class="btn btn-secondary" (click)="closeModal()">Cancelar</button>
+          <button class="btn btn-primary" (click)="onModalSave({})">
+            <i class="fas fa-save"></i> {{ modalMode === 'edit' ? 'Actualizar' : 'Guardar' }}
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+}

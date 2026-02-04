@@ -1,0 +1,194 @@
+<h2 mat-dialog-title>
+  <mat-icon>receipt_long</mat-icon>
+  {{ dialogTitle }}
+</h2>
+
+<mat-dialog-content>
+  @if (loadingData()) {
+    <div class="loading-container">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>Cargando datos...</p>
+    </div>
+  } @else {
+    <form [formGroup]="form" class="factura-form">
+      <!-- Información Principal -->
+      <div class="form-section">
+        <h3>Información de la Factura</h3>
+        
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Número de Factura</mat-label>
+            <input matInput formControlName="numero_factura" placeholder="0004-00001762">
+            @if (form.get('numero_factura')?.hasError('required')) {
+              <mat-error>El número de factura es requerido</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Período</mat-label>
+            <mat-select formControlName="periodo_id">
+              @for (periodo of periodos(); track periodo.id) {
+                <mat-option [value]="periodo.id">{{ formatPeriodo(periodo) }}</mat-option>
+              }
+            </mat-select>
+            @if (form.get('periodo_id')?.hasError('required')) {
+              <mat-error>El período es requerido</mat-error>
+            }
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Fecha de Emisión</mat-label>
+            <input matInput [matDatepicker]="pickerEmision" formControlName="fecha_emision">
+            <mat-datepicker-toggle matIconSuffix [for]="pickerEmision"></mat-datepicker-toggle>
+            <mat-datepicker #pickerEmision></mat-datepicker>
+            @if (form.get('fecha_emision')?.hasError('required')) {
+              <mat-error>La fecha de emisión es requerida</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Fecha de Vencimiento</mat-label>
+            <input matInput [matDatepicker]="pickerVencimiento" formControlName="fecha_vencimiento">
+            <mat-datepicker-toggle matIconSuffix [for]="pickerVencimiento"></mat-datepicker-toggle>
+            <mat-datepicker #pickerVencimiento></mat-datepicker>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Obra Social</mat-label>
+            <mat-select formControlName="obra_social_id">
+              <mat-option value="">Sin asignar</mat-option>
+              @for (os of obrasSociales(); track os.id) {
+                <mat-option [value]="os.id">{{ os.nombre }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Estado</mat-label>
+            <mat-select formControlName="estado">
+              @for (estado of estados; track estado.value) {
+                <mat-option [value]="estado.value">{{ estado.label }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Montos -->
+      <div class="form-section">
+        <h3>Montos</h3>
+        
+        <div class="form-row form-row-3">
+          <mat-form-field appearance="outline">
+            <mat-label>Subtotal</mat-label>
+            <input matInput type="number" formControlName="subtotal" min="0" step="0.01">
+            <span matTextPrefix>$&nbsp;</span>
+            @if (form.get('subtotal')?.hasError('min')) {
+              <mat-error>El subtotal no puede ser negativo</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Impuestos (IVA)</mat-label>
+            <input matInput type="number" formControlName="impuestos" min="0" step="0.01">
+            <span matTextPrefix>$&nbsp;</span>
+            @if (form.get('impuestos')?.hasError('min')) {
+              <mat-error>Los impuestos no pueden ser negativos</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="monto-total">
+            <mat-label>Monto Total</mat-label>
+            <input matInput type="number" formControlName="monto_total" min="0" step="0.01" readonly>
+            <span matTextPrefix>$&nbsp;</span>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Detalles de la Factura (solo en edición/vista) -->
+      @if (data.factura && detalles().length > 0) {
+        <div class="form-section">
+          <div class="section-header">
+            <h3>Detalles de la Factura</h3>
+            @if (!isViewMode) {
+              <button mat-mini-fab color="primary" (click)="addDetalle()" matTooltip="Agregar detalle">
+                <mat-icon>add</mat-icon>
+              </button>
+            }
+          </div>
+          
+          <table mat-table [dataSource]="detalles()" class="detalles-table">
+            <ng-container matColumnDef="descripcion">
+              <th mat-header-cell *matHeaderCellDef>Descripción</th>
+              <td mat-cell *matCellDef="let detalle">{{ detalle.descripcion }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="cantidad">
+              <th mat-header-cell *matHeaderCellDef>Cantidad</th>
+              <td mat-cell *matCellDef="let detalle">{{ detalle.cantidad }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="precio_unitario">
+              <th mat-header-cell *matHeaderCellDef>Precio Unit.</th>
+              <td mat-cell *matCellDef="let detalle">{{ detalle.precio_unitario | currency:'ARS':'symbol-narrow':'1.2-2' }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="subtotal">
+              <th mat-header-cell *matHeaderCellDef>Subtotal</th>
+              <td mat-cell *matCellDef="let detalle">{{ detalle.subtotal | currency:'ARS':'symbol-narrow':'1.2-2' }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="acciones">
+              <th mat-header-cell *matHeaderCellDef>Acciones</th>
+              <td mat-cell *matCellDef="let detalle">
+                @if (!isViewMode) {
+                  <button mat-icon-button color="primary" (click)="editDetalle(detalle)" matTooltip="Editar">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button mat-icon-button color="warn" (click)="removeDetalle(detalle)" matTooltip="Eliminar">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                }
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+        </div>
+      }
+
+      <!-- Observaciones -->
+      <div class="form-section">
+        <h3>Observaciones</h3>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Observaciones</mat-label>
+          <textarea matInput formControlName="observaciones" rows="3" 
+                    placeholder="Notas adicionales sobre la factura..."></textarea>
+        </mat-form-field>
+      </div>
+    </form>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">
+    {{ isViewMode ? 'Cerrar' : 'Cancelar' }}
+  </button>
+  @if (!isViewMode) {
+    <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="loading()">
+      @if (loading()) {
+        <mat-spinner diameter="20"></mat-spinner>
+      } @else {
+        <ng-container>
+          <mat-icon>save</mat-icon>
+          {{ data.mode === 'create' ? 'Crear Factura' : 'Guardar Cambios' }}
+        </ng-container>
+      }
+    </button>
+  }
+</mat-dialog-actions>

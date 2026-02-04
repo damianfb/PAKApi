@@ -1,16 +1,12 @@
-<mat-sidenav-container class="sidenav-container">
-  <mat-sidenav 
-    #sidenav 
-    mode="side" 
-    [opened]="sidenavOpened()"
-    class="sidenav">
-    <app-sidebar></app-sidebar>
-  </mat-sidenav>
+<div class="app-container">
+  <!-- Sidebar Navigation -->
+  <app-sidebar></app-sidebar>
 
-  <mat-sidenav-content>
-    <app-header (menuToggle)="toggleSidenav()"></app-header>
-    <main class="main-content">
+  <!-- Main Content -->
+  <main class="main-content">
+    <app-header></app-header>
+    <div class="content">
       <router-outlet></router-outlet>
-    </main>
-  </mat-sidenav-content>
-</mat-sidenav-container>
+    </div>
+  </main>
+</div>

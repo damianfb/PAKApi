@@ -1,24 +1,28 @@
-<mat-toolbar color="primary" class="header">
-  <button mat-icon-button (click)="onMenuClick()">
-    <mat-icon>menu</mat-icon>
-  </button>
-  
-  <span class="title">PAK - Transporte de Pacientes</span>
-  
-  <span class="spacer"></span>
-  
-  <button mat-icon-button [matMenuTriggerFor]="userMenu">
-    <mat-icon>account_circle</mat-icon>
-  </button>
-  
-  <mat-menu #userMenu="matMenu">
-    <div class="user-info" mat-menu-item disabled>
-      <div>{{ authService.currentUser()?.email }}</div>
+<header class="header">
+  <div>
+    <h1>{{ pageTitle }}</h1>
+    <p class="text-muted">{{ pageSubtitle }}</p>
+  </div>
+  <div class="header-actions">
+    <span class="text-muted">{{ currentDate }}</span>
+    <div class="user-dropdown">
+      <button class="btn btn-secondary" (click)="toggleUserMenu()">
+        <i class="fas fa-user-circle"></i>
+        <span>{{ authService.currentUser()?.email }}</span>
+        <i class="fas fa-chevron-down"></i>
+      </button>
+      @if (showUserMenu) {
+        <div class="dropdown-menu">
+          <div class="dropdown-item user-info">
+            {{ authService.currentUser()?.email }}
+          </div>
+          <hr>
+          <button class="dropdown-item" (click)="onLogout()">
+            <i class="fas fa-sign-out-alt"></i>
+            Cerrar Sesión
+          </button>
+        </div>
+      }
     </div>
-    <mat-divider></mat-divider>
-    <button mat-menu-item (click)="onLogout()">
-      <mat-icon>logout</mat-icon>
-      <span>Cerrar Sesión</span>
-    </button>
-  </mat-menu>
-</mat-toolbar>
+  </div>
+</header>

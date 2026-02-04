@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cartera de Pacientes - PAK TRASLADOS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <span>🚐</span>
+        <span>PAK TRASLADOS</span>
+      </div>
+      <nav>
+        <ul class="sidebar-nav">
+          <li>
+            <a href="../index.html">
+              <span class="nav-icon"><i class="fas fa-home"></i></span>
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li>
+            <a href="cartera.html" class="active">
+              <span class="nav-icon"><i class="fas fa-users"></i></span>
+              <span>Cartera de Pacientes</span>
+            </a>
+          </li>
+          <li>
+            <a href="pacientes.html">
+              <span class="nav-icon"><i class="fas fa-user-injured"></i></span>
+              <span>Pacientes</span>
+            </a>
+          </li>
+          <li>
+            <a href="horarios.html">
+              <span class="nav-icon"><i class="fas fa-calendar-alt"></i></span>
+              <span>Horarios</span>
+            </a>
+          </li>
+          <li>
+            <a href="facturacion.html">
+              <span class="nav-icon"><i class="fas fa-file-invoice-dollar"></i></span>
+              <span>Facturación</span>
+            </a>
+          </li>
+          <li>
+            <a href="cobranza.html">
+              <span class="nav-icon"><i class="fas fa-money-bill-wave"></i></span>
+              <span>Cobranza</span>
+            </a>
+          </li>
+          <li>
+            <a href="presupuesto.html">
+              <span class="nav-icon"><i class="fas fa-chart-line"></i></span>
+              <span>Presupuesto</span>
+            </a>
+          </li>
+          <li>
+            <a href="reportes.html">
+              <span class="nav-icon"><i class="fas fa-chart-bar"></i></span>
+              <span>Reportes</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Header -->
+      <header class="header">
+        <div>
+          <h1>Cartera de Pacientes</h1>
+          <p class="text-muted">Gestión completa de pacientes y traslados</p>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-secondary">
+            <i class="fas fa-download"></i>
+            Exportar
+          </button>
+          <button class="btn btn-primary">
+            <i class="fas fa-plus"></i>
+            Nuevo Paciente
+          </button>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <div class="content">
+        <!-- Filtros -->
+        <div class="filters">
+          <div class="filter-group">
+            <label class="filter-label">Buscar</label>
+            <input type="text" class="form-input" placeholder="Nombre, DNI o N°..." data-table-search="pacientes-table">
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">Obra Social</label>
+            <select class="form-select" data-table-filter="pacientes-table" data-filter-column="3">
+              <option value="todos">Todas</option>
+              <option value="osecac">OSECAC</option>
+              <option value="osmata">OSMATA</option>
+              <option value="ospsa">OSPSA</option>
+              <option value="pasteleros">PASTELEROS</option>
+              <option value="swiss">SWISS MEDICAL</option>
+              <option value="otros">Otros</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">Dependencia</label>
+            <select class="form-select">
+              <option value="todos">Todas</option>
+              <option value="con">Con Dependencia</option>
+              <option value="sin">Sin Dependencia</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">Estado</label>
+            <select class="form-select">
+              <option value="activo">Activo</option>
+              <option value="inactivo">Inactivo</option>
+              <option value="todos">Todos</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid" style="margin-bottom: var(--spacing-xl);">
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <span class="stat-label">Total Pacientes</span>
+              <span class="stat-icon"><i class="fas fa-users" style="color: var(--primary);"></i></span>
+            </div>
+            <div class="stat-value">42</div>
+            <div class="stat-change positive">
+              <span>Activos</span>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <span class="stat-label">Km Totales/día</span>
+              <span class="stat-icon"><i class="fas fa-route" style="color: var(--info);"></i></span>
+            </div>
+            <div class="stat-value">784</div>
+            <div class="stat-change">
+              <span>Recorrido diario</span>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <span class="stat-label">Facturación Estimada</span>
+              <span class="stat-icon"><i class="fas fa-dollar-sign" style="color: var(--secondary);"></i></span>
+            </div>
+            <div class="stat-value">$1.8M</div>
+            <div class="stat-change positive">
+              <span>Mensual</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabla de Pacientes -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Lista de Pacientes</h2>
+            <p class="card-subtitle">42 pacientes registrados</p>
+          </div>
+          
+          <div class="table-container">
+            <table id="pacientes-table">
+              <thead>
+                <tr>
+                  <th>N°</th>
+                  <th>Apellido y Nombre</th>
+                  <th>DNI</th>
+                  <th>Obra Social</th>
+                  <th>Teléfono</th>
+                  <th>Domicilio</th>
+                  <th>Km/día</th>
+                  <th>Dependencia</th>
+                  <th>Monto Mensual</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>001</td>
+                  <td><strong>ALANIS TOMAS SEBASTIAN</strong></td>
+                  <td>55284684</td>
+                  <td>OSMATA</td>
+                  <td>(351) 555-1234</td>
+                  <td>Av. Colón 1234, Córdoba</td>
+                  <td>28</td>
+                  <td><span class="badge badge-warning">C/DEPEN</span></td>
+                  <td><strong>$467.163</strong></td>
+                  <td><span class="badge badge-success">Activo</span></td>
+                </tr>
+                <tr>
+                  <td>002</td>
+                  <td><strong>CONSALVO ANTONINI ABEL</strong></td>
+                  <td>47352009</td>
+                  <td>OSECAC</td>
+                  <td>(351) 555-5678</td>
+                  <td>Bv. San Juan 567, Córdoba</td>
+                  <td>25</td>
+                  <td><span class="badge badge-warning">C/DEPEN</span></td>
+                  <td><strong>$416.895</strong></td>
+                  <td><span class="badge badge-success">Activo</span></td>
+                </tr>
+                <tr>
+                  <td>003</td>
+                  <td><strong>RODRIGUEZ MARIA SOL</strong></td>
+                  <td>52189456</td>
+                  <td>OSPSA</td>
+                  <td>(351) 555-9012</td>
+                  <td>Recta Martinoli 2890, Córdoba</td>
+                  <td>22</td>
+                  <td><span class="badge badge-info">S/DEPEN</span></td>
+                  <td><strong>$271.753</strong></td>
+                  <td><span class="badge badge-success">Activo</span></td>
+                </tr>
+                <tr>
+                  <td>004</td>
+                  <td><strong>MARTINEZ JUAN PABLO</strong></td>
+                  <td>48234567</td>
+                  <td>OSECAC</td>
+                  <td>(351) 555-3456</td>
+                  <td>Av. Rafael Núñez 4567, Córdoba</td>
+                  <td>20</td>
+                  <td><span class="badge badge-warning">C/DEPEN</span></td>
+                  <td><strong>$333.516</strong></td>
+                  <td><span class="badge badge-success">Activo</span></td>
+                </tr>
+                <tr>
+                  <td>005</td>
+                  <td><strong>FERNANDEZ LUCAS GABRIEL</strong></td>
+                  <td>53567890</td>
+                  <td>OSMATA</td>
+                  <td>(351) 555-7890</td>
+                  <td>Calle Falsa 123, Villa Carlos Paz</td>
+                  <td>18</td>
+                  <td><span class="badge badge-info">S/DEPEN</span></td>
+                  <td><strong>$222.344</strong></td>
+                  <td><span class="badge badge-success">Activo</span></td>
+                </tr>
+                <tr>
+                  <td>006</td>
+                  <td><strong>GOMEZ ANA LAURA</strong></td>
+                  <td>49876543</td>
+                  <td>SWISS MEDICAL</td>
+                  <td>(351) 555-2345</td>
+                  <td>Poeta Lugones 345, Córdoba</td>
+                  <td>15</td>
+                  <td><span class="badge badge-warning">C/DEPEN</span></td>
+                  <td><strong>$250.137</strong></td>
+                  <td><span class="badge badge-success">Activo</span></td>
+                </tr>
+                <tr>
+                  <td>007</td>
+                  <td><strong>LOPEZ DIEGO MARTIN</strong></td>
+                  <td>54321098</td>
+                  <td>PASTELEROS</td>
+                  <td>(351) 555-6789</td>
+                  <td>Duarte Quirós 890, Córdoba</td>
+                  <td>14</td>
+                  <td><span class="badge badge-info">S/DEPEN</span></td>
+                  <td><strong>$172.933</strong></td>
+                  <td><span class="badge badge-success">Activo</span></td>
+                </tr>
+                <tr>
+                  <td>008</td>
+                  <td><strong>SANCHEZ CARLA BEATRIZ</strong></td>
+                  <td>50123456</td>
+                  <td>OSECAC</td>
+                  <td>(351) 555-0123</td>
+                  <td>Av. Vélez Sarsfield 1234, Córdoba</td>
+                  <td>12</td>
+                  <td><span class="badge badge-warning">C/DEPEN</span></td>
+                  <td><strong>$180.097</strong></td>
+                  <td><span class="badge badge-success">Activo</span></td>
+                </tr>
+                <tr>
+                  <td>009</td>
+                  <td><strong>DIAZ MATIAS EZEQUIEL</strong></td>
+                  <td>51234567</td>
+                  <td>OSMATA</td>
+                  <td>(351) 555-4567</td>
+                  <td>Av. Richieri 567, Córdoba</td>
+                  <td>11</td>
+                  <td><span class="badge badge-info">S/DEPEN</span></td>
+                  <td><strong>$135.876</strong></td>
+                  <td><span class="badge badge-success">Activo</span></td>
+                </tr>
+                <tr>
+                  <td>010</td>
+                  <td><strong>TORRES SOFIA VALENTINA</strong></td>
+                  <td>52345678</td>
+                  <td>OSPSA</td>
+                  <td>(351) 555-8901</td>
+                  <td>Corro 234, Centro, Córdoba</td>
+                  <td>10</td>
+                  <td><span class="badge badge-warning">C/DEPEN</span></td>
+                  <td><strong>$166.758</strong></td>
+                  <td><span class="badge badge-success">Activo</span></td>
+                </tr>
+                <tr>
+                  <td>011</td>
+                  <td><strong>RAMIREZ NICOLAS MATEO</strong></td>
+                  <td>53456789</td>
+                  <td>OSECAC</td>
+                  <td>(351) 555-2346</td>
+                  <td>Laprida 456, Córdoba</td>
+                  <td>16</td>
+                  <td><span class="badge badge-warning">C/DEPEN</span></td>
+                  <td><strong>$266.810</strong></td>
+                  <td><span class="badge badge-success">Activo</span></td>
+                </tr>
+                <tr>
+                  <td>012</td>
+                  <td><strong>PEREYRA VALENTINA LUCIA</strong></td>
+                  <td>54567890</td>
+                  <td>OSMATA</td>
+                  <td>(351) 555-6790</td>
+                  <td>Sagrada Familia 789, Córdoba</td>
+                  <td>13</td>
+                  <td><span class="badge badge-info">S/DEPEN</span></td>
+                  <td><strong>$160.584</strong></td>
+                  <td><span class="badge badge-success">Activo</span></td>
+                </tr>
+                <tr>
+                  <td>013</td>
+                  <td><strong>MORENO BENJAMIN SANTIAGO</strong></td>
+                  <td>55678901</td>
+                  <td>PASTELEROS</td>
+                  <td>(351) 555-0124</td>
+                  <td>Av. Gral. Paz 1234, Córdoba</td>
+                  <td>9</td>
+                  <td><span class="badge badge-info">S/DEPEN</span></td>
+                  <td><strong>$111.186</strong></td>
+                  <td><span class="badge badge-success">Activo</span></td>
+                </tr>
+                <tr>
+                  <td>014</td>
+                  <td><strong>CASTILLO CATALINA BELEN</strong></td>
+                  <td>46789012</td>
+                  <td>OSECAC</td>
+                  <td>(351) 555-4568</td>
+                  <td>Mariano Moreno 567, Córdoba</td>
+                  <td>17</td>
+                  <td><span class="badge badge-warning">C/DEPEN</span></td>
+                  <td><strong>$283.487</strong></td>
+                  <td><span class="badge badge-success">Activo</span></td>
+                </tr>
+                <tr>
+                  <td>015</td>
+                  <td><strong>VERA EMILIANO JOSE</strong></td>
+                  <td>47890123</td>
+                  <td>SWISS MEDICAL</td>
+                  <td>(351) 555-8902</td>
+                  <td>Fader 890, Cerro de las Rosas</td>
+                  <td>8</td>
+                  <td><span class="badge badge-info">S/DEPEN</span></td>
+                  <td><strong>$98.821</strong></td>
+                  <td><span class="badge badge-success">Activo</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Paginación -->
+          <div class="pagination">
+            <a href="#" class="page-link active">1</a>
+            <a href="#" class="page-link">2</a>
+            <a href="#" class="page-link">3</a>
+            <a href="#" class="page-link">Siguiente</a>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="../js/app.js"></script>
+</body>
+</html>

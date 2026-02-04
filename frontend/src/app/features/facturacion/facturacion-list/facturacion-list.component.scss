@@ -1,0 +1,274 @@
+/* Facturacion List Styles */
+.header-actions {
+  display: flex;
+  gap: var(--spacing-md);
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-xl);
+  color: var(--text-light);
+  
+  p {
+    margin-top: var(--spacing-md);
+  }
+}
+
+.action-buttons {
+  display: flex;
+  gap: var(--spacing-xs);
+}
+
+.btn-icon {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  min-width: auto;
+}
+
+.btn-success {
+  background-color: var(--success);
+  color: white;
+  &:hover {
+    background-color: darken(#28a745, 10%);
+  }
+}
+
+.btn-info {
+  background-color: var(--info);
+  color: white;
+  &:hover {
+    background-color: darken(#17a2b8, 10%);
+  }
+}
+
+.btn-danger {
+  background-color: var(--danger);
+  color: white;
+  &:hover {
+    background-color: darken(#dc3545, 10%);
+  }
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  border-top: 1px solid var(--border-color);
+  
+  .pagination-info {
+    color: var(--text-light);
+    font-size: 0.875rem;
+  }
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: var(--spacing-md);
+}
+
+.modal {
+  background: white;
+  border-radius: var(--border-radius);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  max-height: 90vh;
+  overflow-y: auto;
+  width: 100%;
+  max-width: 600px;
+  
+  &.modal-lg {
+    max-width: 800px;
+  }
+  
+  &.modal-xl {
+    max-width: 1000px;
+  }
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-bottom: 1px solid var(--border-color);
+  
+  h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    
+    i {
+      color: var(--primary);
+    }
+  }
+}
+
+.btn-close {
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  color: var(--text-light);
+  cursor: pointer;
+  padding: var(--spacing-xs);
+  
+  &:hover {
+    color: var(--text-color);
+  }
+}
+
+.modal-body {
+  padding: var(--spacing-lg);
+}
+
+.modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-top: 1px solid var(--border-color);
+}
+
+/* Form Styles */
+.factura-form {
+  .form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+  }
+  
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+  
+  .form-label {
+    font-weight: 500;
+    margin-bottom: var(--spacing-xs);
+    color: var(--text-color);
+  }
+  
+  .form-input, .form-select {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    
+    &:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.2);
+    }
+  }
+  
+  textarea.form-input {
+    resize: vertical;
+  }
+}
+
+/* Detalle de Factura */
+.factura-detalle {
+  .factura-header-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+  }
+  
+  .info-section {
+    h3 {
+      font-size: 1rem;
+      color: var(--text-color);
+      margin-bottom: var(--spacing-md);
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      
+      i {
+        color: var(--primary);
+      }
+    }
+  }
+  
+  .info-grid {
+    display: grid;
+    gap: var(--spacing-sm);
+  }
+  
+  .info-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    
+    .info-label {
+      font-weight: 500;
+      color: var(--text-light);
+      min-width: 140px;
+    }
+    
+    .info-value {
+      color: var(--text-color);
+    }
+  }
+  
+  .factura-totales {
+    background: var(--background-light);
+    padding: var(--spacing-md);
+    border-radius: var(--border-radius);
+    margin-bottom: var(--spacing-lg);
+    
+    .total-item {
+      display: flex;
+      justify-content: space-between;
+      padding: var(--spacing-xs) 0;
+      
+      .total-label {
+        color: var(--text-light);
+      }
+      
+      .total-value {
+        font-weight: 500;
+      }
+      
+      &.total-final {
+        border-top: 2px solid var(--border-color);
+        margin-top: var(--spacing-sm);
+        padding-top: var(--spacing-sm);
+        
+        .total-label, .total-value {
+          font-size: 1.25rem;
+          font-weight: 700;
+          color: var(--primary);
+        }
+      }
+    }
+  }
+  
+  .observaciones-text {
+    background: var(--background-light);
+    padding: var(--spacing-md);
+    border-radius: var(--border-radius);
+    color: var(--text-color);
+    line-height: 1.5;
+  }
+}

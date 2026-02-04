@@ -1,12 +1,118 @@
-<div class="container">
-  <h1>Gestión de Horarios y Viajes</h1>
-  <p>Módulo de gestión de horarios y asignación de viajes por conductor</p>
-  
-  <mat-card>
-    <mat-card-content>
-      <p><mat-icon>schedule</mat-icon> Calendario semanal por chofer</p>
-      <p><mat-icon>location_on</mat-icon> Asignación de viajes</p>
-      <p><mat-icon>notifications</mat-icon> Alertas de conflictos de horarios</p>
-    </mat-card-content>
-  </mat-card>
+<!-- Stats de Choferes -->
+<div class="driver-stats">
+  <div class="driver-stat">
+    <div class="driver-stat-value">{{ totalViajes }}</div>
+    <div class="driver-stat-label">Viajes Programados</div>
+  </div>
+  <div class="driver-stat">
+    <div class="driver-stat-value">{{ totalKm }}</div>
+    <div class="driver-stat-label">Km Estimados</div>
+  </div>
+  <div class="driver-stat">
+    <div class="driver-stat-value">{{ pacientesAtendidos }}</div>
+    <div class="driver-stat-label">Pacientes Atendidos</div>
+  </div>
+  <div class="driver-stat">
+    <div class="driver-stat-value">{{ conductoresActivos }}</div>
+    <div class="driver-stat-label">Conductores Activos</div>
+  </div>
 </div>
+
+<!-- Filtros -->
+<div class="filters">
+  <div class="filter-group">
+    <label class="filter-label">Chofer</label>
+    <select class="form-select" [(ngModel)]="selectedChofer">
+      <option value="todos">Todos los Choferes</option>
+      @for (chofer of choferes; track chofer.id) {
+        <option [value]="chofer.id">{{ chofer.nombre }}</option>
+      }
+    </select>
+  </div>
+  <div class="filter-group">
+    <label class="filter-label">Semana</label>
+    <select class="form-select" [(ngModel)]="selectedSemana">
+      <option value="anterior">Semana Anterior</option>
+      <option value="actual">Semana Actual</option>
+      <option value="siguiente">Próxima Semana</option>
+    </select>
+  </div>
+  <div class="filter-group" style="flex: 0 0 auto;">
+    <label class="filter-label">&nbsp;</label>
+    <div class="header-actions">
+      <button class="btn btn-secondary" (click)="printSchedule()">
+        <i class="fas fa-print"></i>
+        Imprimir
+      </button>
+      <button class="btn btn-primary" (click)="openNewTrasladoModal()">
+        <i class="fas fa-plus"></i>
+        Nuevo Traslado
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Grilla de Horarios -->
+<div class="card">
+  <div class="card-header">
+    <h2 class="card-title">Planificación Semanal</h2>
+    <p class="card-subtitle">Semana del 27 al 31 de Enero 2025</p>
+  </div>
+  
+  <div class="schedule-week">
+    <!-- Header -->
+    <div class="schedule-header"></div>
+    @for (dia of diasSemana; track dia) {
+      <div class="schedule-header">{{ dia }}</div>
+    }
+    
+    <!-- Rows por hora -->
+    @for (hora of horasDelDia; track hora) {
+      <div class="schedule-time-slot">{{ hora }}</div>
+      @for (dia of diasSemana; track dia) {
+        <div class="schedule-cell">
+          @for (traslado of getTrasladosForCell(dia, hora); track traslado.id) {
+            <div class="trip-card" (click)="viewTraslado(traslado)">
+              <div class="trip-patient">{{ traslado.paciente }}</div>
+              <div class="trip-location">{{ traslado.destino }}</div>
+            </div>
+          }
+        </div>
+      }
+    }
+  </div>
+</div>
+
+<!-- Lista de Choferes -->
+<div class="card" style="margin-top: var(--spacing-xl);">
+  <div class="card-header">
+    <h2 class="card-title">Conductores Asignados</h2>
+    <p class="card-subtitle">Estado y asignaciones del día</p>
+  </div>
+  
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Conductor</th>
+          <th>Vehículo</th>
+          <th>Viajes Hoy</th>
+          <th>Km Hoy</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (chofer of choferes; track chofer.id) {
+          <tr>
+            <td><strong>{{ chofer.nombre }}</strong></td>
+            <td>{{ chofer.vehiculo }}</td>
+            <td>{{ chofer.viajesHoy }}</td>
+            <td>{{ chofer.kmHoy }} km</td>
+            <td><span class="badge badge-success">Activo</span></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+

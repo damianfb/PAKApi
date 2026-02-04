@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Facturación - PAK TRASLADOS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <span>🚐</span>
+        <span>PAK TRASLADOS</span>
+      </div>
+      <nav>
+        <ul class="sidebar-nav">
+          <li>
+            <a href="../index.html">
+              <span class="nav-icon"><i class="fas fa-home"></i></span>
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li>
+            <a href="cartera.html">
+              <span class="nav-icon"><i class="fas fa-users"></i></span>
+              <span>Cartera de Pacientes</span>
+            </a>
+          </li>
+          <li>
+            <a href="pacientes.html">
+              <span class="nav-icon"><i class="fas fa-user-injured"></i></span>
+              <span>Pacientes</span>
+            </a>
+          </li>
+          <li>
+            <a href="horarios.html">
+              <span class="nav-icon"><i class="fas fa-calendar-alt"></i></span>
+              <span>Horarios</span>
+            </a>
+          </li>
+          <li>
+            <a href="facturacion.html" class="active">
+              <span class="nav-icon"><i class="fas fa-file-invoice-dollar"></i></span>
+              <span>Facturación</span>
+            </a>
+          </li>
+          <li>
+            <a href="cobranza.html">
+              <span class="nav-icon"><i class="fas fa-money-bill-wave"></i></span>
+              <span>Cobranza</span>
+            </a>
+          </li>
+          <li>
+            <a href="presupuesto.html">
+              <span class="nav-icon"><i class="fas fa-chart-line"></i></span>
+              <span>Presupuesto</span>
+            </a>
+          </li>
+          <li>
+            <a href="reportes.html">
+              <span class="nav-icon"><i class="fas fa-chart-bar"></i></span>
+              <span>Reportes</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Header -->
+      <header class="header">
+        <div>
+          <h1>Facturación</h1>
+          <p class="text-muted">Gestión de facturas y seguimiento AFIP</p>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-secondary">
+            <i class="fas fa-download"></i>
+            Exportar
+          </button>
+          <button class="btn btn-primary">
+            <i class="fas fa-plus"></i>
+            Nueva Factura
+          </button>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <div class="content">
+        <!-- Stats -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <span class="stat-label">Total Facturado</span>
+              <span class="stat-icon"><i class="fas fa-file-invoice" style="color: var(--primary);"></i></span>
+            </div>
+            <div class="stat-value">$1.845.320</div>
+            <div class="stat-change positive">
+              <i class="fas fa-arrow-up"></i>
+              <span>+12% vs mes anterior</span>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <span class="stat-label">Facturas Emitidas</span>
+              <span class="stat-icon"><i class="fas fa-receipt" style="color: var(--secondary);"></i></span>
+            </div>
+            <div class="stat-value">24</div>
+            <div class="stat-change">
+              <span>Este mes</span>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <span class="stat-label">Pendientes AFIP</span>
+              <span class="stat-icon"><i class="fas fa-clock" style="color: var(--warning);"></i></span>
+            </div>
+            <div class="stat-value">3</div>
+            <div class="stat-change negative">
+              <i class="fas fa-exclamation-triangle"></i>
+              <span>Requieren CAE</span>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <span class="stat-label">Promedio por Factura</span>
+              <span class="stat-icon"><i class="fas fa-calculator" style="color: var(--info);"></i></span>
+            </div>
+            <div class="stat-value">$76.888</div>
+            <div class="stat-change">
+              <span>Enero 2025</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Alertas -->
+        <div class="alert alert-info">
+          <i class="fas fa-info-circle"></i>
+          <div>
+            <strong>Información:</strong> Las facturas con estado "Pendiente AFIP" requieren obtener el CAE (Código de Autorización Electrónico).
+          </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="filters">
+          <div class="filter-group">
+            <label class="filter-label">Período</label>
+            <select class="form-select">
+              <option>Enero 2025</option>
+              <option>Diciembre 2024</option>
+              <option>Noviembre 2024</option>
+              <option>Octubre 2024</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">Obra Social</label>
+            <select class="form-select">
+              <option value="todos">Todas</option>
+              <option value="osecac">OSECAC</option>
+              <option value="osmata">OSMATA</option>
+              <option value="ospsa">OSPSA</option>
+              <option value="pasteleros">PASTELEROS</option>
+              <option value="swiss">SWISS MEDICAL</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">Estado</label>
+            <select class="form-select">
+              <option value="todos">Todos</option>
+              <option value="emitida">Emitida</option>
+              <option value="pendiente">Pendiente AFIP</option>
+              <option value="anulada">Anulada</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">Buscar</label>
+            <input type="text" class="form-input" placeholder="N° Factura o CUIT...">
+          </div>
+        </div>
+
+        <!-- Tabla de Facturas -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Facturas Emitidas</h2>
+            <p class="card-subtitle">Listado completo de facturación</p>
+          </div>
+          
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>N° Factura</th>
+                  <th>CUIT</th>
+                  <th>Obra Social</th>
+                  <th>Fecha Emisión</th>
+                  <th>Período</th>
+                  <th>Importe</th>
+                  <th>CAE</th>
+                  <th>Vencimiento CAE</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>0004-00001761</strong></td>
+                  <td>30-59041263-1</td>
+                  <td>OSECAC</td>
+                  <td>15/01/2025</td>
+                  <td>Enero 2025</td>
+                  <td><strong>$322.843,49</strong></td>
+                  <td>75082648933471</td>
+                  <td>25/01/2025</td>
+                  <td><span class="badge badge-success">Emitida</span></td>
+                  <td>
+                    <button class="btn btn-sm btn-secondary" title="Ver detalle">
+                      <i class="fas fa-eye"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>0004-00001762</strong></td>
+                  <td>30-53844343-6</td>
+                  <td>OSMATA</td>
+                  <td>16/01/2025</td>
+                  <td>Enero 2025</td>
+                  <td><strong>$268.550,20</strong></td>
+                  <td>75082658744562</td>
+                  <td>26/01/2025</td>
+                  <td><span class="badge badge-success">Emitida</span></td>
+                  <td>
+                    <button class="btn btn-sm btn-secondary" title="Ver detalle">
+                      <i class="fas fa-eye"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>0004-00001763</strong></td>
+                  <td>30-70795304-6</td>
+                  <td>OSPSA</td>
+                  <td>17/01/2025</td>
+                  <td>Enero 2025</td>
+                  <td><strong>$156.780,80</strong></td>
+                  <td>75082668855653</td>
+                  <td>27/01/2025</td>
+                  <td><span class="badge badge-success">Emitida</span></td>
+                  <td>
+                    <button class="btn btn-sm btn-secondary" title="Ver detalle">
+                      <i class="fas fa-eye"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>0004-00001764</strong></td>
+                  <td>30-59041263-1</td>
+                  <td>OSECAC</td>
+                  <td>18/01/2025</td>
+                  <td>Enero 2025</td>
+                  <td><strong>$189.234,60</strong></td>
+                  <td></td>
+                  <td>-</td>
+                  <td><span class="badge badge-warning">Pendiente AFIP</span></td>
+                  <td>
+                    <button class="btn btn-sm btn-primary" title="Solicitar CAE">
+                      <i class="fas fa-check"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>0004-00001765</strong></td>
+                  <td>30-68018373-6</td>
+                  <td>SWISS MEDICAL</td>
+                  <td>19/01/2025</td>
+                  <td>Enero 2025</td>
+                  <td><strong>$133.590,50</strong></td>
+                  <td>75082688966744</td>
+                  <td>29/01/2025</td>
+                  <td><span class="badge badge-success">Emitida</span></td>
+                  <td>
+                    <button class="btn btn-sm btn-secondary" title="Ver detalle">
+                      <i class="fas fa-eye"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>0004-00001766</strong></td>
+                  <td>30-71108283-5</td>
+                  <td>PASTELEROS</td>
+                  <td>20/01/2025</td>
+                  <td>Enero 2025</td>
+                  <td><strong>$98.650,40</strong></td>
+                  <td>75082698077835</td>
+                  <td>30/01/2025</td>
+                  <td><span class="badge badge-success">Emitida</span></td>
+                  <td>
+                    <button class="btn btn-sm btn-secondary" title="Ver detalle">
+                      <i class="fas fa-eye"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>0004-00001767</strong></td>
+                  <td>30-53844343-6</td>
+                  <td>OSMATA</td>
+                  <td>21/01/2025</td>
+                  <td>Enero 2025</td>
+                  <td><strong>$176.680,30</strong></td>
+                  <td></td>
+                  <td>-</td>
+                  <td><span class="badge badge-warning">Pendiente AFIP</span></td>
+                  <td>
+                    <button class="btn btn-sm btn-primary" title="Solicitar CAE">
+                      <i class="fas fa-check"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>0004-00001768</strong></td>
+                  <td>30-70795304-6</td>
+                  <td>OSPSA</td>
+                  <td>22/01/2025</td>
+                  <td>Enero 2025</td>
+                  <td><strong>$155.109,50</strong></td>
+                  <td>75082718188926</td>
+                  <td>01/02/2025</td>
+                  <td><span class="badge badge-success">Emitida</span></td>
+                  <td>
+                    <button class="btn btn-sm btn-secondary" title="Ver detalle">
+                      <i class="fas fa-eye"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>0004-00001769</strong></td>
+                  <td>30-59041263-1</td>
+                  <td>OSECAC</td>
+                  <td>23/01/2025</td>
+                  <td>Enero 2025</td>
+                  <td><strong>$234.567,80</strong></td>
+                  <td>75082728299017</td>
+                  <td>02/02/2025</td>
+                  <td><span class="badge badge-success">Emitida</span></td>
+                  <td>
+                    <button class="btn btn-sm btn-secondary" title="Ver detalle">
+                      <i class="fas fa-eye"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>0004-00001770</strong></td>
+                  <td>30-68018373-6</td>
+                  <td>SWISS MEDICAL</td>
+                  <td>24/01/2025</td>
+                  <td>Enero 2025</td>
+                  <td><strong>$89.234,70</strong></td>
+                  <td></td>
+                  <td>-</td>
+                  <td><span class="badge badge-warning">Pendiente AFIP</span></td>
+                  <td>
+                    <button class="btn btn-sm btn-primary" title="Solicitar CAE">
+                      <i class="fas fa-check"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr style="background-color: var(--bg-secondary); font-weight: bold;">
+                  <td colspan="5" class="text-right">TOTAL FACTURADO:</td>
+                  <td><strong>$1.845.320,19</strong></td>
+                  <td colspan="4"></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <!-- Paginación -->
+          <div class="pagination">
+            <a href="#" class="page-link active">1</a>
+            <a href="#" class="page-link">2</a>
+            <a href="#" class="page-link">3</a>
+            <a href="#" class="page-link">Siguiente</a>
+          </div>
+        </div>
+
+        <!-- Resumen por Obra Social -->
+        <div class="card" style="margin-top: var(--spacing-xl);">
+          <div class="card-header">
+            <h2 class="card-title">Facturación por Obra Social</h2>
+            <p class="card-subtitle">Distribución del mes actual</p>
+          </div>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Obra Social</th>
+                  <th>CUIT</th>
+                  <th>Facturas Emitidas</th>
+                  <th>Total Facturado</th>
+                  <th>% del Total</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>OSECAC</strong></td>
+                  <td>30-59041263-1</td>
+                  <td>8</td>
+                  <td><strong>$668.450,20</strong></td>
+                  <td><span class="badge badge-info">36%</span></td>
+                  <td><span class="badge badge-success">Al día</span></td>
+                </tr>
+                <tr>
+                  <td><strong>OSMATA</strong></td>
+                  <td>30-53844343-6</td>
+                  <td>6</td>
+                  <td><strong>$445.230,50</strong></td>
+                  <td><span class="badge badge-info">24%</span></td>
+                  <td><span class="badge badge-warning">1 Pendiente</span></td>
+                </tr>
+                <tr>
+                  <td><strong>OSPSA</strong></td>
+                  <td>30-70795304-6</td>
+                  <td>4</td>
+                  <td><strong>$311.890,30</strong></td>
+                  <td><span class="badge badge-info">17%</span></td>
+                  <td><span class="badge badge-success">Al día</span></td>
+                </tr>
+                <tr>
+                  <td><strong>SWISS MEDICAL</strong></td>
+                  <td>30-68018373-6</td>
+                  <td>3</td>
+                  <td><strong>$222.825,20</strong></td>
+                  <td><span class="badge badge-info">12%</span></td>
+                  <td><span class="badge badge-warning">1 Pendiente</span></td>
+                </tr>
+                <tr>
+                  <td><strong>PASTELEROS</strong></td>
+                  <td>30-71108283-5</td>
+                  <td>2</td>
+                  <td><strong>$140.234,20</strong></td>
+                  <td><span class="badge badge-info">8%</span></td>
+                  <td><span class="badge badge-success">Al día</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Otros</strong></td>
+                  <td>-</td>
+                  <td>1</td>
+                  <td><strong>$56.689,79</strong></td>
+                  <td><span class="badge badge-secondary">3%</span></td>
+                  <td><span class="badge badge-success">Al día</span></td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr style="background-color: var(--bg-secondary); font-weight: bold;">
+                  <td colspan="2">TOTAL</td>
+                  <td>24</td>
+                  <td><strong>$1.845.320,19</strong></td>
+                  <td><span class="badge badge-success">100%</span></td>
+                  <td></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="../js/app.js"></script>
+</body>
+</html>

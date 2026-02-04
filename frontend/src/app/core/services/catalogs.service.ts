@@ -14,8 +14,8 @@ export class ObrasSocialesService extends ApiService {
     return this.get<ObraSocial[]>(this.endpoint, filters);
   }
 
-  getById(id: string): Observable<ApiResponse<ObraSocial>> {
-    return this.getById<ObraSocial>(this.endpoint, id);
+  getObraSocialById(id: string): Observable<ApiResponse<ObraSocial>> {
+    return super.getById<ObraSocial>(this.endpoint, id);
   }
 
   create(obraSocial: Partial<ObraSocial>): Observable<ApiResponse<ObraSocial>> {
@@ -41,8 +41,8 @@ export class ConductoresService extends ApiService {
     return this.get<Conductor[]>(this.endpoint, filters);
   }
 
-  getById(id: string): Observable<ApiResponse<Conductor>> {
-    return this.getById<Conductor>(this.endpoint, id);
+  getConductorById(id: string): Observable<ApiResponse<Conductor>> {
+    return super.getById<Conductor>(this.endpoint, id);
   }
 
   create(conductor: Partial<Conductor>): Observable<ApiResponse<Conductor>> {
@@ -68,8 +68,8 @@ export class DestinosService extends ApiService {
     return this.get<Destino[]>(this.endpoint, filters);
   }
 
-  getById(id: string): Observable<ApiResponse<Destino>> {
-    return this.getById<Destino>(this.endpoint, id);
+  getDestinoById(id: string): Observable<ApiResponse<Destino>> {
+    return super.getById<Destino>(this.endpoint, id);
   }
 
   create(destino: Partial<Destino>): Observable<ApiResponse<Destino>> {

@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Horarios - PAK TRASLADOS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../css/styles.css">
+  <style>
+    .schedule-week {
+      display: grid;
+      grid-template-columns: 80px repeat(5, 1fr);
+      gap: 1px;
+      background-color: var(--border);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-top: var(--spacing-lg);
+    }
+    
+    .schedule-header {
+      background-color: var(--bg-sidebar);
+      color: white;
+      padding: var(--spacing-md);
+      font-weight: 600;
+      text-align: center;
+      font-size: var(--font-size-sm);
+    }
+    
+    .schedule-time-slot {
+      background-color: var(--bg-secondary);
+      padding: var(--spacing-md);
+      font-size: var(--font-size-xs);
+      font-weight: 500;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      border-right: 1px solid var(--border);
+    }
+    
+    .schedule-cell {
+      background-color: var(--bg-primary);
+      padding: var(--spacing-sm);
+      min-height: 80px;
+    }
+    
+    .trip-card {
+      background-color: var(--primary-light);
+      border-left: 3px solid var(--primary);
+      padding: var(--spacing-xs);
+      border-radius: var(--radius-sm);
+      margin-bottom: var(--spacing-xs);
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: var(--font-size-xs);
+    }
+    
+    .trip-card:hover {
+      background-color: var(--primary);
+      color: white;
+      transform: translateX(2px);
+    }
+    
+    .trip-card:hover .trip-time {
+      color: white;
+    }
+    
+    .trip-patient {
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+    
+    .trip-time {
+      font-size: 0.65rem;
+      color: var(--text-secondary);
+    }
+    
+    .trip-location {
+      font-size: 0.65rem;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+    
+    .driver-stats {
+      display: flex;
+      justify-content: space-around;
+      margin-top: var(--spacing-lg);
+      padding: var(--spacing-lg);
+      background-color: var(--bg-primary);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+    }
+    
+    .driver-stat {
+      text-align: center;
+    }
+    
+    .driver-stat-value {
+      font-size: var(--font-size-2xl);
+      font-weight: 700;
+      color: var(--primary);
+    }
+    
+    .driver-stat-label {
+      font-size: var(--font-size-sm);
+      color: var(--text-secondary);
+      margin-top: var(--spacing-xs);
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <span>🚐</span>
+        <span>PAK TRASLADOS</span>
+      </div>
+      <nav>
+        <ul class="sidebar-nav">
+          <li>
+            <a href="../index.html">
+              <span class="nav-icon"><i class="fas fa-home"></i></span>
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li>
+            <a href="cartera.html">
+              <span class="nav-icon"><i class="fas fa-users"></i></span>
+              <span>Cartera de Pacientes</span>
+            </a>
+          </li>
+          <li>
+            <a href="pacientes.html">
+              <span class="nav-icon"><i class="fas fa-user-injured"></i></span>
+              <span>Pacientes</span>
+            </a>
+          </li>
+          <li>
+            <a href="horarios.html" class="active">
+              <span class="nav-icon"><i class="fas fa-calendar-alt"></i></span>
+              <span>Horarios</span>
+            </a>
+          </li>
+          <li>
+            <a href="facturacion.html">
+              <span class="nav-icon"><i class="fas fa-file-invoice-dollar"></i></span>
+              <span>Facturación</span>
+            </a>
+          </li>
+          <li>
+            <a href="cobranza.html">
+              <span class="nav-icon"><i class="fas fa-money-bill-wave"></i></span>
+              <span>Cobranza</span>
+            </a>
+          </li>
+          <li>
+            <a href="presupuesto.html">
+              <span class="nav-icon"><i class="fas fa-chart-line"></i></span>
+              <span>Presupuesto</span>
+            </a>
+          </li>
+          <li>
+            <a href="reportes.html">
+              <span class="nav-icon"><i class="fas fa-chart-bar"></i></span>
+              <span>Reportes</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Header -->
+      <header class="header">
+        <div>
+          <h1>Planificación de Horarios</h1>
+          <p class="text-muted">Distribución semanal de traslados por chofer</p>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-secondary">
+            <i class="fas fa-print"></i>
+            Imprimir
+          </button>
+          <button class="btn btn-primary">
+            <i class="fas fa-plus"></i>
+            Nuevo Traslado
+          </button>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <div class="content">
+        <!-- Stats de Choferes -->
+        <div class="driver-stats">
+          <div class="driver-stat">
+            <div class="driver-stat-value">5</div>
+            <div class="driver-stat-label"><i class="fas fa-user-tie"></i> Choferes</div>
+          </div>
+          <div class="driver-stat">
+            <div class="driver-stat-value">42</div>
+            <div class="driver-stat-label"><i class="fas fa-users"></i> Pacientes</div>
+          </div>
+          <div class="driver-stat">
+            <div class="driver-stat-value">126</div>
+            <div class="driver-stat-label"><i class="fas fa-route"></i> Viajes/día</div>
+          </div>
+          <div class="driver-stat">
+            <div class="driver-stat-value">784</div>
+            <div class="driver-stat-label"><i class="fas fa-road"></i> Km/día</div>
+          </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="filters">
+          <div class="filter-group">
+            <label class="filter-label">Semana</label>
+            <select class="form-select">
+              <option>Semana actual (29 Ene - 02 Feb 2025)</option>
+              <option>Próxima semana</option>
+              <option>Semana anterior</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">Chofer</label>
+            <select class="form-select">
+              <option value="todos">Todos los choferes</option>
+              <option value="ruben">RUBEN</option>
+              <option value="marcos">MARCOS</option>
+              <option value="damian">DAMIAN</option>
+              <option value="luis">LUIS</option>
+              <option value="leo">LEO</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">Turno</label>
+            <select class="form-select">
+              <option value="todos">Todos los turnos</option>
+              <option value="manana">Mañana (7:00-13:00)</option>
+              <option value="tarde">Tarde (13:00-20:00)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Grilla de Horarios -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Planificación Semanal</h2>
+            <p class="card-subtitle">Horarios de 7:00 a 20:00 - Lunes a Viernes</p>
+          </div>
+
+          <div class="schedule-week">
+            <!-- Header Row -->
+            <div class="schedule-header">Hora</div>
+            <div class="schedule-header">
+              <i class="fas fa-user-circle"></i><br>RUBEN
+            </div>
+            <div class="schedule-header">
+              <i class="fas fa-user-circle"></i><br>MARCOS
+            </div>
+            <div class="schedule-header">
+              <i class="fas fa-user-circle"></i><br>DAMIAN
+            </div>
+            <div class="schedule-header">
+              <i class="fas fa-user-circle"></i><br>LUIS
+            </div>
+            <div class="schedule-header">
+              <i class="fas fa-user-circle"></i><br>LEO
+            </div>
+
+            <!-- 7:00 - 8:00 -->
+            <div class="schedule-time-slot">7:00<br>8:00</div>
+            <div class="schedule-cell">
+              <div class="trip-card">
+                <div class="trip-patient">JAZMIN</div>
+                <div class="trip-time">7:30 - Esc. Especial</div>
+                <div class="trip-location">📍 B° Güemes</div>
+              </div>
+            </div>
+            <div class="schedule-cell">
+              <div class="trip-card">
+                <div class="trip-patient">CONSALVO ABEL</div>
+                <div class="trip-time">7:15 - CET</div>
+                <div class="trip-location">📍 Bv. San Juan</div>
+              </div>
+            </div>
+            <div class="schedule-cell">
+              <div class="trip-card">
+                <div class="trip-patient">ALANIS TOMAS</div>
+                <div class="trip-time">7:20 - Hidroterapia</div>
+                <div class="trip-location">📍 Av. Colón</div>
+              </div>
+            </div>
+            <div class="schedule-cell">
+              <div class="trip-card">
+                <div class="trip-patient">RODRIGUEZ MARIA</div>
+                <div class="trip-time">7:45 - Terapia</div>
+                <div class="trip-location">📍 Recta Martinoli</div>
+              </div>
+            </div>
+            <div class="schedule-cell">
+              <div class="trip-card">
+                <div class="trip-patient">MARTINEZ JUAN</div>
+                <div class="trip-time">7:30 - Escuela</div>
+                <div class="trip-location">📍 Av. Rafael Núñez</div>
+              </div>
+            </div>
+
+            <!-- 8:00 - 9:00 -->
+            <div class="schedule-time-slot">8:00<br>9:00</div>
+            <div class="schedule-cell">
+              <div class="trip-card">
+                <div class="trip-patient">GINO</div>
+                <div class="trip-time">8:15 - CET</div>
+                <div class="trip-location">📍 Cerro de las Rosas</div>
+              </div>
+            </div>
+            <div class="schedule-cell">
+              <div class="trip-card">
+                <div class="trip-patient">FERNANDEZ LUCAS</div>
+                <div class="trip-time">8:30 - Escuela</div>
+                <div class="trip-location">📍 Villa Carlos Paz</div>
+              </div>
+            </div>
+            <div class="schedule-cell">
+              <div class="trip-card">
+                <div class="trip-patient">GOMEZ ANA</div>
+                <div class="trip-time">8:00 - Terapia</div>
+                <div class="trip-location">📍 Poeta Lugones</div>
+              </div>
+            </div>
+            <div class="schedule-cell">
+              <div class="trip-card">
+                <div class="trip-patient">LOPEZ DIEGO</div>
+                <div class="trip-time">8:20 - CET</div>
+                <div class="trip-location">📍 Duarte Quirós</div>
+              </div>
+            </div>
+            <div class="schedule-cell">
+              <div class="trip-card">
+                <div class="trip-patient">SANCHEZ CARLA</div>
+                <div class="trip-time">8:45 - Hidroterapia</div>
+                <div class="trip-location">📍 Av. Vélez Sarsfield</div>
+              </div>
+            </div>
+
+            <!-- 9:00 - 10:00 -->
+            <div class="schedule-time-slot">9:00<br>10:00</div>
+            <div class="schedule-cell">
+              <div class="trip-card">
+                <div class="trip-patient">JEREMIAS</div>
+                <div class="trip-time">9:00 - Escuela</div>
+                <div class="trip-location">📍 B° Pueyrredón</div>
+              </div>
+            </div>
+            <div class="schedule-cell">
+              <div class="trip-card">
+                <div class="trip-patient">DIAZ MATIAS</div>
+                <div class="trip-time">9:15 - Terapia</div>
+                <div class="trip-location">📍 Av. Richieri</div>
+              </div>
+            </div>
+            <div class="schedule-cell">
+              <div class="trip-card">
+                <div class="trip-patient">TORRES SOFIA</div>
+                <div class="trip-time">9:30 - CET</div>
+                <div class="trip-location">📍 Centro</div>
+              </div>
+            </div>
+            <div class="schedule-cell">
+              <div class="trip-card">
+                <div class="trip-patient">RAMIREZ NICOLAS</div>
+                <div class="trip-time">9:00 - Escuela</div>
+                <div class="trip-location">📍 Laprida</div>
+              </div>
+            </div>
+            <div class="schedule-cell">
+              <div class="trip-card">
+                <div class="trip-patient">PEREYRA VALENTINA</div>
+                <div class="trip-time">9:45 - Terapia</div>
+                <div class="trip-location">📍 Sagrada Familia</div>
+              </div>
+            </div>
+
+            <!-- 10:00 - 11:00 -->
+            <div class="schedule-time-slot">10:00<br>11:00</div>
+            <div class="schedule-cell"></div>
+            <div class="schedule-cell">
+              <div class="trip-card">
+                <div class="trip-patient">MORENO BENJAMIN</div>
+                <div class="trip-time">10:30 - Hidroterapia</div>
+                <div class="trip-location">📍 Av. Gral. Paz</div>
+              </div>
+            </div>
+            <div class="schedule-cell"></div>
+            <div class="schedule-cell">
+              <div class="trip-card">
+                <div class="trip-patient">CASTILLO CATALINA</div>
+                <div class="trip-time">10:15 - Terapia</div>
+                <div class="trip-location">📍 Mariano Moreno</div>
+              </div>
+            </div>
+            <div class="schedule-cell"></div>
+
+            <!-- 11:00 - 12:00 -->
+            <div class="schedule-time-slot">11:00<br>12:00</div>
+            <div class="schedule-cell">
+              <div class="trip-card">
+                <div class="trip-patient">RETORNO JAZMIN</div>
+                <div class="trip-time">11:30</div>
+                <div class="trip-location">📍 Domicilio</div>
+              </div>
+            </div>
+            <div class="schedule-cell"></div>
+            <div class="schedule-cell">
+              <div class="trip-card">
+                <div class="trip-patient">VERA EMILIANO</div>
+                <div class="trip-time">11:00 - CET</div>
+                <div class="trip-location">📍 Cerro de las Rosas</div>
+              </div>
+            </div>
+            <div class="schedule-cell"></div>
+            <div class="schedule-cell"></div>
+
+            <!-- 12:00 - 13:00 -->
+            <div class="schedule-time-slot">12:00<br>13:00</div>
+            <div class="schedule-cell">
+              <div class="trip-card">
+                <div class="trip-patient">RETORNO GINO</div>
+                <div class="trip-time">12:15</div>
+                <div class="trip-location">📍 Domicilio</div>
+              </div>
+            </div>
+            <div class="schedule-cell">
+              <div class="trip-card">
+                <div class="trip-patient">RETORNO CONSALVO</div>
+                <div class="trip-time">12:30</div>
+                <div class="trip-location">📍 Domicilio</div>
+              </div>
+            </div>
+            <div class="schedule-cell">
+              <div class="trip-card">
+                <div class="trip-patient">RETORNO ALANIS</div>
+                <div class="trip-time">12:00</div>
+                <div class="trip-location">📍 Domicilio</div>
+              </div>
+            </div>
+            <div class="schedule-cell">
+              <div class="trip-card">
+                <div class="trip-patient">RETORNO RODRIGUEZ</div>
+                <div class="trip-time">12:45</div>
+                <div class="trip-location">📍 Domicilio</div>
+              </div>
+            </div>
+            <div class="schedule-cell">
+              <div class="trip-card">
+                <div class="trip-patient">RETORNO MARTINEZ</div>
+                <div class="trip-time">12:20</div>
+                <div class="trip-location">📍 Domicilio</div>
+              </div>
+            </div>
+
+            <!-- 13:00 - 14:00 -->
+            <div class="schedule-time-slot">13:00<br>14:00</div>
+            <div class="schedule-cell">
+              <div class="trip-card">
+                <div class="trip-patient">RETORNO JEREMIAS</div>
+                <div class="trip-time">13:00</div>
+                <div class="trip-location">📍 Domicilio</div>
+              </div>
+            </div>
+            <div class="schedule-cell"></div>
+            <div class="schedule-cell"></div>
+            <div class="schedule-cell"></div>
+            <div class="schedule-cell"></div>
+
+            <!-- 14:00 - 15:00 -->
+            <div class="schedule-time-slot">14:00<br>15:00</div>
+            <div class="schedule-cell"></div>
+            <div class="schedule-cell">
+              <div class="trip-card">
+                <div class="trip-patient">Turno Tarde 1</div>
+                <div class="trip-time">14:30 - Escuela</div>
+                <div class="trip-location">📍 B° Alta Córdoba</div>
+              </div>
+            </div>
+            <div class="schedule-cell"></div>
+            <div class="schedule-cell"></div>
+            <div class="schedule-cell">
+              <div class="trip-card">
+                <div class="trip-patient">Turno Tarde 2</div>
+                <div class="trip-time">14:15 - Terapia</div>
+                <div class="trip-location">📍 Nueva Córdoba</div>
+              </div>
+            </div>
+
+            <!-- 15:00 - 16:00 -->
+            <div class="schedule-time-slot">15:00<br>16:00</div>
+            <div class="schedule-cell"></div>
+            <div class="schedule-cell"></div>
+            <div class="schedule-cell">
+              <div class="trip-card">
+                <div class="trip-patient">Turno Tarde 3</div>
+                <div class="trip-time">15:30 - CET</div>
+                <div class="trip-location">📍 B° Jardín</div>
+              </div>
+            </div>
+            <div class="schedule-cell"></div>
+            <div class="schedule-cell"></div>
+
+            <!-- 16:00 - 17:00 -->
+            <div class="schedule-time-slot">16:00<br>17:00</div>
+            <div class="schedule-cell"></div>
+            <div class="schedule-cell"></div>
+            <div class="schedule-cell"></div>
+            <div class="schedule-cell">
+              <div class="trip-card">
+                <div class="trip-patient">Turno Tarde 4</div>
+                <div class="trip-time">16:30 - Hidroterapia</div>
+                <div class="trip-location">📍 Urca</div>
+              </div>
+            </div>
+            <div class="schedule-cell"></div>
+
+            <!-- 17:00 - 18:00 -->
+            <div class="schedule-time-slot">17:00<br>18:00</div>
+            <div class="schedule-cell"></div>
+            <div class="schedule-cell">
+              <div class="trip-card">
+                <div class="trip-patient">RETORNO Tarde 1</div>
+                <div class="trip-time">17:30</div>
+                <div class="trip-location">📍 Domicilio</div>
+              </div>
+            </div>
+            <div class="schedule-cell"></div>
+            <div class="schedule-cell"></div>
+            <div class="schedule-cell">
+              <div class="trip-card">
+                <div class="trip-patient">RETORNO Tarde 2</div>
+                <div class="trip-time">17:15</div>
+                <div class="trip-location">📍 Domicilio</div>
+              </div>
+            </div>
+
+            <!-- 18:00 - 19:00 -->
+            <div class="schedule-time-slot">18:00<br>19:00</div>
+            <div class="schedule-cell"></div>
+            <div class="schedule-cell"></div>
+            <div class="schedule-cell">
+              <div class="trip-card">
+                <div class="trip-patient">RETORNO Tarde 3</div>
+                <div class="trip-time">18:30</div>
+                <div class="trip-location">📍 Domicilio</div>
+              </div>
+            </div>
+            <div class="schedule-cell"></div>
+            <div class="schedule-cell"></div>
+
+            <!-- 19:00 - 20:00 -->
+            <div class="schedule-time-slot">19:00<br>20:00</div>
+            <div class="schedule-cell"></div>
+            <div class="schedule-cell"></div>
+            <div class="schedule-cell"></div>
+            <div class="schedule-cell">
+              <div class="trip-card">
+                <div class="trip-patient">RETORNO Tarde 4</div>
+                <div class="trip-time">19:30</div>
+                <div class="trip-location">📍 Domicilio</div>
+              </div>
+            </div>
+            <div class="schedule-cell"></div>
+          </div>
+        </div>
+
+        <!-- Resumen por Chofer -->
+        <div class="card" style="margin-top: var(--spacing-xl);">
+          <div class="card-header">
+            <h2 class="card-title">Resumen de Carga por Chofer</h2>
+            <p class="card-subtitle">Estadísticas diarias promedio</p>
+          </div>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Chofer</th>
+                  <th>Pacientes Asignados</th>
+                  <th>Viajes/día</th>
+                  <th>Km/día</th>
+                  <th>Horas Activas</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong><i class="fas fa-user-circle"></i> RUBEN</strong></td>
+                  <td>8</td>
+                  <td>24</td>
+                  <td>156</td>
+                  <td>7:00 - 14:00</td>
+                  <td><span class="badge badge-success">Activo</span></td>
+                </tr>
+                <tr>
+                  <td><strong><i class="fas fa-user-circle"></i> MARCOS</strong></td>
+                  <td>9</td>
+                  <td>27</td>
+                  <td>178</td>
+                  <td>7:00 - 18:00</td>
+                  <td><span class="badge badge-success">Activo</span></td>
+                </tr>
+                <tr>
+                  <td><strong><i class="fas fa-user-circle"></i> DAMIAN</strong></td>
+                  <td>10</td>
+                  <td>30</td>
+                  <td>195</td>
+                  <td>7:00 - 19:00</td>
+                  <td><span class="badge badge-success">Activo</span></td>
+                </tr>
+                <tr>
+                  <td><strong><i class="fas fa-user-circle"></i> LUIS</strong></td>
+                  <td>8</td>
+                  <td>24</td>
+                  <td>145</td>
+                  <td>7:00 - 20:00</td>
+                  <td><span class="badge badge-success">Activo</span></td>
+                </tr>
+                <tr>
+                  <td><strong><i class="fas fa-user-circle"></i> LEO</strong></td>
+                  <td>7</td>
+                  <td>21</td>
+                  <td>110</td>
+                  <td>7:00 - 18:00</td>
+                  <td><span class="badge badge-success">Activo</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="../js/app.js"></script>
+</body>
+</html>
