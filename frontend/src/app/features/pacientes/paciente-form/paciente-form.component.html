@@ -1,0 +1,188 @@
+<h2 mat-dialog-title>
+  <mat-icon>{{ data.mode === 'view' ? 'person' : data.mode === 'edit' ? 'edit' : 'person_add' }}</mat-icon>
+  {{ getTitle() }}
+</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form" class="paciente-form">
+    <!-- Datos Personales -->
+    <div class="form-section">
+      <h3>Datos Personales</h3>
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Nombre</mat-label>
+          <input matInput formControlName="nombre" placeholder="Nombre">
+          @if (form.get('nombre')?.hasError('required') && form.get('nombre')?.touched) {
+            <mat-error>El nombre es requerido</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Apellido</mat-label>
+          <input matInput formControlName="apellido" placeholder="Apellido">
+          @if (form.get('apellido')?.hasError('required') && form.get('apellido')?.touched) {
+            <mat-error>El apellido es requerido</mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>DNI</mat-label>
+          <input matInput formControlName="dni" placeholder="12345678">
+          @if (form.get('dni')?.hasError('required') && form.get('dni')?.touched) {
+            <mat-error>El DNI es requerido</mat-error>
+          }
+          @if (form.get('dni')?.hasError('pattern') && form.get('dni')?.touched) {
+            <mat-error>Ingrese un DNI válido (7-8 dígitos)</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Fecha de Nacimiento</mat-label>
+          <input matInput [matDatepicker]="picker" formControlName="fecha_nacimiento">
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+          @if (form.get('fecha_nacimiento')?.hasError('required') && form.get('fecha_nacimiento')?.touched) {
+            <mat-error>La fecha de nacimiento es requerida</mat-error>
+          }
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- Contacto -->
+    <div class="form-section">
+      <h3>Información de Contacto</h3>
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Teléfono</mat-label>
+          <input matInput formControlName="telefono" placeholder="11-1234-5678">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Teléfono Alternativo</mat-label>
+          <input matInput formControlName="telefono_alternativo" placeholder="11-8765-4321">
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Tutor/Responsable</mat-label>
+          <input matInput formControlName="tutor_responsable" placeholder="Nombre del tutor o responsable">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Teléfono del Tutor</mat-label>
+          <input matInput formControlName="telefono_tutor" placeholder="11-1234-5678">
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- Dirección -->
+    <div class="form-section">
+      <h3>Dirección</h3>
+      <div class="form-row full-width">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Dirección Particular</mat-label>
+          <input matInput formControlName="direccion_particular" placeholder="Calle y número">
+          @if (form.get('direccion_particular')?.hasError('required') && form.get('direccion_particular')?.touched) {
+            <mat-error>La dirección es requerida</mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Localidad</mat-label>
+          <input matInput formControlName="localidad" placeholder="Localidad">
+          @if (form.get('localidad')?.hasError('required') && form.get('localidad')?.touched) {
+            <mat-error>La localidad es requerida</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Provincia</mat-label>
+          <mat-select formControlName="provincia">
+            @for (provincia of provinciasArgentinas; track provincia) {
+              <mat-option [value]="provincia">{{ provincia }}</mat-option>
+            }
+          </mat-select>
+          @if (form.get('provincia')?.hasError('required') && form.get('provincia')?.touched) {
+            <mat-error>La provincia es requerida</mat-error>
+          }
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- Obra Social -->
+    <div class="form-section">
+      <h3>Cobertura Médica</h3>
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Obra Social</mat-label>
+          <mat-select formControlName="obra_social_id">
+            @if (loadingObrasSociales()) {
+              <mat-option disabled>Cargando...</mat-option>
+            }
+            @for (os of obrasSociales(); track os.id) {
+              <mat-option [value]="os.id">{{ os.nombre }}</mat-option>
+            }
+          </mat-select>
+          @if (form.get('obra_social_id')?.hasError('required') && form.get('obra_social_id')?.touched) {
+            <mat-error>La obra social es requerida</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Número de Afiliado</mat-label>
+          <input matInput formControlName="numero_afiliado" placeholder="Número de afiliado">
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Tipo de Dependencia</mat-label>
+          <mat-select formControlName="tipo_dependencia">
+            <mat-option value="C/DEPEN">Con Dependencia</mat-option>
+            <mat-option value="S/DEPEN">Sin Dependencia</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- Observaciones -->
+    <div class="form-section">
+      <h3>Información Adicional</h3>
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Observaciones</mat-label>
+        <textarea matInput formControlName="observaciones" rows="3" placeholder="Observaciones adicionales"></textarea>
+      </mat-form-field>
+
+      @if (!isViewMode) {
+        <mat-checkbox formControlName="activo" color="primary">Paciente Activo</mat-checkbox>
+      }
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  @if (isViewMode) {
+    <button mat-button (click)="onCancel()">Cerrar</button>
+    <button mat-raised-button color="primary" (click)="enableEdit()">
+      <mat-icon>edit</mat-icon>
+      Editar
+    </button>
+  } @else {
+    <button mat-button (click)="onCancel()" [disabled]="loading()">Cancelar</button>
+    <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="loading() || form.invalid">
+      @if (loading()) {
+        <mat-spinner diameter="20"></mat-spinner>
+      } @else {
+        <ng-container>
+          <mat-icon>save</mat-icon>
+          {{ data.mode === 'edit' ? 'Actualizar' : 'Guardar' }}
+        </ng-container>
+      }
+    </button>
+  }
+</mat-dialog-actions>

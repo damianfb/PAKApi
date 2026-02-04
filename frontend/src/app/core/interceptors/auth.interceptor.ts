@@ -14,10 +14,11 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   return from(authService.getAccessToken()).pipe(
     switchMap(token => {
+      console.log(token)
       if (token) {
         const cloned = req.clone({
           setHeaders: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${environment.supabaseSKey}`,
             apikey: environment.supabaseKey,
             'Content-Type': 'application/json'
           }
