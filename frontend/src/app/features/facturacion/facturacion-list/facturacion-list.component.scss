@@ -31,7 +31,7 @@
   background-color: var(--success);
   color: white;
   &:hover {
-    background-color: darken(#28a745, 10%);
+    background-color: #1e7e34;
   }
 }
 
@@ -39,7 +39,7 @@
   background-color: var(--info);
   color: white;
   &:hover {
-    background-color: darken(#17a2b8, 10%);
+    background-color: #117a8b;
   }
 }
 
@@ -47,7 +47,7 @@
   background-color: var(--danger);
   color: white;
   &:hover {
-    background-color: darken(#dc3545, 10%);
+    background-color: #c82333;
   }
 }
 

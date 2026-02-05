@@ -26,7 +26,7 @@
   background-color: var(--warning);
   color: #212529;
   &:hover {
-    background-color: darken(#ffc107, 10%);
+    background-color: #d39e00;
   }
 }
 
@@ -34,7 +34,7 @@
   background-color: var(--success);
   color: white;
   &:hover {
-    background-color: darken(#28a745, 10%);
+    background-color: #1e7e34;
   }
 }
 
@@ -42,7 +42,7 @@
   background-color: var(--danger);
   color: white;
   &:hover {
-    background-color: darken(#dc3545, 10%);
+    background-color: #c82333;
   }
 }
 
