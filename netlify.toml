@@ -1,0 +1,62 @@
+# Configuración base para Netlify
+[build]
+  base = "frontend"
+  publish = "dist/PAKTraslados/browser"
+  command = "npm run build:prod"
+
+# Node version
+[build.environment]
+  NODE_VERSION = "20"
+
+# Redirects para Angular routing (URLs limpias)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Headers de seguridad para PWA
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "geolocation=(), microphone=(), camera=()"
+
+[[headers]]
+  for = "/ngsw-worker.js"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+[[headers]]
+  for = "/ngsw.json"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+[[headers]]
+  for = "/manifest.webmanifest"
+  [headers.values]
+    Content-Type = "application/manifest+json"
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Configuración específica para el branch de desarrollo
+[context.develop]
+  command = "npm run build:dev"
+
+# Configuración específica para el branch main (producción)
+[context.main]
+  command = "npm run build:prod"
+
+# Deploy Previews
+[context.deploy-preview]
+  command = "npm run build:dev"
