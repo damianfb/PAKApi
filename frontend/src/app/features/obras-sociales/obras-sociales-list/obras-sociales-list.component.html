@@ -1,0 +1,183 @@
+<!-- Stats -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-card-header">
+      <span class="stat-label">Total Obras Sociales</span>
+      <span class="stat-icon"><i class="fas fa-hospital" style="color: var(--primary);"></i></span>
+    </div>
+    <div class="stat-value">{{ totalObrasSociales }}</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-card-header">
+      <span class="stat-label">Activas</span>
+      <span class="stat-icon"><i class="fas fa-check-circle" style="color: var(--success);"></i></span>
+    </div>
+    <div class="stat-value">{{ obrasSocialesActivas }}</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-card-header">
+      <span class="stat-label">Inactivas</span>
+      <span class="stat-icon"><i class="fas fa-times-circle" style="color: var(--text-light);"></i></span>
+    </div>
+    <div class="stat-value">{{ obrasSocialesInactivas }}</div>
+  </div>
+</div>
+
+<!-- Filtros -->
+<div class="filters">
+  <div class="filter-group">
+    <label class="filter-label">Buscar</label>
+    <input type="text" class="form-input" placeholder="Buscar por nombre o código..."
+           [(ngModel)]="searchTerm" (ngModelChange)="onFilterChange()">
+  </div>
+  <div class="filter-group">
+    <label class="filter-label">Estado</label>
+    <select class="form-select" [(ngModel)]="selectedEstado" (ngModelChange)="onFilterChange()">
+      <option value="todos">Todos</option>
+      <option value="activo">Activos</option>
+      <option value="inactivo">Inactivos</option>
+    </select>
+  </div>
+  <div class="filter-group" style="align-self: flex-end; margin-left: auto;">
+    <button class="btn btn-primary" (click)="openNewModal()">
+      <i class="fas fa-plus"></i>
+      Nueva Obra Social
+    </button>
+  </div>
+</div>
+
+<!-- Tabla -->
+<div class="card">
+  <div class="card-header">
+    <h2 class="card-title">Obras Sociales</h2>
+    <p class="card-subtitle">{{ obrasSociales().length }} registro(s) encontrado(s)</p>
+  </div>
+  
+  @if (loading()) {
+    <div class="loading-container">
+      <i class="fas fa-spinner fa-spin fa-2x"></i>
+      <p>Cargando obras sociales...</p>
+    </div>
+  } @else {
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>Nombre</th>
+            <th>Teléfono</th>
+            <th>Email</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (obraSocial of obrasSociales(); track obraSocial.id) {
+            <tr>
+              <td><strong>{{ obraSocial.codigo || '-' }}</strong></td>
+              <td>{{ obraSocial.nombre }}</td>
+              <td>{{ obraSocial.telefono || '-' }}</td>
+              <td>{{ obraSocial.email || '-' }}</td>
+              <td>
+                <span [class]="getEstadoBadgeClass(obraSocial.activo)">
+                  {{ obraSocial.activo ? 'Activo' : 'Inactivo' }}
+                </span>
+              </td>
+              <td>
+                <div class="action-buttons">
+                  <button class="btn btn-sm btn-secondary btn-icon" (click)="editObraSocial(obraSocial)" title="Editar">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button class="btn btn-sm btn-danger btn-icon" (click)="deleteObraSocial(obraSocial)" title="Eliminar">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="6" class="text-center" style="padding: var(--spacing-xl);">
+                <i class="fas fa-hospital" style="font-size: 3rem; color: var(--text-light); margin-bottom: var(--spacing-md);"></i>
+                <p class="text-muted">No se encontraron obras sociales</p>
+                <button class="btn btn-primary" (click)="openNewModal()">
+                  <i class="fas fa-plus"></i> Crear Obra Social
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
+
+<!-- Modal de Crear/Editar -->
+@if (showModal) {
+  <div class="modal-overlay" (click)="closeModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>
+          @if (modalMode === 'create') {
+            <i class="fas fa-plus-circle"></i> Nueva Obra Social
+          } @else {
+            <i class="fas fa-edit"></i> Editar Obra Social
+          }
+        </h2>
+        <button class="btn-close" (click)="closeModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form class="entity-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Nombre *</label>
+              <input type="text" class="form-input" placeholder="Nombre de la obra social"
+                     [(ngModel)]="formData.nombre" name="nombre">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Código</label>
+              <input type="text" class="form-input" placeholder="Código único"
+                     [(ngModel)]="formData.codigo" name="codigo">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Teléfono</label>
+              <input type="text" class="form-input" placeholder="Teléfono de contacto"
+                     [(ngModel)]="formData.telefono" name="telefono">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input type="email" class="form-input" placeholder="Email de contacto"
+                     [(ngModel)]="formData.email" name="email">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Dirección</label>
+            <textarea class="form-input" rows="2" placeholder="Dirección completa"
+                      [(ngModel)]="formData.direccion" name="direccion"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-check">
+              <input type="checkbox" [(ngModel)]="formData.activo" name="activo">
+              <span>Activo</span>
+            </label>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeModal()">Cancelar</button>
+        <button class="btn btn-primary" (click)="saveObraSocial()">
+          <i class="fas fa-save"></i>
+          {{ modalMode === 'create' ? 'Crear' : 'Guardar Cambios' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

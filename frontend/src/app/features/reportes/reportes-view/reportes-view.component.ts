@@ -26,8 +26,9 @@ interface ReporteReciente {
     templateUrl: './reportes-view.component.html',
     styleUrl: './reportes-view.component.scss'
 })
+// 🔶 MOCK: Pantalla completamente mockeada - No conectada a API
 export class ReportesViewComponent implements OnInit {
-  // Stats
+  // 🔶 MOCK: Stats hardcodeados
   reportesGenerados = 45;
   reportesPendientes = 3;
   reportesProgramados = 8;
@@ -38,7 +39,7 @@ export class ReportesViewComponent implements OnInit {
   
   categorias = ['Facturación', 'Cobranza', 'Operaciones', 'Conductores', 'Pacientes'];
   
-  // Reportes disponibles
+  // 🔶 MOCK: Lista de reportes disponibles hardcodeada
   reportesDisponibles: ReporteDisponible[] = [
     {
       id: '1',

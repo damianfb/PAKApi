@@ -29,12 +29,14 @@ interface Chofer {
     templateUrl: './horarios-list.component.html',
     styleUrl: './horarios-list.component.scss'
 })
+// 🔶 MOCK: Pantalla completamente mockeada - No conectada a API
 export class HorariosListComponent implements OnInit {
   loading = signal(false);
   
   selectedChofer = 'todos';
   selectedSemana = 'actual';
   
+  // 🔶 MOCK: Lista de choferes hardcodeada
   choferes: Chofer[] = [
     { id: 1, nombre: 'Roberto García', vehiculo: 'Peugeot Partner AA123BB', viajesHoy: 12, kmHoy: 145 },
     { id: 2, nombre: 'Carlos Mendez', vehiculo: 'Renault Kangoo AB456CD', viajesHoy: 10, kmHoy: 120 },
@@ -44,7 +46,7 @@ export class HorariosListComponent implements OnInit {
   diasSemana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
   horasDelDia = ['06:00', '07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00'];
   
-  // Mock schedule data
+  // 🔶 MOCK: Datos de horarios hardcodeados
   horarios: { [dia: string]: { [hora: string]: Traslado[] } } = {
     'Lunes': {
       '06:00': [{ id: 1, paciente: 'ALANIS T.', hora: '06:00', destino: 'Clínica Norte' }],
@@ -77,7 +79,7 @@ export class HorariosListComponent implements OnInit {
     }
   };
   
-  // Stats
+  // 🔶 MOCK: Stats hardcodeados
   totalViajes = 30;
   totalKm = 360;
   pacientesAtendidos = 10;

@@ -2,3 +2,22 @@
 :host {
   display: contents;
 }
+
+/* Mock indicators */
+.mock-badge {
+  margin-left: auto;
+  font-size: 0.7rem;
+  opacity: 0.8;
+}
+
+.mock-legend {
+  position: absolute;
+  bottom: 10px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  padding: 8px;
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.6);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}

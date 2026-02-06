@@ -1,0 +1,227 @@
+<!-- Stats -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-card-header">
+      <span class="stat-label">Total Destinos</span>
+      <span class="stat-icon"><i class="fas fa-map-marker-alt" style="color: var(--primary);"></i></span>
+    </div>
+    <div class="stat-value">{{ totalDestinos }}</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-card-header">
+      <span class="stat-label">Activos</span>
+      <span class="stat-icon"><i class="fas fa-check-circle" style="color: var(--success);"></i></span>
+    </div>
+    <div class="stat-value">{{ destinosActivos }}</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-card-header">
+      <span class="stat-label">Inactivos</span>
+      <span class="stat-icon"><i class="fas fa-times-circle" style="color: var(--text-light);"></i></span>
+    </div>
+    <div class="stat-value">{{ destinosInactivos }}</div>
+  </div>
+</div>
+
+<!-- Filtros -->
+<div class="filters">
+  <div class="filter-group">
+    <label class="filter-label">Buscar</label>
+    <input type="text" class="form-input" placeholder="Buscar por nombre, dirección o ciudad..."
+           [(ngModel)]="searchTerm" (ngModelChange)="onFilterChange()">
+  </div>
+  <div class="filter-group">
+    <label class="filter-label">Tipo</label>
+    <select class="form-select" [(ngModel)]="selectedTipo" (ngModelChange)="onFilterChange()">
+      <option value="todos">Todos</option>
+      @for (tipo of tiposDestino; track tipo.value) {
+        <option [value]="tipo.value">{{ tipo.label }}</option>
+      }
+    </select>
+  </div>
+  <div class="filter-group">
+    <label class="filter-label">Estado</label>
+    <select class="form-select" [(ngModel)]="selectedEstado" (ngModelChange)="onFilterChange()">
+      <option value="todos">Todos</option>
+      <option value="activo">Activos</option>
+      <option value="inactivo">Inactivos</option>
+    </select>
+  </div>
+  <div class="filter-group" style="align-self: flex-end; margin-left: auto;">
+    <button class="btn btn-primary" (click)="openNewModal()">
+      <i class="fas fa-plus"></i>
+      Nuevo Destino
+    </button>
+  </div>
+</div>
+
+<!-- Tabla -->
+<div class="card">
+  <div class="card-header">
+    <h2 class="card-title">Destinos</h2>
+    <p class="card-subtitle">{{ destinos().length }} registro(s) encontrado(s)</p>
+  </div>
+  
+  @if (loading()) {
+    <div class="loading-container">
+      <i class="fas fa-spinner fa-spin fa-2x"></i>
+      <p>Cargando destinos...</p>
+    </div>
+  } @else {
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Tipo</th>
+            <th>Dirección</th>
+            <th>Ciudad</th>
+            <th>Teléfono</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (destino of destinos(); track destino.id) {
+            <tr>
+              <td><strong>{{ destino.nombre }}</strong></td>
+              <td>
+                <span [class]="getTipoBadgeClass(destino.tipo || '')">
+                  {{ getTipoLabel(destino.tipo || '') }}
+                </span>
+              </td>
+              <td>{{ destino.direccion }}</td>
+              <td>{{ destino.ciudad || '-' }}</td>
+              <td>{{ destino.telefono || '-' }}</td>
+              <td>
+                <span [class]="getEstadoBadgeClass(destino.activo)">
+                  {{ destino.activo ? 'Activo' : 'Inactivo' }}
+                </span>
+              </td>
+              <td>
+                <div class="action-buttons">
+                  <button class="btn btn-sm btn-secondary btn-icon" (click)="editDestino(destino)" title="Editar">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button class="btn btn-sm btn-danger btn-icon" (click)="deleteDestino(destino)" title="Eliminar">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="7" class="text-center" style="padding: var(--spacing-xl);">
+                <i class="fas fa-map-marker-alt" style="font-size: 3rem; color: var(--text-light); margin-bottom: var(--spacing-md);"></i>
+                <p class="text-muted">No se encontraron destinos</p>
+                <button class="btn btn-primary" (click)="openNewModal()">
+                  <i class="fas fa-plus"></i> Crear Destino
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
+
+<!-- Modal de Crear/Editar -->
+@if (showModal) {
+  <div class="modal-overlay" (click)="closeModal()">
+    <div class="modal modal-lg" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>
+          @if (modalMode === 'create') {
+            <i class="fas fa-plus-circle"></i> Nuevo Destino
+          } @else {
+            <i class="fas fa-edit"></i> Editar Destino
+          }
+        </h2>
+        <button class="btn-close" (click)="closeModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form class="entity-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Nombre *</label>
+              <input type="text" class="form-input" placeholder="Nombre del destino"
+                     [(ngModel)]="formData.nombre" name="nombre">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tipo</label>
+              <select class="form-select" [(ngModel)]="formData.tipo" name="tipo">
+                @for (tipo of tiposDestino; track tipo.value) {
+                  <option [value]="tipo.value">{{ tipo.label }}</option>
+                }
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Dirección *</label>
+            <textarea class="form-input" rows="2" placeholder="Dirección completa"
+                      [(ngModel)]="formData.direccion" name="direccion"></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Ciudad</label>
+              <input type="text" class="form-input" placeholder="Ciudad"
+                     [(ngModel)]="formData.ciudad" name="ciudad">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Provincia</label>
+              <input type="text" class="form-input" placeholder="Provincia"
+                     [(ngModel)]="formData.provincia" name="provincia">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Código Postal</label>
+              <input type="text" class="form-input" placeholder="Código postal"
+                     [(ngModel)]="formData.codigo_postal" name="codigo_postal">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Teléfono</label>
+              <input type="text" class="form-input" placeholder="Teléfono de contacto"
+                     [(ngModel)]="formData.telefono" name="telefono">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Latitud</label>
+              <input type="number" step="any" class="form-input" placeholder="Coordenada latitud"
+                     [(ngModel)]="formData.coordenadas_lat" name="coordenadas_lat">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Longitud</label>
+              <input type="number" step="any" class="form-input" placeholder="Coordenada longitud"
+                     [(ngModel)]="formData.coordenadas_lng" name="coordenadas_lng">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-check">
+              <input type="checkbox" [(ngModel)]="formData.activo" name="activo">
+              <span>Activo</span>
+            </label>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeModal()">Cancelar</button>
+        <button class="btn btn-primary" (click)="saveDestino()">
+          <i class="fas fa-save"></i>
+          {{ modalMode === 'create' ? 'Crear' : 'Guardar Cambios' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

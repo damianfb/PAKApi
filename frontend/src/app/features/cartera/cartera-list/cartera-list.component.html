@@ -1,3 +1,13 @@
+@if (error()) {
+  <div class="error-banner">
+    <i class="fas fa-exclamation-circle"></i>
+    <span>{{ error() }}</span>
+    <button class="btn btn-sm btn-outline" (click)="loadCartera()">
+      <i class="fas fa-redo"></i> Reintentar
+    </button>
+  </div>
+}
+
 <!-- Filtros -->
 <div class="filters">
   <div class="filter-group">
@@ -44,7 +54,7 @@
       <span class="stat-label">Total Pacientes</span>
       <span class="stat-icon"><i class="fas fa-users" style="color: var(--primary);"></i></span>
     </div>
-    <div class="stat-value">{{ totalPacientes }}</div>
+    <div class="stat-value">{{ totalPacientes() }}</div>
     <div class="stat-change positive">
       <span>Activos</span>
     </div>
@@ -52,12 +62,12 @@
 
   <div class="stat-card">
     <div class="stat-card-header">
-      <span class="stat-label">Km Totales/día</span>
+      <span class="stat-label">Km Totales/mes</span>
       <span class="stat-icon"><i class="fas fa-route" style="color: var(--info);"></i></span>
     </div>
-    <div class="stat-value">{{ kmTotales }}</div>
+    <div class="stat-value">{{ kmTotales() | number:'1.0-0' }}</div>
     <div class="stat-change">
-      <span>Recorrido diario</span>
+      <span>Recorrido mensual</span>
     </div>
   </div>
 
@@ -66,7 +76,7 @@
       <span class="stat-label">Facturación Estimada</span>
       <span class="stat-icon"><i class="fas fa-dollar-sign" style="color: var(--secondary);"></i></span>
     </div>
-    <div class="stat-value">{{ facturacionEstimada | currency:'ARS':'symbol-narrow':'1.1-1' }}</div>
+    <div class="stat-value">{{ facturacionEstimada() | currency:'ARS':'symbol-narrow':'1.0-0' }}</div>
     <div class="stat-change positive">
       <span>Mensual</span>
     </div>
@@ -105,38 +115,49 @@
             <th>Apellido y Nombre</th>
             <th>DNI</th>
             <th>Obra Social</th>
-            <th>Teléfono</th>
-            <th>Domicilio</th>
-            <th>Km/día</th>
+            <th>Tutor</th>
+            <th>Servicios</th>
+            <th>Km Total/mes</th>
             <th>Dependencia</th>
+            <th>Valor Km</th>
             <th>Monto Mensual</th>
-            <th>Estado</th>
             <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
-          @for (paciente of filteredPacientes; track paciente.id; let i = $index) {
+          @for (paciente of filteredPacientes; track paciente.paciente_id; let i = $index) {
             <tr>
-              <td>{{ (i + 1).toString().padStart(3, '0') }}</td>
+              <td>{{ paciente.numero_legajo || (i + 1) }}</td>
               <td><strong>{{ paciente.apellido }} {{ paciente.nombre }}</strong></td>
               <td>{{ paciente.dni }}</td>
-              <td>{{ paciente.obraSocial }}</td>
-              <td>{{ paciente.telefono }}</td>
-              <td>{{ paciente.direccion_particular }}, {{ paciente.localidad }}</td>
-              <td>{{ paciente.kmDia }}</td>
+              <td>{{ paciente.obra_social_nombre }}</td>
+              <td>{{ paciente.tutor_responsable }}</td>
               <td>
-                <span [class]="paciente.conDependencia ? 'badge badge-warning' : 'badge badge-info'">
-                  {{ paciente.conDependencia ? 'C/DEPEN' : 'S/DEPEN' }}
+                @if (paciente.servicios && paciente.servicios.length > 0) {
+                  <div class="servicios-list">
+                    @for (servicio of paciente.servicios; track servicio.id) {
+                      <span class="badge badge-info" style="margin: 2px; font-size: 0.75rem;">
+                        {{ servicio.tipo_servicio }} ({{ servicio.kilometros_diarios }}km/d)
+                      </span>
+                    }
+                  </div>
+                } @else {
+                  <span class="text-muted">Sin servicios</span>
+                }
+              </td>
+              <td>{{ paciente.total_km_mes | number:'1.2-2' }}</td>
+              <td>
+                <span [class]="paciente.tipo_dependencia === 'C/DEPEN' ? 'badge badge-warning' : 'badge badge-info'">
+                  {{ paciente.tipo_dependencia }}
                 </span>
               </td>
-              <td>{{ paciente.montoMensual | currency:'ARS':'symbol-narrow':'1.0-0' }}</td>
-              <td>
-                <span [class]="paciente.activo ? 'badge badge-success' : 'badge badge-danger'">
-                  {{ paciente.activo ? 'Activo' : 'Inactivo' }}
-                </span>
-              </td>
+              <td>{{ paciente.valor_km_default | currency:'ARS':'symbol-narrow':'1.2-2' }}</td>
+              <td><strong>{{ paciente.total_monto_mensual | currency:'ARS':'symbol-narrow':'1.0-0' }}</strong></td>
               <td>
                 <div class="action-buttons">
+                  <button class="btn btn-sm btn-secondary btn-icon" (click)="viewServicios(paciente)" title="Ver servicios">
+                    <i class="fas fa-list"></i>
+                  </button>
                   <button class="btn btn-sm btn-secondary btn-icon" (click)="viewPaciente(paciente)" title="Ver detalle">
                     <i class="fas fa-eye"></i>
                   </button>

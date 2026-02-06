@@ -32,7 +32,7 @@ Deno.serve(async (req) => {
     // GET all periodos (with optional filters)
     if (req.method === 'GET') {
       const anio = url.searchParams.get('anio');
-      const cerrado = url.searchParams.get('cerrado');
+      const estado = url.searchParams.get('estado');
       const page = parseInt(url.searchParams.get('page') || '1');
       const limit = parseInt(url.searchParams.get('limit') || '24');
       const offset = (page - 1) * limit;
@@ -41,15 +41,15 @@ Deno.serve(async (req) => {
         .from('periodos_facturacion')
         .select('*', { count: 'exact' })
         .range(offset, offset + limit - 1)
-        .order('anio', { ascending: false })
-        .order('mes', { ascending: false });
+        .order('periodo', { ascending: false });
 
+      // Filtrar por año usando el campo periodo (YYYY-MM)
       if (anio) {
-        query = query.eq('anio', parseInt(anio));
+        query = query.like('periodo', `${anio}-%`);
       }
 
-      if (cerrado !== null && cerrado !== undefined) {
-        query = query.eq('cerrado', cerrado === 'true');
+      if (estado) {
+        query = query.eq('estado', estado);
       }
 
       const { data, error, count } = await query;
@@ -73,36 +73,47 @@ Deno.serve(async (req) => {
     if (req.method === 'POST') {
       const body = await req.json();
 
-      // Validate required fields
-      if (!body.mes || !body.anio) {
-        return errorResponse('Los campos "mes" y "anio" son requeridos', 400);
+      // Validate required fields - acepta periodo (YYYY-MM) o mes+anio
+      let periodo: string;
+      let fechaInicio: Date;
+      let fechaFin: Date;
+
+      if (body.periodo) {
+        // Formato directo YYYY-MM
+        periodo = body.periodo;
+        const [anio, mes] = periodo.split('-').map(Number);
+        fechaInicio = new Date(anio, mes - 1, 1);
+        fechaFin = new Date(anio, mes, 0); // Último día del mes
+      } else if (body.mes && body.anio) {
+        // Formato mes + anio separados
+        const mes = parseInt(body.mes);
+        const anio = parseInt(body.anio);
+        periodo = `${anio}-${mes.toString().padStart(2, '0')}`;
+        fechaInicio = new Date(anio, mes - 1, 1);
+        fechaFin = new Date(anio, mes, 0);
+      } else {
+        return errorResponse('Se requiere "periodo" (YYYY-MM) o "mes" y "anio"', 400);
       }
 
       // Verificar que no exista ya ese período
       const { data: existing } = await supabase
         .from('periodos_facturacion')
         .select('id')
-        .eq('mes', body.mes)
-        .eq('anio', body.anio)
+        .eq('periodo', periodo)
         .single();
 
       if (existing) {
         return errorResponse('Ya existe un período de facturación para ese mes y año', 400);
       }
 
-      // Calcular fechas de inicio y fin
-      const fechaInicio = new Date(body.anio, body.mes - 1, 1);
-      const fechaFin = new Date(body.anio, body.mes, 0); // Último día del mes
-
       const { data, error } = await supabase
         .from('periodos_facturacion')
         .insert([
           {
-            mes: body.mes,
-            anio: body.anio,
+            periodo: periodo,
             fecha_inicio: fechaInicio.toISOString().split('T')[0],
             fecha_fin: fechaFin.toISOString().split('T')[0],
-            cerrado: body.cerrado || false,
+            estado: body.estado || 'abierto',
             observaciones: body.observaciones || null,
           },
         ])
@@ -120,12 +131,25 @@ Deno.serve(async (req) => {
     if (req.method === 'PUT' && id) {
       const body = await req.json();
 
+      const updateData: any = {};
+      
+      if (body.estado !== undefined) {
+        updateData.estado = body.estado;
+        // Si se cierra el período, registrar la fecha de cierre
+        if (body.estado === 'cerrado') {
+          updateData.fecha_cierre = new Date().toISOString();
+        } else if (body.estado === 'abierto') {
+          updateData.fecha_cierre = null;
+        }
+      }
+      
+      if (body.observaciones !== undefined) {
+        updateData.observaciones = body.observaciones;
+      }
+
       const { data, error } = await supabase
         .from('periodos_facturacion')
-        .update({
-          cerrado: body.cerrado,
-          observaciones: body.observaciones,
-        })
+        .update(updateData)
         .eq('id', id)
         .select()
         .single();

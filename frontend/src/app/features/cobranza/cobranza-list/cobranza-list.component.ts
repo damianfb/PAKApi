@@ -21,6 +21,7 @@ interface Cobranza {
     templateUrl: './cobranza-list.component.html',
     styleUrl: './cobranza-list.component.scss'
 })
+// 🔶 MOCK: Pantalla completamente mockeada - No conectada a API
 export class CobranzaListComponent implements OnInit {
   cobranzas = signal<Cobranza[]>([]);
   loading = signal(false);
@@ -31,7 +32,7 @@ export class CobranzaListComponent implements OnInit {
   selectedEstado = 'todos';
   searchTerm = '';
   
-  // Stats
+  // 🔶 MOCK: Stats hardcodeados
   totalACobrar = 1321840;
   cobradoMes = 523480;
   pendienteCobro = 798360;
@@ -45,6 +46,7 @@ export class CobranzaListComponent implements OnInit {
   }
 
   loadCobranzas() {
+    // 🔶 MOCK: Lista de cobranzas hardcodeada
     this.cobranzas.set([
       { id: 1, facturaNum: '0004-00001761', obraSocial: 'OSECAC', fechaEmision: new Date('2025-01-20'), fechaVencimiento: new Date('2025-02-20'), monto: 322843, montoPagado: 0, saldo: 322843, comision: 0, estado: 'pendiente' },
       { id: 2, facturaNum: '0004-00001760', obraSocial: 'OSMATA', fechaEmision: new Date('2025-01-18'), fechaVencimiento: new Date('2025-02-18'), monto: 215000, montoPagado: 215000, saldo: 0, comision: 6450, estado: 'pagado' },

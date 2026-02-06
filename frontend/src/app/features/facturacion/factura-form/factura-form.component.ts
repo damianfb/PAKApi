@@ -179,7 +179,7 @@ export class FacturaFormComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error loading obras sociales:', err);
-        // Mock data for development
+        // 🔶 MOCK: Fallback - Obras sociales de desarrollo
         this.obrasSociales.set([
           { id: '1', nombre: 'OSECAC', codigo: 'OSECAC', activo: true, created_at: '', updated_at: '' },
           { id: '2', nombre: 'OSMATA', codigo: 'OSMATA', activo: true, created_at: '', updated_at: '' },
@@ -196,7 +196,7 @@ export class FacturaFormComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error loading periodos:', err);
-        // Mock data
+        // 🔶 MOCK: Fallback - Períodos de desarrollo
         this.periodos.set([
           { id: '1', mes: 1, anio: 2026, fecha_inicio: '2026-01-01', fecha_fin: '2026-01-31', cerrado: false, created_at: '', updated_at: '' },
           { id: '2', mes: 12, anio: 2025, fecha_inicio: '2025-12-01', fecha_fin: '2025-12-31', cerrado: true, created_at: '', updated_at: '' }

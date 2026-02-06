@@ -1,0 +1,143 @@
+h2[mat-dialog-title] {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  padding: var(--spacing-md, 1rem) var(--spacing-lg, 1.5rem);
+  border-bottom: 1px solid var(--border-color, #e5e7eb);
+  font-size: 1.25rem;
+  font-weight: 600;
+
+  mat-icon {
+    color: var(--primary, #3b82f6);
+  }
+}
+
+mat-dialog-content {
+  padding: var(--spacing-lg, 1.5rem) !important;
+  max-height: 70vh;
+}
+
+.paciente-info {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md, 1rem);
+  padding: var(--spacing-md, 1rem);
+  background: var(--background-light, #f8fafc);
+  border-radius: var(--radius-md, 8px);
+  margin-bottom: var(--spacing-lg, 1.5rem);
+
+  strong {
+    font-size: 1rem;
+  }
+
+  .badge {
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: #dbeafe;
+    color: #1e40af;
+
+    &.con-dep {
+      background: #fef3c7;
+      color: #92400e;
+    }
+  }
+}
+
+.servicio-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md, 1rem);
+}
+
+.form-section {
+  padding: var(--spacing-md, 1rem);
+  background: var(--background-light, #f8fafc);
+  border-radius: var(--radius-md, 8px);
+  border: 1px solid var(--border-color, #e5e7eb);
+
+  h3 {
+    margin: 0 0 var(--spacing-md, 1rem);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-secondary, #666);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-md, 1rem);
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.full-width {
+  width: 100%;
+}
+
+.dias-section {
+  .dias-label {
+    display: block;
+    margin-bottom: var(--spacing-sm, 0.5rem);
+    font-size: 0.85rem;
+    color: var(--text-secondary, #666);
+  }
+
+  .dias-actions {
+    display: flex;
+    gap: var(--spacing-sm, 0.5rem);
+    margin-bottom: var(--spacing-sm, 0.5rem);
+
+    button {
+      font-size: 0.8rem;
+    }
+  }
+}
+
+.monto-estimado {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md, 1rem);
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border-radius: var(--radius-md, 8px);
+  color: white;
+  margin-top: var(--spacing-md, 1rem);
+
+  .monto-label {
+    font-size: 0.9rem;
+    opacity: 0.9;
+  }
+
+  .monto-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+  }
+}
+
+mat-dialog-actions {
+  padding: var(--spacing-md, 1rem) var(--spacing-lg, 1.5rem);
+  border-top: 1px solid var(--border-color, #e5e7eb);
+  gap: var(--spacing-sm, 0.5rem);
+
+  button {
+    min-width: 100px;
+  }
+
+  mat-spinner {
+    display: inline-block;
+    margin-right: var(--spacing-sm, 0.5rem);
+  }
+}
+
+// Material overrides
+::ng-deep .mat-mdc-form-field-subscript-wrapper {
+  min-height: 1.2rem;
+}

@@ -190,7 +190,7 @@ export class PacienteFormComponent implements OnInit {
       error: (err) => {
         console.error('Error loading obras sociales:', err);
         this.loadingObrasSociales.set(false);
-        // Mock data for development
+        // 🔶 MOCK: Fallback - Obras sociales de desarrollo
         this.obrasSociales.set([
           { id: '1', nombre: 'OSDE', codigo: 'OSDE', activo: true } as ObraSocial,
           { id: '2', nombre: 'Swiss Medical', codigo: 'SWISS', activo: true } as ObraSocial,

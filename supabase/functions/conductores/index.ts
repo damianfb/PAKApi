@@ -14,8 +14,12 @@ Deno.serve(async (req) => {
     const pathParts = url.pathname.split('/').filter(Boolean);
     const id = pathParts[pathParts.length - 1];
 
+    // Validar que sea un UUID válido para operaciones con ID
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    const isValidId = id && uuidRegex.test(id);
+
     // GET single conductor by ID
-    if (req.method === 'GET' && id && id !== 'conductores') {
+    if (req.method === 'GET' && isValidId) {
       const { data, error } = await supabase
         .from('conductores')
         .select('*')
@@ -102,7 +106,7 @@ Deno.serve(async (req) => {
     }
 
     // PUT update conductor by ID
-    if (req.method === 'PUT' && id && id !== 'conductores') {
+    if (req.method === 'PUT' && isValidId) {
       const body = await req.json();
 
       const { data, error } = await supabase
@@ -129,7 +133,7 @@ Deno.serve(async (req) => {
     }
 
     // DELETE conductor by ID (soft delete)
-    if (req.method === 'DELETE' && id && id !== 'conductores') {
+    if (req.method === 'DELETE' && isValidId) {
       const { data, error } = await supabase
         .from('conductores')
         .update({ activo: false })
@@ -146,6 +150,7 @@ Deno.serve(async (req) => {
 
     return errorResponse('Método no permitido', 405);
   } catch (error) {
-    return errorResponse('Error interno del servidor', 500, error.message);
+    console.error('Error en conductores:', error);
+    return errorResponse('Error interno del servidor', 500, error instanceof Error ? error.message : 'Unknown error');
   }
 });

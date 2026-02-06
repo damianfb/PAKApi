@@ -32,6 +32,7 @@ interface PacienteView {
 export class PacientesListComponent implements OnInit {
   pacientes = signal<PacienteView[]>([]);
   loading = signal(true);
+  error = signal<string | null>(null);
   searchTerm = '';
   selectedObraSocial = 'todos';
   selectedEstado = 'todos';
@@ -83,12 +84,13 @@ export class PacientesListComponent implements OnInit {
       error: (err) => {
         console.error('Error loading pacientes:', err);
         this.loading.set(false);
-        this.loadMockData();
+        this.error.set('Error al cargar pacientes. Verifique su conexión.');
       }
     });
   }
 
   loadMockData() {
+    // 🔶 MOCK: Lista de pacientes de desarrollo
     const mockData: PacienteView[] = [
       { id: '1', nombre: 'TOMAS SEBASTIAN', apellido: 'ALANIS', dni: '55284684', telefono: '(351) 555-1234', direccion_particular: 'Av. Colón 1234', localidad: 'Córdoba', provincia: 'Córdoba', activo: true, obraSocial: 'OSMATA', tipo_dependencia: 'C/DEPEN' },
       { id: '2', nombre: 'ABEL', apellido: 'CONSALVO ANTONINI', dni: '45789123', telefono: '(351) 555-2345', direccion_particular: 'Bv. San Juan 567', localidad: 'Córdoba', provincia: 'Córdoba', activo: true, obraSocial: 'OSECAC', tipo_dependencia: 'C/DEPEN' },

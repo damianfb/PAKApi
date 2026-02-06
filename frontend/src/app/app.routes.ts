@@ -34,6 +34,10 @@ export const routes: Routes = [
         component: PacientesListComponent
       },
       {
+        path: 'pacientes/:id/servicios',
+        loadComponent: () => import('./features/pacientes/servicios-paciente/servicios-list/servicios-list.component').then(m => m.ServiciosListComponent)
+      },
+      {
         path: 'horarios',
         loadComponent: () => import('./features/horarios/horarios-list/horarios-list.component').then(m => m.HorariosListComponent)
       },
@@ -56,6 +60,18 @@ export const routes: Routes = [
       {
         path: 'reportes',
         loadComponent: () => import('./features/reportes/reportes-view/reportes-view.component').then(m => m.ReportesViewComponent)
+      },
+      {
+        path: 'obras-sociales',
+        loadComponent: () => import('./features/obras-sociales/obras-sociales-list/obras-sociales-list.component').then(m => m.ObrasSocialesListComponent)
+      },
+      {
+        path: 'conductores',
+        loadComponent: () => import('./features/conductores/conductores-list/conductores-list.component').then(m => m.ConductoresListComponent)
+      },
+      {
+        path: 'destinos',
+        loadComponent: () => import('./features/destinos/destinos-list/destinos-list.component').then(m => m.DestinosListComponent)
       }
     ]
   },

@@ -1,3 +1,13 @@
+@if (error()) {
+  <div class="error-banner">
+    <i class="fas fa-exclamation-circle"></i>
+    <span>{{ error() }}</span>
+    <button class="btn btn-sm btn-outline" (click)="loadDashboard()">
+      <i class="fas fa-redo"></i> Reintentar
+    </button>
+  </div>
+}
+
 <!-- Stats Cards -->
 <div class="stats-grid">
   <div class="stat-card">

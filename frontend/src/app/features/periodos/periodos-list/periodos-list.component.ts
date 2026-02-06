@@ -13,6 +13,7 @@ import { PeriodoFacturacion } from '../../../shared/models/entities.model';
 export class PeriodosListComponent implements OnInit {
   periodos = signal<PeriodoFacturacion[]>([]);
   loading = signal(false);
+  error = signal<string | null>(null);
   
   // Filters
   selectedAnio = new Date().getFullYear();
@@ -72,7 +73,7 @@ export class PeriodosListComponent implements OnInit {
     }
     
     if (this.selectedEstado !== 'todos') {
-      filters.cerrado = this.selectedEstado === 'cerrado';
+      filters.estado = this.selectedEstado;
     }
     
     this.periodosService.getAll(filters).subscribe({
@@ -84,24 +85,23 @@ export class PeriodosListComponent implements OnInit {
       error: (err) => {
         console.error('Error loading periodos:', err);
         this.loading.set(false);
-        // Cargar datos mock para desarrollo
-        this.loadMockData();
+        this.error.set('Error al cargar períodos. Verifique su conexión.');
       }
     });
   }
 
   loadMockData() {
+    // 🔶 MOCK: Períodos generados dinámicamente
     const currentYear = new Date().getFullYear();
     const mockData: PeriodoFacturacion[] = [];
     
     for (let mes = 1; mes <= 12; mes++) {
       mockData.push({
         id: `${currentYear}-${mes}`,
-        mes: mes,
-        anio: currentYear,
+        periodo: `${currentYear}-${mes.toString().padStart(2, '0')}`,
         fecha_inicio: `${currentYear}-${mes.toString().padStart(2, '0')}-01`,
         fecha_fin: new Date(currentYear, mes, 0).toISOString().split('T')[0],
-        cerrado: mes < new Date().getMonth() + 1,
+        estado: mes < new Date().getMonth() + 1 ? 'cerrado' : 'abierto',
         created_at: '',
         updated_at: ''
       });
@@ -113,17 +113,20 @@ export class PeriodosListComponent implements OnInit {
 
   updateStats(data: PeriodoFacturacion[]) {
     this.totalPeriodos = data.length;
-    this.periodosAbiertos = data.filter(p => !p.cerrado).length;
-    this.periodosCerrados = data.filter(p => p.cerrado).length;
+    this.periodosAbiertos = data.filter(p => p.estado === 'abierto').length;
+    this.periodosCerrados = data.filter(p => p.estado === 'cerrado' || p.estado === 'facturado').length;
   }
 
   formatPeriodo(periodo: PeriodoFacturacion): string {
     return this.periodosService.formatPeriodo(periodo);
   }
 
-  getMesLabel(mes: number): string {
-    const mesObj = this.meses.find(m => m.value === mes);
-    return mesObj ? mesObj.label : '';
+  getMesLabel(periodo: PeriodoFacturacion): string {
+    return this.periodosService.getMesLabel(periodo);
+  }
+
+  getAnio(periodo: PeriodoFacturacion): number {
+    return this.periodosService.getAnio(periodo);
   }
 
   onFilterChange() {
@@ -142,8 +145,9 @@ export class PeriodosListComponent implements OnInit {
   editPeriodo(periodo: PeriodoFacturacion) {
     this.modalMode = 'edit';
     this.selectedPeriodo = periodo;
-    this.formMes = periodo.mes;
-    this.formAnio = periodo.anio;
+    const { mes, anio } = this.periodosService.parsePeriodo(periodo.periodo);
+    this.formMes = mes;
+    this.formAnio = anio;
     this.formObservaciones = periodo.observaciones || '';
     this.showModal = true;
   }
@@ -227,11 +231,29 @@ export class PeriodosListComponent implements OnInit {
     }
   }
 
-  getEstadoBadgeClass(cerrado: boolean): string {
-    return cerrado ? 'badge badge-secondary' : 'badge badge-success';
+  getEstadoBadgeClass(estado: string): string {
+    switch (estado) {
+      case 'abierto': return 'badge badge-success';
+      case 'cerrado': return 'badge badge-secondary';
+      case 'facturado': return 'badge badge-primary';
+      default: return 'badge';
+    }
   }
 
-  getEstadoLabel(cerrado: boolean): string {
-    return cerrado ? 'Cerrado' : 'Abierto';
+  getEstadoLabel(estado: string): string {
+    switch (estado) {
+      case 'abierto': return 'Abierto';
+      case 'cerrado': return 'Cerrado';
+      case 'facturado': return 'Facturado';
+      default: return estado;
+    }
+  }
+
+  isAbierto(periodo: PeriodoFacturacion): boolean {
+    return periodo.estado === 'abierto';
+  }
+
+  isCerrado(periodo: PeriodoFacturacion): boolean {
+    return periodo.estado === 'cerrado' || periodo.estado === 'facturado';
   }
 }

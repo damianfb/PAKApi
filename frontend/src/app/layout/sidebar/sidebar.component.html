@@ -9,12 +9,23 @@
         <li>
           <a [routerLink]="item.route" 
              routerLinkActive="active"
-             [routerLinkActiveOptions]="{exact: item.route === '/dashboard'}">
+             [routerLinkActiveOptions]="{exact: item.route === '/dashboard'}"
+             [title]="getMockTooltip(item.mockStatus)">
             <span class="nav-icon"><i [class]="item.icon"></i></span>
             <span>{{ item.label }}</span>
+            @if (showMockIndicators && item.mockStatus === 'full') {
+              <span class="mock-badge" [title]="getMockTooltip(item.mockStatus)">
+                {{ getMockBadge(item.mockStatus) }}
+              </span>
+            }
           </a>
         </li>
       }
     </ul>
   </nav>
+  @if (showMockIndicators) {
+    <div class="mock-legend">
+      <small>🔶 = En desarrollo</small>
+    </div>
+  }
 </aside>

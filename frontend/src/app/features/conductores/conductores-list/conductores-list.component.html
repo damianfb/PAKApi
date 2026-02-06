@@ -1,0 +1,214 @@
+<!-- Stats -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-card-header">
+      <span class="stat-label">Total Conductores</span>
+      <span class="stat-icon"><i class="fas fa-id-card" style="color: var(--primary);"></i></span>
+    </div>
+    <div class="stat-value">{{ totalConductores }}</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-card-header">
+      <span class="stat-label">Activos</span>
+      <span class="stat-icon"><i class="fas fa-check-circle" style="color: var(--success);"></i></span>
+    </div>
+    <div class="stat-value">{{ conductoresActivos }}</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-card-header">
+      <span class="stat-label">Inactivos</span>
+      <span class="stat-icon"><i class="fas fa-times-circle" style="color: var(--text-light);"></i></span>
+    </div>
+    <div class="stat-value">{{ conductoresInactivos }}</div>
+  </div>
+</div>
+
+<!-- Filtros -->
+<div class="filters">
+  <div class="filter-group">
+    <label class="filter-label">Buscar</label>
+    <input type="text" class="form-input" placeholder="Buscar por nombre, apellido o DNI..."
+           [(ngModel)]="searchTerm" (ngModelChange)="onFilterChange()">
+  </div>
+  <div class="filter-group">
+    <label class="filter-label">Estado</label>
+    <select class="form-select" [(ngModel)]="selectedEstado" (ngModelChange)="onFilterChange()">
+      <option value="todos">Todos</option>
+      <option value="activo">Activos</option>
+      <option value="inactivo">Inactivos</option>
+    </select>
+  </div>
+  <div class="filter-group" style="align-self: flex-end; margin-left: auto;">
+    <button class="btn btn-primary" (click)="openNewModal()">
+      <i class="fas fa-plus"></i>
+      Nuevo Conductor
+    </button>
+  </div>
+</div>
+
+<!-- Tabla -->
+<div class="card">
+  <div class="card-header">
+    <h2 class="card-title">Conductores</h2>
+    <p class="card-subtitle">{{ conductores().length }} registro(s) encontrado(s)</p>
+  </div>
+  
+  @if (loading()) {
+    <div class="loading-container">
+      <i class="fas fa-spinner fa-spin fa-2x"></i>
+      <p>Cargando conductores...</p>
+    </div>
+  } @else {
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre Completo</th>
+            <th>DNI</th>
+            <th>Teléfono</th>
+            <th>Licencia</th>
+            <th>Venc. Licencia</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (conductor of conductores(); track conductor.id) {
+            <tr>
+              <td><strong>{{ getNombreCompleto(conductor) }}</strong></td>
+              <td>{{ conductor.dni }}</td>
+              <td>{{ conductor.telefono || '-' }}</td>
+              <td>{{ conductor.licencia_conducir || '-' }}</td>
+              <td>
+                @if (conductor.licencia_vencimiento) {
+                  <span [class]="{
+                    'text-danger': isLicenciaVencida(conductor.licencia_vencimiento),
+                    'text-warning': isLicenciaPorVencer(conductor.licencia_vencimiento)
+                  }">
+                    {{ conductor.licencia_vencimiento | date:'dd/MM/yyyy' }}
+                    @if (isLicenciaVencida(conductor.licencia_vencimiento)) {
+                      <i class="fas fa-exclamation-triangle" title="Licencia vencida"></i>
+                    } @else if (isLicenciaPorVencer(conductor.licencia_vencimiento)) {
+                      <i class="fas fa-exclamation-circle" title="Próxima a vencer"></i>
+                    }
+                  </span>
+                } @else {
+                  -
+                }
+              </td>
+              <td>
+                <span [class]="getEstadoBadgeClass(conductor.activo)">
+                  {{ conductor.activo ? 'Activo' : 'Inactivo' }}
+                </span>
+              </td>
+              <td>
+                <div class="action-buttons">
+                  <button class="btn btn-sm btn-secondary btn-icon" (click)="editConductor(conductor)" title="Editar">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button class="btn btn-sm btn-danger btn-icon" (click)="deleteConductor(conductor)" title="Eliminar">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="7" class="text-center" style="padding: var(--spacing-xl);">
+                <i class="fas fa-id-card" style="font-size: 3rem; color: var(--text-light); margin-bottom: var(--spacing-md);"></i>
+                <p class="text-muted">No se encontraron conductores</p>
+                <button class="btn btn-primary" (click)="openNewModal()">
+                  <i class="fas fa-plus"></i> Crear Conductor
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
+
+<!-- Modal de Crear/Editar -->
+@if (showModal) {
+  <div class="modal-overlay" (click)="closeModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>
+          @if (modalMode === 'create') {
+            <i class="fas fa-plus-circle"></i> Nuevo Conductor
+          } @else {
+            <i class="fas fa-edit"></i> Editar Conductor
+          }
+        </h2>
+        <button class="btn-close" (click)="closeModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form class="entity-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Nombre *</label>
+              <input type="text" class="form-input" placeholder="Nombre"
+                     [(ngModel)]="formData.nombre" name="nombre">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Apellido *</label>
+              <input type="text" class="form-input" placeholder="Apellido"
+                     [(ngModel)]="formData.apellido" name="apellido">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">DNI *</label>
+              <input type="text" class="form-input" placeholder="Número de documento"
+                     [(ngModel)]="formData.dni" name="dni">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Teléfono</label>
+              <input type="text" class="form-input" placeholder="Teléfono de contacto"
+                     [(ngModel)]="formData.telefono" name="telefono">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-input" placeholder="Email"
+                   [(ngModel)]="formData.email" name="email">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Número de Licencia</label>
+              <input type="text" class="form-input" placeholder="Número de licencia de conducir"
+                     [(ngModel)]="formData.licencia_conducir" name="licencia_conducir">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Vencimiento de Licencia</label>
+              <input type="date" class="form-input"
+                     [(ngModel)]="formData.licencia_vencimiento" name="licencia_vencimiento">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-check">
+              <input type="checkbox" [(ngModel)]="formData.activo" name="activo">
+              <span>Activo</span>
+            </label>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeModal()">Cancelar</button>
+        <button class="btn btn-primary" (click)="saveConductor()">
+          <i class="fas fa-save"></i>
+          {{ modalMode === 'create' ? 'Crear' : 'Guardar Cambios' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

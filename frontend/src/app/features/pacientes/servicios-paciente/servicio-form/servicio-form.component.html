@@ -1,0 +1,188 @@
+<h2 mat-dialog-title>
+  <mat-icon>{{ data.mode === 'view' ? 'visibility' : data.mode === 'edit' ? 'edit' : 'add_circle' }}</mat-icon>
+  {{ getTitle() }}
+</h2>
+
+<mat-dialog-content>
+  @if (data.paciente) {
+    <div class="paciente-info">
+      <strong>{{ data.paciente.apellido }} {{ data.paciente.nombre }}</strong>
+      <span class="badge" [class.con-dep]="data.paciente.tipo_dependencia === 'C/DEPEN'">
+        {{ data.paciente.tipo_dependencia }}
+      </span>
+    </div>
+  }
+
+  <form [formGroup]="form" class="servicio-form">
+    <!-- Tipo de Servicio -->
+    <div class="form-section">
+      <h3>Tipo de Servicio</h3>
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Tipo de Servicio</mat-label>
+          <mat-select formControlName="tipo_servicio">
+            @for (tipo of tiposServicio; track tipo.value) {
+              <mat-option [value]="tipo.value">{{ tipo.label }}</mat-option>
+            }
+          </mat-select>
+          @if (form.get('tipo_servicio')?.hasError('required') && form.get('tipo_servicio')?.touched) {
+            <mat-error>El tipo de servicio es requerido</mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Destino</mat-label>
+          <mat-select formControlName="destino_id">
+            <mat-option [value]="null">-- Sin destino específico --</mat-option>
+            @for (destino of data.destinos; track destino.id) {
+              <mat-option [value]="destino.id">
+                {{ destino.nombre }} - {{ destino.direccion }}
+              </mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- Horarios y Días -->
+    <div class="form-section">
+      <h3>Horarios y Días</h3>
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Hora de Ida</mat-label>
+          <input matInput type="time" formControlName="hora_ida">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Hora de Vuelta</mat-label>
+          <input matInput type="time" formControlName="hora_vuelta">
+        </mat-form-field>
+      </div>
+
+      <div class="dias-section">
+        <label class="dias-label">Días de la Semana</label>
+        <div class="dias-actions">
+          <button mat-button type="button" (click)="selectAllDays()" [disabled]="isViewMode">
+            L a V
+          </button>
+          <button mat-button type="button" (click)="clearDays()" [disabled]="isViewMode">
+            Limpiar
+          </button>
+        </div>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Seleccione los días</mat-label>
+          <mat-select formControlName="dias_semana" multiple>
+            @for (dia of diasSemana; track dia.value) {
+              <mat-option [value]="dia.value">{{ dia.label }}</mat-option>
+            }
+          </mat-select>
+          @if (form.get('dias_semana')?.hasError('required') && form.get('dias_semana')?.touched) {
+            <mat-error>Debe seleccionar al menos un día</mat-error>
+          }
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- Kilometraje y Valores -->
+    <div class="form-section">
+      <h3>Kilometraje y Valores</h3>
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Km por Día</mat-label>
+          <input matInput type="number" formControlName="kilometros_diarios" step="0.1" min="0">
+          <span matSuffix>km</span>
+          @if (form.get('kilometros_diarios')?.hasError('required') && form.get('kilometros_diarios')?.touched) {
+            <mat-error>Los km son requeridos</mat-error>
+          }
+          @if (form.get('kilometros_diarios')?.hasError('min')) {
+            <mat-error>Debe ser mayor a 0</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Valor por Km</mat-label>
+          <input matInput type="number" formControlName="valor_por_km" step="0.01" min="0">
+          <span matPrefix>$&nbsp;</span>
+          @if (form.get('valor_por_km')?.hasError('required') && form.get('valor_por_km')?.touched) {
+            <mat-error>El valor por km es requerido</mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Cantidad Mensual (días)</mat-label>
+          <input matInput type="number" formControlName="cantidad_mensual" min="1">
+          <span matSuffix>días</span>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>N° Autorización</mat-label>
+          <input matInput formControlName="numero_autorizacion" placeholder="Ej: 1486843">
+        </mat-form-field>
+      </div>
+
+      <!-- Monto Estimado -->
+      <div class="monto-estimado">
+        <span class="monto-label">Monto Mensual Estimado:</span>
+        <span class="monto-value">{{ getMontoEstimado() | currency:'ARS':'symbol-narrow':'1.2-2' }}</span>
+      </div>
+    </div>
+
+    <!-- Fechas -->
+    <div class="form-section">
+      <h3>Vigencia</h3>
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Fecha de Inicio</mat-label>
+          <input matInput type="date" formControlName="fecha_inicio">
+          @if (form.get('fecha_inicio')?.hasError('required') && form.get('fecha_inicio')?.touched) {
+            <mat-error>La fecha de inicio es requerida</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Fecha de Fin (opcional)</mat-label>
+          <input matInput type="date" formControlName="fecha_fin">
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- Observaciones -->
+    <div class="form-section">
+      <h3>Información Adicional</h3>
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Observaciones</mat-label>
+        <textarea matInput formControlName="observaciones" rows="3"></textarea>
+      </mat-form-field>
+
+      @if (!isViewMode) {
+        <mat-checkbox formControlName="activo" color="primary">Servicio Activo</mat-checkbox>
+      }
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  @if (isViewMode) {
+    <button mat-button (click)="onCancel()">Cerrar</button>
+    <button mat-raised-button color="primary" (click)="enableEdit()">
+      <mat-icon>edit</mat-icon>
+      Editar
+    </button>
+  } @else {
+    <button mat-button (click)="onCancel()" [disabled]="loading()">Cancelar</button>
+    <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="loading() || form.invalid">
+      @if (loading()) {
+        <mat-spinner diameter="20"></mat-spinner>
+      } @else {
+        <ng-container>
+          <mat-icon>save</mat-icon>
+          {{ data.mode === 'edit' ? 'Actualizar' : 'Guardar' }}
+        </ng-container>
+      }
+    </button>
+  }
+</mat-dialog-actions>

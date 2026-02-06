@@ -24,6 +24,7 @@ interface ResumenCategoria {
     templateUrl: './presupuesto-view.component.html',
     styleUrl: './presupuesto-view.component.scss'
 })
+// 🔶 MOCK: Pantalla completamente mockeada - No conectada a API
 export class PresupuestoViewComponent implements OnInit {
   movimientos = signal<Movimiento[]>([]);
   loading = signal(false);
@@ -33,7 +34,7 @@ export class PresupuestoViewComponent implements OnInit {
   selectedTipo = 'todos';
   selectedCategoria = 'todos';
   
-  // Stats
+  // 🔶 MOCK: Stats hardcodeados
   ingresosMes = 1845320;
   egresosMes = 987450;
   resultadoMensual = 857870;
@@ -43,6 +44,7 @@ export class PresupuestoViewComponent implements OnInit {
   periodos = ['Enero 2025', 'Diciembre 2024', 'Noviembre 2024', 'Ver año completo'];
   categorias = ['Sueldos', 'Seguros', 'Combustible', 'Mantenimiento', 'Servicios'];
   
+  // 🔶 MOCK: Resumen de egresos hardcodeado
   resumenEgresos: ResumenCategoria[] = [
     { categoria: 'Sueldos Conductores', monto: 450000, porcentaje: 46 },
     { categoria: 'Combustible', monto: 187450, porcentaje: 19 },
@@ -57,6 +59,7 @@ export class PresupuestoViewComponent implements OnInit {
   }
 
   loadMovimientos() {
+    // 🔶 MOCK: Movimientos hardcodeados
     let saldo = 0;
     this.movimientos.set([
       { id: 1, fecha: new Date('2025-01-03'), concepto: 'Facturación OSECAC', categoria: 'Facturación', ingreso: 322843, egreso: 0, saldo: saldo += 322843 },

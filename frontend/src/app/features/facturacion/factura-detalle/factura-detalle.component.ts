@@ -52,7 +52,7 @@ export class FacturaDetalleComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error loading detalles:', err);
-        // Mock data for development
+        // 🔶 MOCK: Fallback - Detalles de factura de desarrollo
         this.detalles.set([
           { 
             id: '1', 

@@ -86,18 +86,9 @@ export class DashboardComponent implements OnInit {
         this.loading.set(false);
       },
       error: (err) => {
-        this.error.set('Error cargando dashboard');
+        this.error.set('Error al cargar el dashboard. Verifique su conexión.');
         this.loading.set(false);
         console.error('Error loading dashboard:', err);
-        
-        // Mock data for development
-        this.kpis.set({
-          totalFacturado: 1845320,
-          pendienteCobro: 523480,
-          viajesHoy: 45,
-          pacientesActivos: 42,
-          conductoresActivos: 5
-        });
       }
     });
   }

@@ -1,3 +1,13 @@
+@if (error()) {
+  <div class="error-banner">
+    <i class="fas fa-exclamation-circle"></i>
+    <span>{{ error() }}</span>
+    <button class="btn btn-sm btn-outline" (click)="loadPeriodos()">
+      <i class="fas fa-redo"></i> Reintentar
+    </button>
+  </div>
+}
+
 <!-- Stats -->
 <div class="stats-grid">
   <div class="stat-card">
@@ -101,13 +111,13 @@
           @for (periodo of periodos(); track periodo.id) {
             <tr>
               <td><strong>{{ formatPeriodo(periodo) }}</strong></td>
-              <td>{{ getMesLabel(periodo.mes) }}</td>
-              <td>{{ periodo.anio }}</td>
+              <td>{{ getMesLabel(periodo) }}</td>
+              <td>{{ getAnio(periodo) }}</td>
               <td>{{ periodo.fecha_inicio | date:'dd/MM/yyyy' }}</td>
               <td>{{ periodo.fecha_fin | date:'dd/MM/yyyy' }}</td>
               <td>
-                <span [class]="getEstadoBadgeClass(periodo.cerrado)">
-                  {{ getEstadoLabel(periodo.cerrado) }}
+                <span [class]="getEstadoBadgeClass(periodo.estado)">
+                  {{ getEstadoLabel(periodo.estado) }}
                 </span>
               </td>
               <td>{{ periodo.observaciones || '-' }}</td>
@@ -116,7 +126,7 @@
                   <button class="btn btn-sm btn-secondary btn-icon" (click)="editPeriodo(periodo)" title="Editar">
                     <i class="fas fa-edit"></i>
                   </button>
-                  @if (!periodo.cerrado) {
+                  @if (isAbierto(periodo)) {
                     <button class="btn btn-sm btn-warning btn-icon" (click)="cerrarPeriodo(periodo)" title="Cerrar período">
                       <i class="fas fa-lock"></i>
                     </button>

@@ -37,14 +37,10 @@ export interface Conductor {
   nombre: string;
   apellido: string;
   dni: string;
-  telefono: string;
+  telefono?: string;
   email?: string;
-  direccion?: string;
-  fecha_nacimiento: string;
-  tipo_licencia: string;
-  numero_licencia: string;
-  vencimiento_licencia: string;
-  fecha_ingreso: string;
+  licencia_conducir?: string;
+  licencia_vencimiento?: string;
   activo: boolean;
   created_at: string;
   updated_at: string;
@@ -53,15 +49,14 @@ export interface Conductor {
 export interface Destino {
   id: string;
   nombre: string;
-  tipo: 'escuela' | 'centro_terapeutico' | 'hospital' | 'clinica' | 'otro';
   direccion: string;
-  localidad: string;
-  provincia: string;
+  ciudad?: string;
+  provincia?: string;
+  codigo_postal?: string;
   telefono?: string;
-  email?: string;
-  latitud?: number;
-  longitud?: number;
-  observaciones?: string;
+  tipo?: string;
+  coordenadas_lat?: number;
+  coordenadas_lng?: number;
   activo: boolean;
   created_at: string;
   updated_at: string;
@@ -78,11 +73,17 @@ export interface ServicioPaciente {
   kilometros_diarios: number;
   valor_por_km: number;
   monto_mensual_estimado: number;
+  cantidad_mensual?: number; // Días de asistencia al mes
+  numero_autorizacion?: string; // Número de autorización de obra social
+  observaciones?: string;
   fecha_inicio: string;
   fecha_fin?: string;
   activo: boolean;
   created_at: string;
   updated_at: string;
+  // Relaciones expandidas
+  destino?: Destino;
+  paciente?: Paciente;
 }
 
 export interface HorarioTraslado {
@@ -221,11 +222,11 @@ export interface LiquidacionConductor {
 
 export interface PeriodoFacturacion {
   id: string;
-  mes: number;
-  anio: number;
+  periodo: string; // Formato YYYY-MM
   fecha_inicio: string;
   fecha_fin: string;
-  cerrado: boolean;
+  estado: 'abierto' | 'cerrado' | 'facturado';
+  fecha_cierre?: string;
   observaciones?: string;
   created_at: string;
   updated_at: string;

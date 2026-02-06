@@ -22,6 +22,7 @@ export class FacturacionListComponent implements OnInit {
   obrasSociales = signal<ObraSocial[]>([]);
   periodos = signal<PeriodoFacturacion[]>([]);
   loading = signal(false);
+  error = signal<string | null>(null);
   
   // Filters
   selectedPeriodo = '';
@@ -84,17 +85,17 @@ export class FacturacionListComponent implements OnInit {
         this.periodos.set(response.data);
         if (response.data.length > 0) {
           // Seleccionar el primer período abierto, o el primero si todos están cerrados
-          const periodoAbierto = response.data.find(p => !p.cerrado);
+          const periodoAbierto = response.data.find(p => p.estado === 'abierto');
           this.selectedPeriodo = periodoAbierto?.id || response.data[0].id;
         }
       },
       error: (err) => {
         console.error('Error loading periodos:', err);
-        // Mock data
+        // 🔶 MOCK: Fallback - Datos de desarrollo cuando falla la API
         const mockPeriodos: PeriodoFacturacion[] = [
-          { id: '1', mes: 1, anio: 2026, fecha_inicio: '2026-01-01', fecha_fin: '2026-01-31', cerrado: false, created_at: '', updated_at: '' },
-          { id: '2', mes: 12, anio: 2025, fecha_inicio: '2025-12-01', fecha_fin: '2025-12-31', cerrado: true, created_at: '', updated_at: '' },
-          { id: '3', mes: 11, anio: 2025, fecha_inicio: '2025-11-01', fecha_fin: '2025-11-30', cerrado: true, created_at: '', updated_at: '' }
+          { id: '1', periodo: '2026-01', fecha_inicio: '2026-01-01', fecha_fin: '2026-01-31', estado: 'abierto', created_at: '', updated_at: '' },
+          { id: '2', periodo: '2025-12', fecha_inicio: '2025-12-01', fecha_fin: '2025-12-31', estado: 'cerrado', created_at: '', updated_at: '' },
+          { id: '3', periodo: '2025-11', fecha_inicio: '2025-11-01', fecha_fin: '2025-11-30', estado: 'cerrado', created_at: '', updated_at: '' }
         ];
         this.periodos.set(mockPeriodos);
         this.selectedPeriodo = mockPeriodos[0].id;
@@ -142,12 +143,13 @@ export class FacturacionListComponent implements OnInit {
       error: (err) => {
         console.error('Error loading facturas:', err);
         this.loading.set(false);
-        this.loadMockData();
+        this.error.set('Error al cargar facturas. Verifique su conexión.');
       }
     });
   }
 
   loadMockData() {
+    // 🔶 MOCK: Lista de facturas de desarrollo
     const mockData: FacturaView[] = [
       { id: '1', numero_factura: '0004-00001761', fecha_emision: '2026-01-20', fecha_vencimiento: '2026-02-20', periodo_id: '1', obra_social_id: '1', subtotal: 300000, impuestos: 22843, monto_total: 322843, estado: 'emitida', obraSocialNombre: 'OSECAC', periodoNombre: 'Enero 2026', created_at: '', updated_at: '' },
       { id: '2', numero_factura: '0004-00001760', fecha_emision: '2026-01-18', fecha_vencimiento: '2026-02-18', periodo_id: '1', obra_social_id: '2', subtotal: 200000, impuestos: 15000, monto_total: 215000, estado: 'emitida', obraSocialNombre: 'OSMATA', periodoNombre: 'Enero 2026', created_at: '', updated_at: '' },
@@ -172,7 +174,8 @@ export class FacturacionListComponent implements OnInit {
 
   formatPeriodo(periodo: PeriodoFacturacion): string {
     const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-    return `${meses[periodo.mes - 1]} ${periodo.anio}`;
+    const [anio, mes] = periodo.periodo.split('-').map(Number);
+    return `${meses[mes - 1]} ${anio}`;
   }
 
   getPeriodoLabel(periodoId: string): string {
