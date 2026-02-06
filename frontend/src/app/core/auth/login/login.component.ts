@@ -1,12 +1,7 @@
 import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
-import { MatCardModule } from '@angular/material/card';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { Router, RouterModule } from '@angular/router';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { AuthService } from '../auth.service';
 
@@ -15,11 +10,7 @@ import { AuthService } from '../auth.service';
     imports: [
         CommonModule,
         FormsModule,
-        MatCardModule,
-        MatFormFieldModule,
-        MatInputModule,
-        MatButtonModule,
-        MatProgressSpinnerModule,
+        RouterModule,
         MatSnackBarModule
     ],
     templateUrl: './login.component.html',
@@ -29,12 +20,17 @@ export class LoginComponent {
   email = signal('');
   password = signal('');
   loading = signal(false);
+  showPassword = signal(false);
 
   constructor(
     private authService: AuthService,
     private router: Router,
     private snackBar: MatSnackBar
   ) {}
+
+  togglePasswordVisibility() {
+    this.showPassword.set(!this.showPassword());
+  }
 
   async onSubmit() {
     if (!this.email() || !this.password()) {
