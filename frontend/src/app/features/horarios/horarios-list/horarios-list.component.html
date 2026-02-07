@@ -1,25 +1,30 @@
-<!-- 🔶 MOCK BANNER -->
-<div class="mock-banner">
-  <i class="fas fa-flask"></i>
-  <span><strong>Pantalla de desarrollo:</strong> Esta sección muestra datos de ejemplo. No está conectada a la API.</span>
-</div>
+<!-- Error Banner -->
+@if (error()) {
+  <div class="error-banner">
+    <i class="fas fa-exclamation-triangle"></i>
+    <span>{{ error() }}</span>
+    <button class="btn btn-sm" (click)="retry()">
+      <i class="fas fa-redo"></i> Reintentar
+    </button>
+  </div>
+}
 
-<!-- Stats de Choferes -->
+<!-- Stats de la Semana -->
 <div class="driver-stats">
   <div class="driver-stat">
-    <div class="driver-stat-value">{{ totalViajes }}</div>
+    <div class="driver-stat-value">{{ totalViajes() }}</div>
     <div class="driver-stat-label">Viajes Programados</div>
   </div>
   <div class="driver-stat">
-    <div class="driver-stat-value">{{ totalKm }}</div>
+    <div class="driver-stat-value">{{ totalKm() }}</div>
     <div class="driver-stat-label">Km Estimados</div>
   </div>
   <div class="driver-stat">
-    <div class="driver-stat-value">{{ pacientesAtendidos }}</div>
+    <div class="driver-stat-value">{{ pacientesAtendidos() }}</div>
     <div class="driver-stat-label">Pacientes Atendidos</div>
   </div>
   <div class="driver-stat">
-    <div class="driver-stat-value">{{ conductoresActivos }}</div>
+    <div class="driver-stat-value">{{ conductoresActivos() }}</div>
     <div class="driver-stat-label">Conductores Activos</div>
   </div>
 </div>
@@ -27,21 +32,27 @@
 <!-- Filtros -->
 <div class="filters">
   <div class="filter-group">
-    <label class="filter-label">Chofer</label>
-    <select class="form-select" [(ngModel)]="selectedChofer">
-      <option value="todos">Todos los Choferes</option>
-      @for (chofer of choferes; track chofer.id) {
-        <option [value]="chofer.id">{{ chofer.nombre }}</option>
+    <label class="filter-label">Conductor</label>
+    <select class="form-select" [ngModel]="selectedConductor()" (ngModelChange)="selectedConductor.set($event); onConductorFilterChange()">
+      <option value="todos">Todos los Conductores</option>
+      @for (conductor of conductores(); track conductor.id) {
+        <option [value]="conductor.id">{{ conductor.apellido }}, {{ conductor.nombre }}</option>
       }
     </select>
   </div>
-  <div class="filter-group">
+  <div class="filter-group week-navigation">
     <label class="filter-label">Semana</label>
-    <select class="form-select" [(ngModel)]="selectedSemana">
-      <option value="anterior">Semana Anterior</option>
-      <option value="actual">Semana Actual</option>
-      <option value="siguiente">Próxima Semana</option>
-    </select>
+    <div class="week-nav-buttons">
+      <button class="btn btn-icon" (click)="previousWeek()" title="Semana anterior">
+        <i class="fas fa-chevron-left"></i>
+      </button>
+      <button class="btn btn-secondary week-current" (click)="goToCurrentWeek()">
+        {{ weekDateRange() }}
+      </button>
+      <button class="btn btn-icon" (click)="nextWeek()" title="Semana siguiente">
+        <i class="fas fa-chevron-right"></i>
+      </button>
+    </div>
   </div>
   <div class="filter-group" style="flex: 0 0 auto;">
     <label class="filter-label">&nbsp;</label>
@@ -58,67 +69,172 @@
   </div>
 </div>
 
-<!-- Grilla de Horarios -->
-<div class="card">
-  <div class="card-header">
-    <h2 class="card-title">Planificación Semanal</h2>
-    <p class="card-subtitle">Semana del 27 al 31 de Enero 2025</p>
+<!-- Loading -->
+@if (loading()) {
+  <div class="loading-container">
+    <i class="fas fa-spinner fa-spin fa-2x"></i>
+    <p>Cargando horarios...</p>
   </div>
-  
-  <div class="schedule-week">
-    <!-- Header -->
-    <div class="schedule-header"></div>
-    @for (dia of diasSemana; track dia) {
-      <div class="schedule-header">{{ dia }}</div>
-    }
-    
-    <!-- Rows por hora -->
-    @for (hora of horasDelDia; track hora) {
-      <div class="schedule-time-slot">{{ hora }}</div>
-      @for (dia of diasSemana; track dia) {
-        <div class="schedule-cell">
-          @for (traslado of getTrasladosForCell(dia, hora); track traslado.id) {
-            <div class="trip-card" (click)="viewTraslado(traslado)">
-              <div class="trip-patient">{{ traslado.paciente }}</div>
-              <div class="trip-location">{{ traslado.destino }}</div>
-            </div>
-          }
-        </div>
-      }
-    }
-  </div>
-</div>
+}
 
-<!-- Lista de Choferes -->
-<div class="card" style="margin-top: var(--spacing-xl);">
-  <div class="card-header">
-    <h2 class="card-title">Conductores Asignados</h2>
-    <p class="card-subtitle">Estado y asignaciones del día</p>
-  </div>
-  
-  <div class="table-container">
-    <table>
-      <thead>
-        <tr>
-          <th>Conductor</th>
-          <th>Vehículo</th>
-          <th>Viajes Hoy</th>
-          <th>Km Hoy</th>
-          <th>Estado</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (chofer of choferes; track chofer.id) {
-          <tr>
-            <td><strong>{{ chofer.nombre }}</strong></td>
-            <td>{{ chofer.vehiculo }}</td>
-            <td>{{ chofer.viajesHoy }}</td>
-            <td>{{ chofer.kmHoy }} km</td>
-            <td><span class="badge badge-success">Activo</span></td>
-          </tr>
+<!-- Grilla de Horarios -->
+@if (!loading()) {
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">Planificación Semanal</h2>
+      <p class="card-subtitle">{{ weekDateRange() }}</p>
+    </div>
+    
+    <div class="schedule-week">
+      <!-- Header -->
+      <div class="schedule-header"></div>
+      @for (dia of diasSemana; track dia; let i = $index) {
+        <div class="schedule-header">{{ dia }}</div>
+      }
+      
+      <!-- Rows por hora -->
+      @for (hora of horasDelDia; track hora) {
+        <div class="schedule-time-slot">{{ hora }}</div>
+        @for (dia of diasSemana; track dia; let diaIndex = $index) {
+          <div class="schedule-cell">
+            @for (traslado of getTrasladosForCell(diaIndex, hora); track traslado.id) {
+              <div class="trip-card" 
+                   [class.trip-completado]="traslado.estado === 'completado'"
+                   [class.trip-cancelado]="traslado.estado === 'cancelado'"
+                   [class.trip-en-curso]="traslado.estado === 'en_curso'"
+                   (click)="openEditModal(traslado)">
+                <div class="trip-patient">{{ traslado.paciente }}</div>
+                <div class="trip-type">
+                  <span class="badge" [class]="getEstadoBadgeClass(traslado.estado)">
+                    {{ traslado.destino }}
+                  </span>
+                </div>
+                @if (traslado.conductor) {
+                  <div class="trip-driver">
+                    <i class="fas fa-user-tie"></i> {{ traslado.conductor }}
+                  </div>
+                }
+              </div>
+            }
+          </div>
         }
-      </tbody>
-    </table>
+      }
+    </div>
   </div>
-</div>
+}
+
+<!-- Lista de Conductores -->
+@if (!loading() && getConductorStats().length > 0) {
+  <div class="card" style="margin-top: var(--spacing-xl);">
+    <div class="card-header">
+      <h2 class="card-title">Conductores del Día</h2>
+      <p class="card-subtitle">Resumen de actividad</p>
+    </div>
+    
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Conductor</th>
+            <th>Viajes Hoy</th>
+            <th>Km Hoy</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (conductor of getConductorStats(); track conductor.id) {
+            <tr>
+              <td><strong>{{ conductor.nombre }}</strong></td>
+              <td>{{ conductor.viajesHoy }}</td>
+              <td>{{ conductor.kmHoy }} km</td>
+              <td>
+                <span class="badge" [class]="conductor.viajesHoy > 0 ? 'badge-success' : 'badge-secondary'">
+                  {{ conductor.viajesHoy > 0 ? 'Activo' : 'Sin viajes' }}
+                </span>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+}
+
+<!-- Empty State -->
+@if (!loading() && !error() && horarios().length === 0) {
+  <div class="empty-state">
+    <i class="fas fa-calendar-times"></i>
+    <h3>Sin horarios programados</h3>
+    <p>No hay traslados para esta semana. Puede crear uno nuevo.</p>
+    <button class="btn btn-primary" (click)="openNewTrasladoModal()">
+      <i class="fas fa-plus"></i> Nuevo Traslado
+    </button>
+  </div>
+}
+
+<!-- Modal Crear/Editar Horario -->
+@if (showModal()) {
+  <div class="modal-backdrop" (click)="closeModal()"></div>
+  <div class="modal">
+    <div class="modal-header">
+      <h3>{{ editingHorario() ? 'Editar Horario' : 'Nuevo Horario de Traslado' }}</h3>
+      <button class="btn btn-icon" (click)="closeModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Paciente *</label>
+        <select class="form-select" [(ngModel)]="formData.paciente_id" required>
+          <option value="">Seleccionar paciente</option>
+          @for (paciente of pacientes(); track paciente.id) {
+            <option [value]="paciente.id">{{ paciente.apellido }}, {{ paciente.nombre }} - {{ paciente.dni }}</option>
+          }
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Conductor</label>
+        <select class="form-select" [(ngModel)]="formData.conductor_id">
+          <option value="">Sin asignar</option>
+          @for (conductor of conductores(); track conductor.id) {
+            <option [value]="conductor.id">{{ conductor.apellido }}, {{ conductor.nombre }}</option>
+          }
+        </select>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Fecha *</label>
+          <input type="date" class="form-input" [(ngModel)]="formData.fecha" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Hora *</label>
+          <input type="time" class="form-input" [(ngModel)]="formData.hora_inicio" required>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tipo de Traslado</label>
+        <select class="form-select" [(ngModel)]="formData.tipo_traslado">
+          <option value="ida">Ida</option>
+          <option value="vuelta">Vuelta</option>
+          <option value="ida_vuelta">Ida y Vuelta</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Observaciones</label>
+        <textarea class="form-input" [(ngModel)]="formData.observaciones" rows="3" placeholder="Notas adicionales..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      @if (editingHorario()) {
+        <button class="btn btn-danger" (click)="deleteHorario({id: editingHorario()!.id, paciente: '', paciente_id: '', hora: '', destino: '', conductor: '', conductor_id: '', estado: '', tipo_traslado: ''})">
+          <i class="fas fa-trash"></i> Eliminar
+        </button>
+      }
+      <button class="btn btn-secondary" (click)="closeModal()">Cancelar</button>
+      <button class="btn btn-primary" (click)="saveHorario()">
+        <i class="fas fa-save"></i> {{ editingHorario() ? 'Actualizar' : 'Guardar' }}
+      </button>
+    </div>
+  </div>
+}
 

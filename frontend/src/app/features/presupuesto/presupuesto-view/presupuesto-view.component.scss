@@ -67,3 +67,340 @@
     grid-template-columns: 1fr;
   }
 }
+
+// Error Banner
+.error-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: var(--danger-light, #ffe6e6);
+  border: 1px solid var(--danger);
+  border-radius: var(--border-radius);
+  margin-bottom: var(--spacing-lg);
+  color: var(--danger);
+
+  .btn {
+    margin-left: auto;
+  }
+}
+
+// Loading
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-xxl);
+  color: var(--text-secondary);
+}
+
+// Modal styles
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 9998;
+}
+
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--bg-primary, #fff);
+  border-radius: var(--radius-lg, 0.75rem);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  z-index: 9999;
+  min-width: 500px;
+  max-width: 90vw;
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border, #e2e8f0);
+  background: var(--bg-primary, #fff);
+
+  h3 {
+    margin: 0;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-primary, #1e293b);
+  }
+}
+
+.modal-body {
+  padding: 1.5rem;
+  overflow-y: auto;
+  background: var(--bg-primary, #fff);
+  flex: 1;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--border, #e2e8f0);
+  background: var(--bg-secondary, #f8fafc);
+}
+
+// Form elements
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary, #1e293b);
+}
+
+.form-input,
+.form-select {
+  width: 100%;
+  padding: 0.625rem 0.875rem;
+  font-size: 0.875rem;
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: 0.5rem;
+  background: var(--bg-primary, #fff);
+  color: var(--text-primary, #1e293b);
+  transition: border-color 0.2s, box-shadow 0.2s;
+
+  &:focus {
+    outline: none;
+    border-color: var(--primary, #2563eb);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  }
+}
+
+textarea.form-input {
+  resize: vertical;
+  min-height: 60px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.pago-info {
+  background: var(--bg-secondary, #f8fafc);
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+
+  p {
+    margin: 0 0 0.5rem;
+    &:last-child { margin-bottom: 0; }
+  }
+}
+
+// Action buttons
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-icon {
+  padding: 0.5rem;
+  min-width: 32px;
+  height: 32px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-radius: 0.375rem;
+  color: var(--text-secondary, #64748b);
+  
+  &:hover {
+    background: var(--bg-secondary, #f8fafc);
+    color: var(--text-primary, #1e293b);
+  }
+}
+
+// Button outline
+.btn-outline {
+  background: transparent;
+  border: 1px solid var(--border, #e2e8f0);
+  color: var(--text-primary, #1e293b);
+  
+  &:hover {
+    background: var(--bg-secondary, #f8fafc);
+    border-color: var(--primary, #2563eb);
+    color: var(--primary, #2563eb);
+  }
+}
+
+// Modal large
+.modal-lg {
+  min-width: 900px;
+  max-width: 95vw;
+}
+
+// Conceptos modal
+.conceptos-modal-body {
+  padding: 0 !important;
+}
+
+.conceptos-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 400px;
+}
+
+.conceptos-list-panel {
+  border-right: 1px solid var(--border, #e2e8f0);
+  padding: 1.5rem;
+  overflow-y: auto;
+  max-height: 60vh;
+  background: var(--bg-primary, #fff);
+  
+  h4 {
+    margin: 0 0 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary, #1e293b);
+  }
+}
+
+.conceptos-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.concepto-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  background: var(--bg-secondary, #f8fafc);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: var(--primary-light, #dbeafe);
+  }
+  
+  &.selected {
+    background: var(--primary-light, #dbeafe);
+    border-left: 3px solid var(--primary, #2563eb);
+  }
+  
+  &.inactive {
+    opacity: 0.5;
+  }
+}
+
+.concepto-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.concepto-nombre {
+  display: block;
+  font-weight: 500;
+  color: var(--text-primary, #1e293b);
+  margin-bottom: 2px;
+}
+
+.concepto-meta {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-secondary, #64748b);
+}
+
+.concepto-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-icon-sm {
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  color: var(--text-secondary, #64748b);
+  border-radius: 0.375rem;
+  
+  &:hover {
+    background: var(--bg-primary, #fff);
+    color: var(--primary, #2563eb);
+  }
+  
+  &.text-danger:hover {
+    color: var(--danger, #ef4444);
+  }
+}
+
+.concepto-form-panel {
+  padding: 1.5rem;
+  background: var(--bg-secondary, #f8fafc);
+  
+  h4 {
+    margin: 0 0 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary, #1e293b);
+  }
+}
+
+.form-label-check {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.875rem;
+  color: var(--text-primary, #1e293b);
+  cursor: pointer;
+  
+  input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--primary, #2563eb);
+  }
+}
+
+.form-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border, #e2e8f0);
+}
+
+@media (max-width: 768px) {
+  .modal {
+    min-width: auto !important;
+    width: 95vw;
+  }
+  
+  .conceptos-layout {
+    grid-template-columns: 1fr;
+  }
+  
+  .conceptos-list-panel {
+    border-right: none;
+    border-bottom: 1px solid var(--border, #e2e8f0);
+    max-height: 30vh;
+  }
+  
+  .modal-lg {
+    min-width: auto;
+    width: 95vw;
+  }
+}

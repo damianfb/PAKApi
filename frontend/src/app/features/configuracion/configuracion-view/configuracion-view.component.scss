@@ -1,0 +1,140 @@
+.config-header {
+  margin-bottom: var(--spacing-xl);
+}
+
+.page-title {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-xs);
+  
+  i {
+    color: var(--primary);
+  }
+}
+
+.page-subtitle {
+  color: var(--text-secondary);
+  font-size: var(--font-size-base);
+  margin: 0;
+}
+
+.config-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+.config-card {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-xl);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--border-radius-lg, 12px);
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: var(--primary);
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+    
+    .config-arrow {
+      color: var(--primary);
+      transform: translateX(4px);
+    }
+  }
+}
+
+.config-icon {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--border-radius);
+  color: white;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.config-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.config-title {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-xs);
+}
+
+.config-description {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.config-arrow {
+  color: var(--text-muted);
+  font-size: 1.25rem;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.config-info {
+  margin-top: var(--spacing-xl);
+}
+
+.info-card {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+  background: var(--info-light, #e8f4fd);
+  border: 1px solid var(--info, #3b82f6);
+  border-radius: var(--border-radius);
+  color: var(--info, #3b82f6);
+  
+  > i {
+    font-size: 1.25rem;
+    margin-top: 2px;
+  }
+  
+  h4 {
+    margin: 0 0 var(--spacing-xs);
+    font-size: var(--font-size-base);
+    color: var(--text-primary);
+  }
+  
+  p {
+    margin: 0;
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+}
+
+@media (max-width: 768px) {
+  .config-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .config-card {
+    padding: var(--spacing-lg);
+  }
+  
+  .config-icon {
+    width: 48px;
+    height: 48px;
+    font-size: 1.25rem;
+  }
+}

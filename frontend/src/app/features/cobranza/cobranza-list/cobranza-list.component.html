@@ -1,8 +1,13 @@
-<!-- 🔶 MOCK BANNER -->
-<div class="mock-banner">
-  <i class="fas fa-flask"></i>
-  <span><strong>Pantalla de desarrollo:</strong> Esta sección muestra datos de ejemplo. No está conectada a la API.</span>
-</div>
+<!-- Error Banner -->
+@if (error()) {
+  <div class="error-banner">
+    <i class="fas fa-exclamation-triangle"></i>
+    <span>{{ error() }}</span>
+    <button class="btn btn-sm" (click)="retry()">
+      <i class="fas fa-redo"></i> Reintentar
+    </button>
+  </div>
+}
 
 <!-- Stats -->
 <div class="stats-grid">
@@ -11,7 +16,7 @@
       <span class="stat-label">Total a Cobrar</span>
       <span class="stat-icon"><i class="fas fa-hand-holding-usd" style="color: var(--primary);"></i></span>
     </div>
-    <div class="stat-value">{{ totalACobrar | currency:'ARS':'symbol-narrow':'1.0-0' }}</div>
+    <div class="stat-value">{{ totalACobrar() | currency:'ARS':'symbol-narrow':'1.0-0' }}</div>
     <div class="stat-change">
       <span>Facturación pendiente</span>
     </div>
@@ -19,13 +24,13 @@
 
   <div class="stat-card">
     <div class="stat-card-header">
-      <span class="stat-label">Cobrado Este Mes</span>
+      <span class="stat-label">Cobrado</span>
       <span class="stat-icon"><i class="fas fa-check-circle" style="color: var(--secondary);"></i></span>
     </div>
-    <div class="stat-value">{{ cobradoMes | currency:'ARS':'symbol-narrow':'1.0-0' }}</div>
+    <div class="stat-value">{{ cobradoMes() | currency:'ARS':'symbol-narrow':'1.0-0' }}</div>
     <div class="stat-change positive">
       <i class="fas fa-arrow-up"></i>
-      <span>8 pagos recibidos</span>
+      <span>Pagos recibidos</span>
     </div>
   </div>
 
@@ -34,10 +39,10 @@
       <span class="stat-label">Pendiente de Cobro</span>
       <span class="stat-icon"><i class="fas fa-clock" style="color: var(--warning);"></i></span>
     </div>
-    <div class="stat-value">{{ pendienteCobro | currency:'ARS':'symbol-narrow':'1.0-0' }}</div>
+    <div class="stat-value">{{ pendienteCobro() | currency:'ARS':'symbol-narrow':'1.0-0' }}</div>
     <div class="stat-change negative">
       <i class="fas fa-exclamation-triangle"></i>
-      <span>16 facturas pendientes</span>
+      <span>{{ cobranzas().length }} cobranzas</span>
     </div>
   </div>
 
@@ -46,7 +51,7 @@
       <span class="stat-label">Comisiones Generadas</span>
       <span class="stat-icon"><i class="fas fa-percent" style="color: var(--info);"></i></span>
     </div>
-    <div class="stat-value">{{ comisionesGeneradas | currency:'ARS':'symbol-narrow':'1.0-0' }}</div>
+    <div class="stat-value">{{ comisionesGeneradas() | currency:'ARS':'symbol-narrow':'1.0-0' }}</div>
     <div class="stat-change">
       <span>3% sobre cobrado</span>
     </div>
@@ -54,122 +59,322 @@
 </div>
 
 <!-- Alertas -->
-<div class="alert alert-warning">
-  <i class="fas fa-exclamation-triangle"></i>
-  <div>
-    <strong>Atención:</strong> Hay 4 facturas con más de 60 días de vencimiento. Se recomienda gestionar el cobro.
+@if (overdueCount() > 0) {
+  <div class="alert alert-warning">
+    <i class="fas fa-exclamation-triangle"></i>
+    <div>
+      <strong>Atención:</strong> Hay {{ overdueCount() }} cobranzas con más de 60 días de vencimiento. Se recomienda gestionar el cobro.
+    </div>
   </div>
-</div>
+}
 
 <!-- Filtros -->
 <div class="filters">
   <div class="filter-group">
     <label class="filter-label">Período</label>
-    <select class="form-select" [(ngModel)]="selectedPeriodo">
-      @for (periodo of periodos; track periodo) {
-        <option [value]="periodo">{{ periodo }}</option>
+    <select class="form-select" [ngModel]="selectedPeriodo()" (ngModelChange)="selectedPeriodo.set($event); onFilterChange()">
+      <option value="">Todos los períodos</option>
+      @for (periodo of periodos(); track periodo.id) {
+        <option [value]="periodo.id">{{ periodo.periodo }}</option>
       }
     </select>
   </div>
   <div class="filter-group">
     <label class="filter-label">Obra Social</label>
-    <select class="form-select" [(ngModel)]="selectedObraSocial">
-      <option value="todos">Todas</option>
-      @for (os of obrasSociales; track os) {
-        <option [value]="os.toLowerCase()">{{ os }}</option>
+    <select class="form-select" [ngModel]="selectedObraSocial()" (ngModelChange)="selectedObraSocial.set($event); onFilterChange()">
+      <option value="">Todas</option>
+      @for (os of obrasSociales(); track os.id) {
+        <option [value]="os.id">{{ os.nombre }}</option>
       }
     </select>
   </div>
   <div class="filter-group">
     <label class="filter-label">Estado</label>
-    <select class="form-select" [(ngModel)]="selectedEstado">
-      <option value="todos">Todos</option>
+    <select class="form-select" [ngModel]="selectedEstado()" (ngModelChange)="selectedEstado.set($event); onFilterChange()">
+      <option value="">Todos</option>
       <option value="pendiente">Pendiente</option>
-      <option value="pagado">Pagado</option>
+      <option value="cobrado">Cobrado</option>
       <option value="parcial">Pago Parcial</option>
-      <option value="vencido">Vencido</option>
+      <option value="anulado">Anulado</option>
     </select>
   </div>
   <div class="filter-group">
     <label class="filter-label">Buscar</label>
-    <input type="text" class="form-input" placeholder="N° Factura o Recibo..." [(ngModel)]="searchTerm">
+    <input type="text" class="form-input" placeholder="N° Cobranza..." [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)">
   </div>
 </div>
 
+<!-- Loading -->
+@if (loading()) {
+  <div class="loading-container">
+    <i class="fas fa-spinner fa-spin fa-2x"></i>
+    <p>Cargando cobranzas...</p>
+  </div>
+}
+
 <!-- Tabla de Cobranzas -->
-<div class="card">
-  <div class="card-header d-flex justify-between align-center">
-    <div>
-      <h2 class="card-title">Estado de Cobranzas</h2>
-      <p class="card-subtitle">Seguimiento de pagos por factura</p>
+@if (!loading()) {
+  <div class="card">
+    <div class="card-header d-flex justify-between align-center">
+      <div>
+        <h2 class="card-title">Estado de Cobranzas</h2>
+        <p class="card-subtitle">Seguimiento de pagos por cobranza</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-secondary" (click)="exportData()">
+          <i class="fas fa-download"></i>
+          Exportar
+        </button>
+        <button class="btn btn-primary" (click)="openNuevaCobranzaModal()">
+          <i class="fas fa-plus"></i>
+          Nueva Cobranza
+        </button>
+      </div>
     </div>
-    <div class="header-actions">
-      <button class="btn btn-secondary" (click)="exportData()">
-        <i class="fas fa-download"></i>
-        Exportar
-      </button>
-      <button class="btn btn-primary" (click)="openNewPagoModal()">
-        <i class="fas fa-plus"></i>
-        Registrar Pago
-      </button>
-    </div>
-  </div>
-  
-  <div class="table-container">
-    <table>
-      <thead>
-        <tr>
-          <th>Factura N°</th>
-          <th>Obra Social</th>
-          <th>Fecha Emisión</th>
-          <th>Vencimiento</th>
-          <th class="text-right">Monto</th>
-          <th class="text-right">Pagado</th>
-          <th class="text-right">Saldo</th>
-          <th class="text-right">Comisión</th>
-          <th>Estado</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (cobranza of filteredCobranzas; track cobranza.id) {
+    
+    <div class="table-container">
+      <table>
+        <thead>
           <tr>
-            <td><strong>{{ cobranza.facturaNum }}</strong></td>
-            <td>{{ cobranza.obraSocial }}</td>
-            <td>{{ cobranza.fechaEmision | date:'dd/MM/yyyy' }}</td>
-            <td>{{ cobranza.fechaVencimiento | date:'dd/MM/yyyy' }}</td>
-            <td class="text-right">{{ cobranza.monto | currency:'ARS':'symbol-narrow':'1.0-0' }}</td>
-            <td class="text-right">{{ cobranza.montoPagado | currency:'ARS':'symbol-narrow':'1.0-0' }}</td>
-            <td class="text-right">{{ cobranza.saldo | currency:'ARS':'symbol-narrow':'1.0-0' }}</td>
-            <td class="text-right">{{ cobranza.comision | currency:'ARS':'symbol-narrow':'1.0-0' }}</td>
-            <td>
-              <span [class]="getEstadoBadgeClass(cobranza.estado)">
-                {{ getEstadoLabel(cobranza.estado) }}
-              </span>
-            </td>
-            <td>
-              <div class="action-buttons">
-                <button class="btn btn-sm btn-secondary btn-icon" (click)="viewCobranza(cobranza)" title="Ver detalle">
-                  <i class="fas fa-eye"></i>
-                </button>
-                @if (cobranza.estado !== 'pagado') {
-                  <button class="btn btn-sm btn-success btn-icon" (click)="registrarPago(cobranza)" title="Registrar pago">
-                    <i class="fas fa-dollar-sign"></i>
-                  </button>
+            <th>N° Cobranza</th>
+            <th>Obra Social</th>
+            <th>Fecha</th>
+            <th>Vencimiento</th>
+            <th class="text-right">Monto Total</th>
+            <th class="text-right">Cobrado</th>
+            <th class="text-right">Pendiente</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (cobranza of filteredCobranzas(); track cobranza.id) {
+            <tr [class.row-overdue]="isOverdue(cobranza)">
+              <td><strong>{{ cobranza.numero_cobranza }}</strong></td>
+              <td>{{ cobranza.obra_social?.nombre || '-' }}</td>
+              <td>{{ cobranza.fecha_cobranza | date:'dd/MM/yyyy' }}</td>
+              <td [class.text-danger]="isOverdue(cobranza)">
+                {{ cobranza.fecha_vencimiento | date:'dd/MM/yyyy' }}
+                @if (isOverdue(cobranza)) {
+                  <i class="fas fa-exclamation-circle ms-1" title="Vencida"></i>
                 }
-              </div>
-            </td>
-          </tr>
-        } @empty {
-          <tr>
-            <td colspan="10" class="text-center" style="padding: var(--spacing-xl);">
-              <i class="fas fa-money-bill-wave" style="font-size: 3rem; color: var(--text-light); margin-bottom: var(--spacing-md);"></i>
-              <p class="text-muted">No se encontraron cobranzas</p>
-            </td>
-          </tr>
-        }
-      </tbody>
-    </table>
+              </td>
+              <td class="text-right">{{ cobranza.monto_total | currency:'ARS':'symbol-narrow':'1.0-0' }}</td>
+              <td class="text-right">{{ cobranza.monto_cobrado | currency:'ARS':'symbol-narrow':'1.0-0' }}</td>
+              <td class="text-right">{{ cobranza.monto_pendiente | currency:'ARS':'symbol-narrow':'1.0-0' }}</td>
+              <td>
+                <span [class]="getEstadoBadgeClass(cobranza.estado)">
+                  {{ getEstadoLabel(cobranza.estado) }}
+                </span>
+              </td>
+              <td>
+                <div class="action-buttons">
+                  <button class="btn btn-sm btn-secondary btn-icon" (click)="viewCobranza(cobranza)" title="Ver detalle">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                  @if (cobranza.estado !== 'cobrado' && cobranza.estado !== 'anulado') {
+                    <button class="btn btn-sm btn-success btn-icon" (click)="registrarPago(cobranza)" title="Registrar pago">
+                      <i class="fas fa-dollar-sign"></i>
+                    </button>
+                  }
+                </div>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="9" class="text-center" style="padding: var(--spacing-xl);">
+                <i class="fas fa-money-bill-wave" style="font-size: 3rem; color: var(--text-light); margin-bottom: var(--spacing-md);"></i>
+                <p class="text-muted">No se encontraron cobranzas</p>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
   </div>
-</div>
+}
+
+<!-- Modal Registrar Pago -->
+@if (showPagoModal()) {
+  <div class="modal-backdrop" (click)="closePagoModal()"></div>
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Registrar Pago</h3>
+      <button class="btn btn-icon" (click)="closePagoModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      @if (selectedCobranza()) {
+        <div class="pago-info">
+          <p><strong>Cobranza:</strong> {{ selectedCobranza()!.numero_cobranza }}</p>
+          <p><strong>Obra Social:</strong> {{ selectedCobranza()!.obra_social?.nombre || '-' }}</p>
+          <p><strong>Monto Pendiente:</strong> {{ selectedCobranza()!.monto_pendiente | currency:'ARS':'symbol-narrow':'1.0-0' }}</p>
+        </div>
+      }
+      <div class="form-group">
+        <label class="form-label">Monto a Pagar *</label>
+        <input type="number" class="form-input" [(ngModel)]="pagoMonto" [max]="selectedCobranza()?.monto_pendiente || 0" min="0">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Método de Pago</label>
+        <select class="form-select" [(ngModel)]="pagoMetodo">
+          <option value="transferencia">Transferencia</option>
+          <option value="efectivo">Efectivo</option>
+          <option value="cheque">Cheque</option>
+          <option value="tarjeta">Tarjeta</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Observaciones</label>
+        <textarea class="form-input" [(ngModel)]="pagoObservaciones" rows="3"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="closePagoModal()">Cancelar</button>
+      <button class="btn btn-primary" (click)="savePago()">
+        <i class="fas fa-save"></i> Registrar Pago
+      </button>
+    </div>
+  </div>
+}
+
+<!-- Modal Nueva Cobranza -->
+@if (showCobranzaModal()) {
+  <div class="modal-backdrop" (click)="closeCobranzaModal()"></div>
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Nueva Cobranza</h3>
+      <button class="btn btn-icon" (click)="closeCobranzaModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">N° Cobranza *</label>
+        <input type="text" class="form-input" [(ngModel)]="nuevaCobranza.numero_cobranza">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Obra Social</label>
+        <select class="form-select" [(ngModel)]="nuevaCobranza.obra_social_id">
+          <option value="">Seleccionar...</option>
+          @for (os of obrasSociales(); track os.id) {
+            <option [value]="os.id">{{ os.nombre }}</option>
+          }
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Período</label>
+        <select class="form-select" [(ngModel)]="nuevaCobranza.periodo_id">
+          <option value="">Seleccionar...</option>
+          @for (periodo of periodos(); track periodo.id) {
+            <option [value]="periodo.id">{{ periodo.periodo }}</option>
+          }
+        </select>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Fecha Cobranza</label>
+          <input type="date" class="form-input" [(ngModel)]="nuevaCobranza.fecha_cobranza">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Fecha Vencimiento</label>
+          <input type="date" class="form-input" [(ngModel)]="nuevaCobranza.fecha_vencimiento">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Monto Total *</label>
+        <input type="number" class="form-input" [(ngModel)]="nuevaCobranza.monto_total" min="0">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Observaciones</label>
+        <textarea class="form-input" [(ngModel)]="nuevaCobranza.observaciones" rows="2"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="closeCobranzaModal()">Cancelar</button>
+      <button class="btn btn-primary" (click)="saveCobranza()">
+        <i class="fas fa-save"></i> Crear Cobranza
+      </button>
+    </div>
+  </div>
+}
+
+<!-- Modal Ver Detalle -->
+@if (showDetalleModal() && selectedCobranza()) {
+  <div class="modal-backdrop" (click)="closeDetalleModal()"></div>
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <h3>Detalle de Cobranza</h3>
+      <button class="btn btn-icon" (click)="closeDetalleModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="detalle-grid">
+        <div class="detalle-item">
+          <span class="detalle-label">N° Cobranza</span>
+          <span class="detalle-value">{{ selectedCobranza()!.numero_cobranza }}</span>
+        </div>
+        <div class="detalle-item">
+          <span class="detalle-label">Estado</span>
+          <span [class]="getEstadoBadgeClass(selectedCobranza()!.estado)">
+            {{ getEstadoLabel(selectedCobranza()!.estado) }}
+          </span>
+        </div>
+        <div class="detalle-item">
+          <span class="detalle-label">Obra Social</span>
+          <span class="detalle-value">{{ selectedCobranza()!.obra_social?.nombre || '-' }}</span>
+        </div>
+        <div class="detalle-item">
+          <span class="detalle-label">Período</span>
+          <span class="detalle-value">{{ selectedCobranza()!.periodo?.periodo || '-' }}</span>
+        </div>
+        <div class="detalle-item">
+          <span class="detalle-label">Fecha Cobranza</span>
+          <span class="detalle-value">{{ selectedCobranza()!.fecha_cobranza | date:'dd/MM/yyyy' }}</span>
+        </div>
+        <div class="detalle-item">
+          <span class="detalle-label">Fecha Vencimiento</span>
+          <span class="detalle-value" [class.text-danger]="isOverdue(selectedCobranza()!)">
+            {{ selectedCobranza()!.fecha_vencimiento | date:'dd/MM/yyyy' }}
+            @if (isOverdue(selectedCobranza()!)) {
+              <i class="fas fa-exclamation-circle ms-1"></i>
+            }
+          </span>
+        </div>
+      </div>
+      
+      <div class="detalle-montos">
+        <div class="monto-card">
+          <span class="monto-label">Monto Total</span>
+          <span class="monto-value">{{ selectedCobranza()!.monto_total | currency:'ARS':'symbol-narrow':'1.0-0' }}</span>
+        </div>
+        <div class="monto-card monto-success">
+          <span class="monto-label">Cobrado</span>
+          <span class="monto-value">{{ selectedCobranza()!.monto_cobrado | currency:'ARS':'symbol-narrow':'1.0-0' }}</span>
+        </div>
+        <div class="monto-card monto-warning">
+          <span class="monto-label">Pendiente</span>
+          <span class="monto-value">{{ selectedCobranza()!.monto_pendiente | currency:'ARS':'symbol-narrow':'1.0-0' }}</span>
+        </div>
+      </div>
+      
+      @if (selectedCobranza()!.observaciones) {
+        <div class="detalle-observaciones">
+          <span class="detalle-label">Observaciones</span>
+          <p>{{ selectedCobranza()!.observaciones }}</p>
+        </div>
+      }
+    </div>
+    <div class="modal-footer">
+      @if (selectedCobranza()!.estado !== 'cobrado' && selectedCobranza()!.estado !== 'anulado') {
+        <button class="btn btn-success" (click)="closeDetalleModal(); registrarPago(selectedCobranza()!)">
+          <i class="fas fa-dollar-sign"></i> Registrar Pago
+        </button>
+      }
+      <button class="btn btn-secondary" (click)="closeDetalleModal()">Cerrar</button>
+    </div>
+  </div>
+}
 

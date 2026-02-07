@@ -1,23 +1,17 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ReportesService } from '../../../core/services/reportes.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
-interface ReporteDisponible {
+interface TipoReporte {
   id: string;
   nombre: string;
   descripcion: string;
   icono: string;
-  categoria: string;
-  ultimaGeneracion?: Date;
-}
-
-interface ReporteReciente {
-  id: string;
-  nombre: string;
-  fechaGeneracion: Date;
-  usuario: string;
-  formato: string;
-  tamanio: string;
+  endpoint: string;
+  requiereFiltros: boolean;
+  filtros?: { tipo: string; label: string }[];
 }
 
 @Component({
@@ -26,153 +20,329 @@ interface ReporteReciente {
     templateUrl: './reportes-view.component.html',
     styleUrl: './reportes-view.component.scss'
 })
-// 🔶 MOCK: Pantalla completamente mockeada - No conectada a API
 export class ReportesViewComponent implements OnInit {
-  // 🔶 MOCK: Stats hardcodeados
-  reportesGenerados = 45;
-  reportesPendientes = 3;
-  reportesProgramados = 8;
+  // State
+  loading = signal(false);
+  error = signal<string | null>(null);
   
-  // Filtros
-  selectedCategoria = 'todos';
-  searchText = '';
+  // Dashboard stats from API
+  dashboardStats = signal<any>(null);
   
-  categorias = ['Facturación', 'Cobranza', 'Operaciones', 'Conductores', 'Pacientes'];
+  // Report result
+  reporteActual = signal<any>(null);
+  showResultModal = signal(false);
+  selectedReporteName = signal('');
   
-  // 🔶 MOCK: Lista de reportes disponibles hardcodeada
-  reportesDisponibles: ReporteDisponible[] = [
+  // Filters
+  selectedAnio = signal(new Date().getFullYear());
+  selectedMes = signal(new Date().getMonth() + 1);
+  selectedObraSocial = signal<string>('');
+  searchText = signal('');
+  selectedCategoria = signal('todos');
+  
+  // Options
+  anios = [2024, 2025, 2026];
+  meses = [
+    { value: 1, label: 'Enero' },
+    { value: 2, label: 'Febrero' },
+    { value: 3, label: 'Marzo' },
+    { value: 4, label: 'Abril' },
+    { value: 5, label: 'Mayo' },
+    { value: 6, label: 'Junio' },
+    { value: 7, label: 'Julio' },
+    { value: 8, label: 'Agosto' },
+    { value: 9, label: 'Septiembre' },
+    { value: 10, label: 'Octubre' },
+    { value: 11, label: 'Noviembre' },
+    { value: 12, label: 'Diciembre' }
+  ];
+  
+  categorias = ['Facturación', 'Cobranza', 'Análisis', 'Operaciones'];
+  
+  // Available reports
+  tiposReportes: TipoReporte[] = [
     {
-      id: '1',
-      nombre: 'Facturación Mensual por Obra Social',
-      descripcion: 'Resumen de facturación agrupado por obra social con totales y comparativas',
+      id: 'facturacion-anual',
+      nombre: 'Facturación Anual',
+      descripcion: 'Resumen de facturación agrupado por obra social con totales anuales',
       icono: 'fa-file-invoice-dollar',
-      categoria: 'Facturación',
-      ultimaGeneracion: new Date('2025-01-30')
+      endpoint: 'facturacion-anual',
+      requiereFiltros: true,
+      filtros: [{ tipo: 'anio', label: 'Año' }]
     },
     {
-      id: '2',
-      nombre: 'Estado de Cuenta de Cobranza',
-      descripcion: 'Detalle de pagos pendientes, parciales y completados por obra social',
+      id: 'cobranzas-pendientes',
+      nombre: 'Cobranzas Pendientes',
+      descripcion: 'Detalle de pagos pendientes con antigüedad y vencimientos',
       icono: 'fa-credit-card',
-      categoria: 'Cobranza',
-      ultimaGeneracion: new Date('2025-01-29')
+      endpoint: 'cobranzas-pendientes',
+      requiereFiltros: false
     },
     {
-      id: '3',
-      nombre: 'Kilómetros Recorridos por Conductor',
-      descripcion: 'Reporte de distancias, tiempos y eficiencia por conductor',
-      icono: 'fa-route',
-      categoria: 'Conductores',
-      ultimaGeneracion: new Date('2025-01-28')
+      id: 'pacientes-obra-social',
+      nombre: 'Pacientes por Obra Social',
+      descripcion: 'Distribución de pacientes y servicios por obra social',
+      icono: 'fa-users',
+      endpoint: 'pacientes-obra-social',
+      requiereFiltros: false
     },
     {
-      id: '4',
-      nombre: 'Rentabilidad por Paciente',
-      descripcion: 'Análisis de ingresos vs costos por paciente activo',
+      id: 'rentabilidad-mensual',
+      nombre: 'Rentabilidad Mensual',
+      descripcion: 'Análisis de ingresos vs egresos con márgenes por período',
       icono: 'fa-chart-line',
-      categoria: 'Pacientes'
+      endpoint: 'rentabilidad-mensual',
+      requiereFiltros: true,
+      filtros: [{ tipo: 'anio', label: 'Año' }]
     },
     {
-      id: '5',
-      nombre: 'Traslados del Período',
-      descripcion: 'Listado completo de traslados con estados y novedades',
-      icono: 'fa-ambulance',
-      categoria: 'Operaciones',
-      ultimaGeneracion: new Date('2025-01-31')
+      id: 'resumen-anual',
+      nombre: 'Resumen Anual',
+      descripcion: 'Resumen ejecutivo con métricas clave del año',
+      icono: 'fa-chart-pie',
+      endpoint: 'resumen-anual',
+      requiereFiltros: true,
+      filtros: [{ tipo: 'anio', label: 'Año' }]
     },
     {
-      id: '6',
-      nombre: 'Liquidación de Conductores',
-      descripcion: 'Cálculo de pagos a conductores con detalle de servicios',
-      icono: 'fa-money-check-alt',
-      categoria: 'Conductores'
-    },
-    {
-      id: '7',
-      nombre: 'Análisis de Demanda',
-      descripcion: 'Patrones de demanda de traslados por zona y horario',
-      icono: 'fa-chart-area',
-      categoria: 'Operaciones'
-    },
-    {
-      id: '8',
-      nombre: 'Antigüedad de Saldos',
-      descripcion: 'Desglose de deuda por antigüedad (30, 60, 90+ días)',
-      icono: 'fa-clock',
-      categoria: 'Cobranza'
+      id: 'dashboard',
+      nombre: 'Dashboard General',
+      descripcion: 'KPIs y métricas principales del sistema',
+      icono: 'fa-tachometer-alt',
+      endpoint: 'dashboard',
+      requiereFiltros: false
     }
   ];
   
-  // Reportes recientes
-  reportesRecientes: ReporteReciente[] = [
-    {
-      id: '1',
-      nombre: 'Facturación Enero 2025',
-      fechaGeneracion: new Date('2025-01-31T10:30:00'),
-      usuario: 'admin',
-      formato: 'PDF',
-      tamanio: '2.4 MB'
-    },
-    {
-      id: '2',
-      nombre: 'Traslados Enero 2025',
-      fechaGeneracion: new Date('2025-01-31T09:15:00'),
-      usuario: 'admin',
-      formato: 'Excel',
-      tamanio: '1.8 MB'
-    },
-    {
-      id: '3',
-      nombre: 'Liquidación Conductores Enero',
-      fechaGeneracion: new Date('2025-01-30T16:45:00'),
-      usuario: 'admin',
-      formato: 'PDF',
-      tamanio: '856 KB'
-    },
-    {
-      id: '4',
-      nombre: 'Estado de Cobranza Q1',
-      fechaGeneracion: new Date('2025-01-30T14:20:00'),
-      usuario: 'admin',
-      formato: 'Excel',
-      tamanio: '1.2 MB'
+  // Computed
+  totalPacientes = computed(() => this.dashboardStats()?.total_pacientes || 0);
+  totalFacturado = computed(() => this.dashboardStats()?.total_facturado || 0);
+  totalPendiente = computed(() => this.dashboardStats()?.total_pendiente || 0);
+  
+  filteredReportes = computed(() => {
+    let result = this.tiposReportes;
+    const search = this.searchText().toLowerCase();
+    const categoria = this.selectedCategoria();
+    
+    if (search) {
+      result = result.filter(r => 
+        r.nombre.toLowerCase().includes(search) || 
+        r.descripcion.toLowerCase().includes(search)
+      );
     }
-  ];
+    
+    if (categoria !== 'todos') {
+      // Map categoria to endpoint prefixes
+      const categoriaMap: { [key: string]: string[] } = {
+        'facturación': ['facturacion'],
+        'cobranza': ['cobranzas'],
+        'análisis': ['rentabilidad', 'resumen'],
+        'operaciones': ['pacientes', 'dashboard']
+      };
+      const endpoints = categoriaMap[categoria.toLowerCase()] || [];
+      result = result.filter(r => endpoints.some(e => r.endpoint.includes(e)));
+    }
+    
+    return result;
+  });
   
-  filteredReportes: ReporteDisponible[] = [];
-  
-  ngOnInit(): void {
-    this.filterReportes();
+  constructor(
+    private reportesService: ReportesService,
+    private snackBar: MatSnackBar
+  ) {}
+
+  ngOnInit() {
+    this.loadDashboard();
   }
   
-  filterReportes(): void {
-    this.filteredReportes = this.reportesDisponibles.filter(reporte => {
-      const matchCategoria = this.selectedCategoria === 'todos' || 
-                            reporte.categoria.toLowerCase() === this.selectedCategoria.toLowerCase();
-      const matchSearch = !this.searchText || 
-                         reporte.nombre.toLowerCase().includes(this.searchText.toLowerCase()) ||
-                         reporte.descripcion.toLowerCase().includes(this.searchText.toLowerCase());
-      return matchCategoria && matchSearch;
+  loadDashboard() {
+    this.reportesService.getDashboard().subscribe({
+      next: (res) => {
+        if (res.data) {
+          const data = (res.data as any).datos || res.data;
+          this.dashboardStats.set(data);
+        }
+      },
+      error: (err) => console.error('Error loading dashboard:', err)
+    });
+  }
+
+  generarReporte(tipo: TipoReporte) {
+    this.loading.set(true);
+    this.error.set(null);
+    this.selectedReporteName.set(tipo.nombre);
+    
+    let observable;
+    
+    switch (tipo.endpoint) {
+      case 'facturacion-anual':
+        observable = this.reportesService.getFacturacionAnual(this.selectedAnio());
+        break;
+      case 'cobranzas-pendientes':
+        observable = this.reportesService.getCobranzasPendientes(this.selectedObraSocial() || undefined);
+        break;
+      case 'pacientes-obra-social':
+        observable = this.reportesService.getPacientesPorObraSocial();
+        break;
+      case 'rentabilidad-mensual':
+        observable = this.reportesService.getRentabilidadMensual(this.selectedAnio());
+        break;
+      case 'resumen-anual':
+        observable = this.reportesService.getResumenAnual(this.selectedAnio());
+        break;
+      case 'dashboard':
+        observable = this.reportesService.getDashboard();
+        break;
+      default:
+        this.snackBar.open('Tipo de reporte no soportado', 'Cerrar', { duration: 3000 });
+        this.loading.set(false);
+        return;
+    }
+    
+    observable.subscribe({
+      next: (res) => {
+        console.log('Reporte response:', res);
+        if (res.data) {
+          this.reporteActual.set(res.data);
+          this.showResultModal.set(true);
+        } else {
+          this.snackBar.open('No hay datos para mostrar', 'Cerrar', { duration: 3000 });
+        }
+        this.loading.set(false);
+      },
+      error: (err) => {
+        console.error('Error generating report:', err);
+        this.snackBar.open('Error al generar reporte: ' + (err.error?.message || err.message), 'Cerrar', { duration: 5000 });
+        this.loading.set(false);
+      }
     });
   }
   
-  generarReporte(reporte: ReporteDisponible, formato: string): void {
-    console.log(`Generando reporte: ${reporte.nombre} en formato ${formato}`);
-    // Implementar generación de reporte
+  closeResultModal() {
+    this.showResultModal.set(false);
+    this.reporteActual.set(null);
   }
   
-  descargarReporte(reporte: ReporteReciente): void {
-    console.log(`Descargando reporte: ${reporte.nombre}`);
-    // Implementar descarga
+  exportarCSV() {
+    const data = this.reporteActual();
+    if (!data) return;
+    
+    let rows: any[] = [];
+    
+    // Extract data array from response
+    if (data.datos) {
+      rows = Array.isArray(data.datos) ? data.datos : [data.datos];
+    } else if (Array.isArray(data)) {
+      rows = data;
+    } else {
+      rows = [data];
+    }
+    
+    if (rows.length === 0) {
+      this.snackBar.open('No hay datos para exportar', 'Cerrar', { duration: 3000 });
+      return;
+    }
+    
+    // Get headers from first row
+    const headers = Object.keys(rows[0]);
+    const csvRows = [
+      headers.join(','),
+      ...rows.map(row => headers.map(h => {
+        const val = row[h];
+        // Escape quotes and wrap in quotes if contains comma
+        if (typeof val === 'string' && (val.includes(',') || val.includes('"'))) {
+          return `"${val.replace(/"/g, '""')}"`;
+        }
+        return val ?? '';
+      }).join(','))
+    ];
+    
+    const csv = csvRows.join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `reporte_${this.selectedReporteName().toLowerCase().replace(/ /g, '_')}_${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    
+    this.snackBar.open('Reporte exportado', 'Cerrar', { duration: 3000 });
   }
   
-  programarReporte(reporte: ReporteDisponible): void {
-    console.log(`Programando reporte: ${reporte.nombre}`);
-    // Implementar programación
+  exportarJSON() {
+    const data = this.reporteActual();
+    if (!data) return;
+    
+    const json = JSON.stringify(data, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `reporte_${this.selectedReporteName().toLowerCase().replace(/ /g, '_')}_${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    
+    this.snackBar.open('Reporte exportado', 'Cerrar', { duration: 3000 });
   }
   
-  verHistorial(): void {
-    console.log('Ver historial completo');
-    // Implementar navegación
+  getReporteDataArray(): any[] {
+    const data = this.reporteActual();
+    if (!data) return [];
+    
+    if (data.datos) {
+      return Array.isArray(data.datos) ? data.datos : [data.datos];
+    } else if (Array.isArray(data)) {
+      return data;
+    }
+    return [data];
+  }
+  
+  getReporteHeaders(): string[] {
+    const rows = this.getReporteDataArray();
+    if (rows.length === 0) return [];
+    return Object.keys(rows[0]).filter(k => !k.endsWith('_id') && k !== 'created_at' && k !== 'updated_at');
+  }
+  
+  getResumenData(): { label: string; value: any }[] {
+    const data = this.reporteActual();
+    if (!data?.resumen) return [];
+    
+    const resumen = data.resumen;
+    return Object.entries(resumen).map(([key, value]) => ({
+      label: this.formatLabel(key),
+      value: this.formatValue(value)
+    }));
+  }
+  
+  formatLabel(key: string): string {
+    return key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+  }
+  
+  formatValue(value: any): string {
+    if (typeof value === 'number') {
+      if (value > 10000) {
+        return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(value);
+      }
+      return value.toLocaleString('es-AR');
+    }
+    return String(value);
+  }
+  
+  formatCellValue(value: any): string {
+    if (value === null || value === undefined) return '-';
+    if (typeof value === 'number') {
+      if (value > 1000) {
+        return value.toLocaleString('es-AR');
+      }
+      return String(value);
+    }
+    if (typeof value === 'boolean') {
+      return value ? 'Sí' : 'No';
+    }
+    return String(value);
+  }
+  
+  retry() {
+    this.loadDashboard();
   }
 }

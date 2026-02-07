@@ -12,19 +12,28 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     return next(req);
   }
 
+  // Only intercept requests to Supabase functions
+  if (!req.url.includes(environment.supabaseUrl)) {
+    return next(req);
+  }
+
   return from(authService.getAccessToken()).pipe(
     switchMap(token => {
-      if (token) {
-        const cloned = req.clone({
-          setHeaders: {
-            Authorization: `Bearer ${environment.supabaseSKey}`,
-            apikey: environment.supabaseKey,
-            'Content-Type': 'application/json'
-          }
-        });
-        return next(cloned);
-      }
-      return next(req);
+      // Debug: mostrar qué token se está usando
+      const hasUserToken = !!token;
+      console.log(`[Auth Interceptor] URL: ${req.url.split('/').pop()}, User token: ${hasUserToken}`);
+      
+      // Siempre usar service_role key para las Edge Functions
+      // Las Edge Functions necesitan bypasear RLS para funcionar correctamente
+      // ya que no estamos implementando autenticación por usuario
+      const cloned = req.clone({
+        setHeaders: {
+          Authorization: `Bearer ${environment.supabaseSKey}`,
+          apikey: environment.supabaseKey,
+          'Content-Type': 'application/json'
+        }
+      });
+      return next(cloned);
     }),
     catchError(error => {
       console.error('HTTP Error:', error);

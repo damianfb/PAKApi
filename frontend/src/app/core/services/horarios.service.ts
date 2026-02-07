@@ -14,8 +14,8 @@ export class HorariosService extends ApiService {
     return this.get<HorarioTraslado[]>(this.endpoint, filters);
   }
 
-  getById(id: string): Observable<ApiResponse<HorarioTraslado>> {
-    return this.getById<HorarioTraslado>(this.endpoint, id);
+  getHorarioById(id: string): Observable<ApiResponse<HorarioTraslado>> {
+    return super.getById<HorarioTraslado>(this.endpoint, id);
   }
 
   create(horario: Partial<HorarioTraslado>): Observable<ApiResponse<HorarioTraslado>> {

@@ -35,6 +35,8 @@ Deno.serve(async (req) => {
       const conductor_id = url.searchParams.get('conductor_id');
       const estado = url.searchParams.get('estado');
       const fecha = url.searchParams.get('fecha');
+      const fecha_desde = url.searchParams.get('fecha_desde');
+      const fecha_hasta = url.searchParams.get('fecha_hasta');
       const page = parseInt(url.searchParams.get('page') || '1');
       const limit = parseInt(url.searchParams.get('limit') || '50');
       const offset = (page - 1) * limit;
@@ -43,8 +45,8 @@ Deno.serve(async (req) => {
         .from('horarios_traslados')
         .select('*, paciente:pacientes(*), servicio:servicios_paciente(*), conductor:conductores(*), destino:destinos(*)', { count: 'exact' })
         .range(offset, offset + limit - 1)
-        .order('fecha', { ascending: false })
-        .order('hora_programada', { ascending: false });
+        .order('fecha', { ascending: true })
+        .order('hora_inicio', { ascending: true });
 
       if (paciente_id) {
         query = query.eq('paciente_id', paciente_id);
@@ -60,6 +62,14 @@ Deno.serve(async (req) => {
 
       if (fecha) {
         query = query.eq('fecha', fecha);
+      }
+
+      if (fecha_desde) {
+        query = query.gte('fecha', fecha_desde);
+      }
+
+      if (fecha_hasta) {
+        query = query.lte('fecha', fecha_hasta);
       }
 
       const { data, error, count } = await query;
@@ -84,8 +94,8 @@ Deno.serve(async (req) => {
       const body = await req.json();
 
       // Validate required fields
-      if (!body.paciente_id || !body.servicio_id || !body.fecha || !body.hora_programada) {
-        return errorResponse('Los campos "paciente_id", "servicio_id", "fecha" y "hora_programada" son requeridos', 400);
+      if (!body.paciente_id || !body.fecha || !body.hora_inicio) {
+        return errorResponse('Los campos "paciente_id", "fecha" y "hora_inicio" son requeridos', 400);
       }
 
       const { data, error } = await supabase
@@ -93,15 +103,15 @@ Deno.serve(async (req) => {
         .insert([
           {
             paciente_id: body.paciente_id,
-            servicio_id: body.servicio_id,
+            servicio_paciente_id: body.servicio_paciente_id || null,
             conductor_id: body.conductor_id || null,
             destino_id: body.destino_id || null,
             fecha: body.fecha,
-            hora_programada: body.hora_programada,
-            hora_real: body.hora_real || null,
+            hora_inicio: body.hora_inicio || null,
+            hora_fin: body.hora_fin || null,
+            hora_salida_real: body.hora_salida_real || null,
+            hora_llegada_real: body.hora_llegada_real || null,
             tipo_traslado: body.tipo_traslado || 'ida',
-            direccion_origen: body.direccion_origen || null,
-            direccion_destino: body.direccion_destino || null,
             distancia_km: body.distancia_km || null,
             estado: body.estado || 'programado',
             observaciones: body.observaciones || null,
@@ -127,11 +137,11 @@ Deno.serve(async (req) => {
           conductor_id: body.conductor_id,
           destino_id: body.destino_id,
           fecha: body.fecha,
-          hora_programada: body.hora_programada,
-          hora_real: body.hora_real,
+          hora_inicio: body.hora_inicio,
+          hora_fin: body.hora_fin,
+          hora_salida_real: body.hora_salida_real,
+          hora_llegada_real: body.hora_llegada_real,
           tipo_traslado: body.tipo_traslado,
-          direccion_origen: body.direccion_origen,
-          direccion_destino: body.direccion_destino,
           distancia_km: body.distancia_km,
           estado: body.estado,
           observaciones: body.observaciones,

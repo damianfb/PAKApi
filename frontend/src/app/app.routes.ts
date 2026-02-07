@@ -67,16 +67,36 @@ export const routes: Routes = [
         loadComponent: () => import('./features/reportes/reportes-view/reportes-view.component').then(m => m.ReportesViewComponent)
       },
       {
-        path: 'obras-sociales',
+        path: 'configuracion',
+        loadComponent: () => import('./features/configuracion/configuracion-view/configuracion-view.component').then(m => m.ConfiguracionViewComponent)
+      },
+      {
+        path: 'configuracion/obras-sociales',
         loadComponent: () => import('./features/obras-sociales/obras-sociales-list/obras-sociales-list.component').then(m => m.ObrasSocialesListComponent)
       },
       {
-        path: 'conductores',
+        path: 'configuracion/conductores',
         loadComponent: () => import('./features/conductores/conductores-list/conductores-list.component').then(m => m.ConductoresListComponent)
       },
       {
-        path: 'destinos',
+        path: 'configuracion/destinos',
         loadComponent: () => import('./features/destinos/destinos-list/destinos-list.component').then(m => m.DestinosListComponent)
+      },
+      // Keep old routes for backward compatibility
+      {
+        path: 'obras-sociales',
+        redirectTo: 'configuracion/obras-sociales',
+        pathMatch: 'full'
+      },
+      {
+        path: 'conductores',
+        redirectTo: 'configuracion/conductores',
+        pathMatch: 'full'
+      },
+      {
+        path: 'destinos',
+        redirectTo: 'configuracion/destinos',
+        pathMatch: 'full'
       }
     ]
   },

@@ -1,0 +1,34 @@
+<div class="config-header">
+  <h1 class="page-title">
+    <i class="fas fa-cog"></i>
+    Configuración
+  </h1>
+  <p class="page-subtitle">Administra los datos maestros y configuraciones del sistema</p>
+</div>
+
+<div class="config-grid">
+  @for (option of configOptions; track option.id) {
+    <div class="config-card" (click)="navigateTo(option)">
+      <div class="config-icon" [style.background]="option.color">
+        <i class="fas {{ option.icon }}"></i>
+      </div>
+      <div class="config-content">
+        <h3 class="config-title">{{ option.title }}</h3>
+        <p class="config-description">{{ option.description }}</p>
+      </div>
+      <div class="config-arrow">
+        <i class="fas fa-chevron-right"></i>
+      </div>
+    </div>
+  }
+</div>
+
+<div class="config-info">
+  <div class="info-card">
+    <i class="fas fa-info-circle"></i>
+    <div>
+      <h4>Datos Maestros</h4>
+      <p>Estos datos son utilizados en todo el sistema. Los cambios aquí se reflejarán en facturación, presupuesto y reportes.</p>
+    </div>
+  </div>
+</div>

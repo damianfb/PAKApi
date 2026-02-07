@@ -1,8 +1,13 @@
-<!-- 🔶 MOCK BANNER -->
-<div class="mock-banner">
-  <i class="fas fa-flask"></i>
-  <span><strong>Pantalla de desarrollo:</strong> Esta sección muestra datos de ejemplo. No está conectada a la API.</span>
-</div>
+<!-- Error Banner -->
+@if (error()) {
+  <div class="error-banner">
+    <i class="fas fa-exclamation-triangle"></i>
+    <span>{{ error() }}</span>
+    <button class="btn btn-sm" (click)="retry()">
+      <i class="fas fa-redo"></i> Reintentar
+    </button>
+  </div>
+}
 
 <!-- Stats -->
 <div class="stats-grid">
@@ -11,10 +16,10 @@
       <span class="stat-label">Ingresos del Mes</span>
       <span class="stat-icon"><i class="fas fa-arrow-down" style="color: var(--secondary);"></i></span>
     </div>
-    <div class="stat-value">{{ ingresosMes | currency:'ARS':'symbol-narrow':'1.0-0' }}</div>
+    <div class="stat-value">{{ ingresosMes() | currency:'ARS':'symbol-narrow':'1.0-0' }}</div>
     <div class="stat-change positive">
-      <i class="fas fa-arrow-up"></i>
-      <span>+12% vs mes anterior</span>
+      <i class="fas fa-check-circle"></i>
+      <span>Facturación recibida</span>
     </div>
   </div>
 
@@ -23,10 +28,10 @@
       <span class="stat-label">Egresos del Mes</span>
       <span class="stat-icon"><i class="fas fa-arrow-up" style="color: var(--danger);"></i></span>
     </div>
-    <div class="stat-value">{{ egresosMes | currency:'ARS':'symbol-narrow':'1.0-0' }}</div>
+    <div class="stat-value">{{ egresosMes() | currency:'ARS':'symbol-narrow':'1.0-0' }}</div>
     <div class="stat-change negative">
-      <i class="fas fa-arrow-up"></i>
-      <span>+8% vs mes anterior</span>
+      <i class="fas fa-wallet"></i>
+      <span>Gastos totales</span>
     </div>
   </div>
 
@@ -35,21 +40,23 @@
       <span class="stat-label">Resultado Mensual</span>
       <span class="stat-icon"><i class="fas fa-balance-scale" style="color: var(--primary);"></i></span>
     </div>
-    <div class="stat-value">{{ resultadoMensual | currency:'ARS':'symbol-narrow':'1.0-0' }}</div>
-    <div class="stat-change positive">
-      <i class="fas fa-check-circle"></i>
-      <span>{{ margenPorcentaje }}% margen</span>
+    <div class="stat-value" [class.text-success]="resultadoMensual() > 0" [class.text-danger]="resultadoMensual() < 0">
+      {{ resultadoMensual() | currency:'ARS':'symbol-narrow':'1.0-0' }}
+    </div>
+    <div class="stat-change" [class.positive]="margenPorcentaje() > 0" [class.negative]="margenPorcentaje() < 0">
+      <i class="fas" [class.fa-check-circle]="margenPorcentaje() > 0" [class.fa-times-circle]="margenPorcentaje() < 0"></i>
+      <span>{{ margenPorcentaje() }}% margen</span>
     </div>
   </div>
 
   <div class="stat-card">
     <div class="stat-card-header">
-      <span class="stat-label">Presupuesto Anual</span>
-      <span class="stat-icon"><i class="fas fa-chart-pie" style="color: var(--info);"></i></span>
+      <span class="stat-label">Pendiente de Pago</span>
+      <span class="stat-icon"><i class="fas fa-clock" style="color: var(--warning);"></i></span>
     </div>
-    <div class="stat-value">{{ presupuestoAnual | currency:'ARS':'symbol-narrow':'1.1-1' }}</div>
+    <div class="stat-value">{{ pendienteMes() | currency:'ARS':'symbol-narrow':'1.0-0' }}</div>
     <div class="stat-change">
-      <span>Proyectado 2025</span>
+      <span>Por abonar</span>
     </div>
   </div>
 </div>
@@ -58,118 +65,381 @@
 <div class="filters">
   <div class="filter-group">
     <label class="filter-label">Período</label>
-    <select class="form-select" [(ngModel)]="selectedPeriodo">
+    <select class="form-select" [ngModel]="selectedPeriodo()" (ngModelChange)="selectedPeriodo.set($event); onFilterChange()">
       @for (periodo of periodos; track periodo) {
         <option [value]="periodo">{{ periodo }}</option>
       }
     </select>
   </div>
   <div class="filter-group">
-    <label class="filter-label">Tipo de Movimiento</label>
-    <select class="form-select" [(ngModel)]="selectedTipo">
-      <option value="todos">Todos</option>
-      <option value="ingresos">Solo Ingresos</option>
-      <option value="egresos">Solo Egresos</option>
+    <label class="filter-label">Tipo</label>
+    <select class="form-select" [ngModel]="selectedTipo()" (ngModelChange)="selectedTipo.set($event); onFilterChange()">
+      <option value="">Todos</option>
+      <option value="ingreso">Solo Ingresos</option>
+      <option value="egreso">Solo Egresos</option>
     </select>
   </div>
   <div class="filter-group">
-    <label class="filter-label">Categoría</label>
-    <select class="form-select" [(ngModel)]="selectedCategoria">
-      <option value="todos">Todas las categorías</option>
-      @for (cat of categorias; track cat) {
-        <option [value]="cat.toLowerCase()">{{ cat }}</option>
-      }
+    <label class="filter-label">Estado</label>
+    <select class="form-select" [ngModel]="selectedEstado()" (ngModelChange)="selectedEstado.set($event); onFilterChange()">
+      <option value="">Todos</option>
+      <option value="pendiente">Pendiente</option>
+      <option value="pagado">Pagado</option>
+      <option value="parcial">Pago Parcial</option>
     </select>
   </div>
+  <div class="filter-group">
+    <label class="filter-label">Buscar</label>
+    <input type="text" class="form-input" placeholder="Concepto..." [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)">
+  </div>
 </div>
+
+<!-- Loading -->
+@if (loading()) {
+  <div class="loading-container">
+    <i class="fas fa-spinner fa-spin fa-2x"></i>
+    <p>Cargando presupuesto...</p>
+  </div>
+}
 
 <!-- Grid de Contenido -->
-<div class="presupuesto-grid">
-  <!-- Tabla de Movimientos -->
-  <div class="card main-card">
-    <div class="card-header d-flex justify-between align-center">
-      <div>
-        <h2 class="card-title">Detalle de Movimientos</h2>
-        <p class="card-subtitle">Ingresos y egresos del período</p>
+@if (!loading()) {
+  <div class="presupuesto-grid">
+    <!-- Tabla de Movimientos -->
+    <div class="card main-card">
+      <div class="card-header d-flex justify-between align-center">
+        <div>
+          <h2 class="card-title">Detalle de Movimientos</h2>
+          <p class="card-subtitle">Ingresos y egresos del período</p>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-outline" (click)="openConceptosModal()">
+            <i class="fas fa-cog"></i>
+            Conceptos
+          </button>
+          <button class="btn btn-secondary" (click)="exportData()">
+            <i class="fas fa-download"></i>
+            Exportar
+          </button>
+          <button class="btn btn-primary" (click)="openNewMovimientoModal()">
+            <i class="fas fa-plus"></i>
+            Nuevo Movimiento
+          </button>
+        </div>
       </div>
-      <div class="header-actions">
-        <button class="btn btn-secondary" (click)="exportData()">
-          <i class="fas fa-download"></i>
-          Exportar
-        </button>
-        <button class="btn btn-primary" (click)="openNewGastoModal()">
-          <i class="fas fa-plus"></i>
-          Nuevo Gasto
-        </button>
-      </div>
-    </div>
-    
-    <div class="table-container">
-      <table>
-        <thead>
-          <tr>
-            <th>Fecha</th>
-            <th>Concepto</th>
-            <th>Categoría</th>
-            <th class="text-right">Ingresos</th>
-            <th class="text-right">Egresos</th>
-            <th class="text-right">Saldo</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (mov of filteredMovimientos; track mov.id) {
+      
+      <div class="table-container">
+        <table>
+          <thead>
             <tr>
-              <td>{{ mov.fecha | date:'dd/MM/yyyy' }}</td>
-              <td>{{ mov.concepto }}</td>
-              <td><span class="badge badge-secondary">{{ mov.categoria }}</span></td>
-              <td class="text-right" [style.color]="mov.ingreso > 0 ? 'var(--secondary)' : ''">
-                {{ mov.ingreso > 0 ? (mov.ingreso | currency:'ARS':'symbol-narrow':'1.0-0') : '-' }}
-              </td>
-              <td class="text-right" [style.color]="mov.egreso > 0 ? 'var(--danger)' : ''">
-                {{ mov.egreso > 0 ? (mov.egreso | currency:'ARS':'symbol-narrow':'1.0-0') : '-' }}
-              </td>
-              <td class="text-right"><strong>{{ mov.saldo | currency:'ARS':'symbol-narrow':'1.0-0' }}</strong></td>
+              <th>Concepto</th>
+              <th>Categoría</th>
+              <th>Tipo</th>
+              <th class="text-right">Monto</th>
+              <th class="text-right">Pagado</th>
+              <th>Estado</th>
+              <th>Acciones</th>
             </tr>
-          }
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            @for (mov of filteredMovimientos(); track mov.id) {
+              <tr>
+                <td><strong>{{ mov.nombre || mov.concepto?.nombre }}</strong></td>
+                <td><span class="badge badge-secondary">{{ formatCategoria(mov.categoria || mov.concepto?.categoria || 'otros') }}</span></td>
+                <td>
+                  @if ((mov.tipo || mov.concepto?.tipo) === 'ingreso') {
+                    <span class="text-success"><i class="fas fa-arrow-down"></i> Ingreso</span>
+                  } @else {
+                    <span class="text-danger"><i class="fas fa-arrow-up"></i> Egreso</span>
+                  }
+                </td>
+                <td class="text-right">{{ mov.monto | currency:'ARS':'symbol-narrow':'1.0-0' }}</td>
+                <td class="text-right">{{ mov.monto_pagado | currency:'ARS':'symbol-narrow':'1.0-0' }}</td>
+                <td>
+                  <span [class]="getEstadoBadgeClass(mov.estado)">{{ mov.estado }}</span>
+                </td>
+                <td>
+                  <div class="action-buttons">
+                    <button class="btn btn-sm btn-secondary btn-icon" (click)="editMovimiento(mov)" title="Editar">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    @if (mov.estado !== 'pagado') {
+                      <button class="btn btn-sm btn-success btn-icon" (click)="registrarPago(mov)" title="Registrar pago">
+                        <i class="fas fa-dollar-sign"></i>
+                      </button>
+                    }
+                    <button class="btn btn-sm btn-danger btn-icon" (click)="deleteMovimiento(mov)" title="Eliminar">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="7" class="text-center" style="padding: var(--spacing-xl);">
+                  <i class="fas fa-chart-line" style="font-size: 3rem; color: var(--text-light); margin-bottom: var(--spacing-md);"></i>
+                  <p class="text-muted">No hay movimientos para este período</p>
+                  <button class="btn btn-primary btn-sm" (click)="openNewMovimientoModal()">
+                    <i class="fas fa-plus"></i> Agregar Movimiento
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
     </div>
-  </div>
 
-  <!-- Resumen de Egresos -->
-  <div class="card side-card">
-    <div class="card-header">
-      <h2 class="card-title">Distribución de Egresos</h2>
-      <p class="card-subtitle">Por categoría</p>
-    </div>
-    <ul class="summary-list">
-      @for (item of resumenEgresos; track item.categoria) {
+    <!-- Resumen de Egresos -->
+    <div class="card side-card">
+      <div class="card-header">
+        <h2 class="card-title">Distribución de Egresos</h2>
+        <p class="card-subtitle">Por categoría</p>
+      </div>
+      <ul class="summary-list">
+        @for (item of resumenEgresos(); track item.categoria) {
+          <li class="summary-item">
+            <span class="summary-label">{{ item.categoria }}</span>
+            <span class="summary-value">{{ item.porcentaje }}%</span>
+          </li>
+        } @empty {
+          <li class="summary-item">
+            <span class="summary-label text-muted">Sin egresos registrados</span>
+          </li>
+        }
+      </ul>
+      
+      <hr style="margin: var(--spacing-lg) 0; border: none; border-top: 1px solid var(--border);">
+      
+      <div class="card-header">
+        <h3 class="card-title" style="font-size: var(--font-size-base);">Resumen del Mes</h3>
+      </div>
+      <ul class="summary-list">
         <li class="summary-item">
-          <span class="summary-label">{{ item.categoria }}</span>
-          <span class="summary-value">{{ item.porcentaje }}%</span>
+          <span class="summary-label">Total Ingresos</span>
+          <span class="summary-value" style="color: var(--secondary);">{{ ingresosMes() | currency:'ARS':'symbol-narrow':'1.0-0' }}</span>
         </li>
-      }
-    </ul>
-    
-    <hr style="margin: var(--spacing-lg) 0; border: none; border-top: 1px solid var(--border);">
-    
-    <div class="card-header">
-      <h3 class="card-title" style="font-size: var(--font-size-base);">Resumen del Mes</h3>
+        <li class="summary-item">
+          <span class="summary-label">Total Egresos</span>
+          <span class="summary-value" style="color: var(--danger);">{{ egresosMes() | currency:'ARS':'symbol-narrow':'1.0-0' }}</span>
+        </li>
+        <li class="summary-item">
+          <span class="summary-label">Resultado</span>
+          <span class="summary-value" [style.color]="resultadoMensual() >= 0 ? 'var(--success)' : 'var(--danger)'">
+            {{ resultadoMensual() | currency:'ARS':'symbol-narrow':'1.0-0' }}
+          </span>
+        </li>
+      </ul>
     </div>
-    <ul class="summary-list">
-      <li class="summary-item">
-        <span class="summary-label">Total Ingresos</span>
-        <span class="summary-value" style="color: var(--secondary);">{{ ingresosMes | currency:'ARS':'symbol-narrow':'1.0-0' }}</span>
-      </li>
-      <li class="summary-item">
-        <span class="summary-label">Total Egresos</span>
-        <span class="summary-value" style="color: var(--danger);">{{ egresosMes | currency:'ARS':'symbol-narrow':'1.0-0' }}</span>
-      </li>
-      <li class="summary-item">
-        <span class="summary-label">Resultado</span>
-        <span class="summary-value" style="color: var(--primary);">{{ resultadoMensual | currency:'ARS':'symbol-narrow':'1.0-0' }}</span>
-      </li>
-    </ul>
   </div>
-</div>
+}
 
+<!-- Modal Nuevo Movimiento -->
+@if (showMovimientoModal()) {
+  <div class="modal-backdrop" (click)="closeMovimientoModal()"></div>
+  <div class="modal">
+    <div class="modal-header">
+      <h3>{{ isEditing() ? 'Editar Movimiento' : 'Nuevo Movimiento' }}</h3>
+      <button class="btn btn-icon" (click)="closeMovimientoModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Concepto Predefinido (opcional)</label>
+        <select class="form-select" [(ngModel)]="nuevoMovimiento.concepto_id">
+          <option value="">-- Crear nuevo --</option>
+          @for (c of conceptos(); track c.id) {
+            <option [value]="c.id">{{ c.nombre }} ({{ formatCategoria(c.categoria) }})</option>
+          }
+        </select>
+      </div>
+      
+      @if (!nuevoMovimiento.concepto_id) {
+        <div class="form-group">
+          <label class="form-label">Nombre *</label>
+          <input type="text" class="form-input" [(ngModel)]="nuevoMovimiento.nombre">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Categoría</label>
+            <select class="form-select" [(ngModel)]="nuevoMovimiento.categoria">
+              @for (cat of categorias; track cat) {
+                <option [value]="cat">{{ formatCategoria(cat) }}</option>
+              }
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tipo</label>
+            <select class="form-select" [(ngModel)]="nuevoMovimiento.tipo">
+              <option value="egreso">Egreso</option>
+              <option value="ingreso">Ingreso</option>
+            </select>
+          </div>
+        </div>
+      }
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Período</label>
+          <select class="form-select" [(ngModel)]="nuevoMovimiento.periodo">
+            @for (p of periodos; track p) {
+              <option [value]="p">{{ p }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Monto *</label>
+          <input type="number" class="form-input" [(ngModel)]="nuevoMovimiento.monto" min="0">
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Observaciones</label>
+        <textarea class="form-input" [(ngModel)]="nuevoMovimiento.observaciones" rows="2"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="closeMovimientoModal()">Cancelar</button>
+      <button class="btn btn-primary" (click)="saveMovimiento()">
+        <i class="fas fa-save"></i> {{ isEditing() ? 'Guardar Cambios' : 'Crear Movimiento' }}
+      </button>
+    </div>
+  </div>
+}
+
+<!-- Modal Pago -->
+@if (showPagoModal() && selectedMovimiento()) {
+  <div class="modal-backdrop" (click)="closePagoModal()"></div>
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Registrar Pago</h3>
+      <button class="btn btn-icon" (click)="closePagoModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="pago-info">
+        <p><strong>Concepto:</strong> {{ selectedMovimiento()!.nombre || selectedMovimiento()!.concepto?.nombre }}</p>
+        <p><strong>Monto Total:</strong> {{ selectedMovimiento()!.monto | currency:'ARS':'symbol-narrow':'1.0-0' }}</p>
+        <p><strong>Ya Pagado:</strong> {{ selectedMovimiento()!.monto_pagado | currency:'ARS':'symbol-narrow':'1.0-0' }}</p>
+        <p><strong>Pendiente:</strong> {{ (selectedMovimiento()!.monto - (selectedMovimiento()!.monto_pagado || 0)) | currency:'ARS':'symbol-narrow':'1.0-0' }}</p>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Monto a Pagar *</label>
+        <input type="number" class="form-input" [(ngModel)]="pagoMonto" min="0" [max]="selectedMovimiento()!.monto - (selectedMovimiento()!.monto_pagado || 0)">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="closePagoModal()">Cancelar</button>
+      <button class="btn btn-primary" (click)="savePago()">
+        <i class="fas fa-check"></i> Registrar Pago
+      </button>
+    </div>
+  </div>
+}
+
+<!-- Modal Conceptos -->
+@if (showConceptosModal()) {
+  <div class="modal-backdrop" (click)="closeConceptosModal()"></div>
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <h3>Gestionar Conceptos de Presupuesto</h3>
+      <button class="btn btn-icon" (click)="closeConceptosModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-body conceptos-modal-body">
+      <div class="conceptos-layout">
+        <!-- Lista de conceptos -->
+        <div class="conceptos-list-panel">
+          <h4>Conceptos Existentes</h4>
+          <div class="conceptos-list">
+            @for (c of conceptos(); track c.id) {
+              <div class="concepto-item" [class.inactive]="!c.activo" [class.selected]="selectedConcepto()?.id === c.id">
+                <div class="concepto-info" (click)="editConcepto(c)">
+                  <span class="concepto-nombre">{{ c.nombre }}</span>
+                  <span class="concepto-meta">
+                    {{ formatCategoria(c.categoria) }} · 
+                    <span [class.text-success]="c.tipo === 'ingreso'" [class.text-danger]="c.tipo === 'egreso'">{{ c.tipo }}</span>
+                    @if (c.monto_base) {
+                      · {{ c.monto_base | currency:'ARS':'symbol-narrow':'1.0-0' }}
+                    }
+                  </span>
+                </div>
+                <div class="concepto-actions">
+                  <button class="btn-icon-sm" (click)="toggleConceptoActivo(c)" [title]="c.activo ? 'Desactivar' : 'Activar'">
+                    <i class="fas" [class.fa-toggle-on]="c.activo" [class.fa-toggle-off]="!c.activo"></i>
+                  </button>
+                  <button class="btn-icon-sm text-danger" (click)="deleteConcepto(c)" title="Eliminar">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+            } @empty {
+              <p class="text-muted text-center">No hay conceptos registrados</p>
+            }
+          </div>
+        </div>
+        
+        <!-- Formulario -->
+        <div class="concepto-form-panel">
+          <h4>{{ isEditingConcepto() ? 'Editar Concepto' : 'Nuevo Concepto' }}</h4>
+          <div class="form-group">
+            <label class="form-label">Nombre *</label>
+            <input type="text" class="form-input" [(ngModel)]="nuevoConcepto.nombre" placeholder="Ej: Sueldo Conductor">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Categoría</label>
+              <select class="form-select" [(ngModel)]="nuevoConcepto.categoria">
+                @for (cat of categorias; track cat) {
+                  <option [value]="cat">{{ formatCategoria(cat) }}</option>
+                }
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tipo</label>
+              <select class="form-select" [(ngModel)]="nuevoConcepto.tipo">
+                <option value="egreso">Egreso</option>
+                <option value="ingreso">Ingreso</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Monto Base</label>
+              <input type="number" class="form-input" [(ngModel)]="nuevoConcepto.monto_base" min="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Día Vencimiento</label>
+              <input type="number" class="form-input" [(ngModel)]="nuevoConcepto.dia_vencimiento" min="1" max="31" placeholder="1-31">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label-check">
+                <input type="checkbox" [(ngModel)]="nuevoConcepto.es_recurrente">
+                Es recurrente
+              </label>
+            </div>
+            <div class="form-group">
+              <label class="form-label-check">
+                <input type="checkbox" [(ngModel)]="nuevoConcepto.activo">
+                Activo
+              </label>
+            </div>
+          </div>
+          <div class="form-actions">
+            @if (isEditingConcepto()) {
+              <button class="btn btn-secondary" (click)="openNewConceptoForm()">Cancelar</button>
+            }
+            <button class="btn btn-primary" (click)="saveConcepto()">
+              <i class="fas fa-save"></i> {{ isEditingConcepto() ? 'Guardar' : 'Crear' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+}

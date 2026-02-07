@@ -90,14 +90,23 @@ export interface HorarioTraslado {
   id: string;
   paciente_id: string;
   conductor_id: string;
-  servicio_paciente_id: string;
+  servicio_paciente_id?: string;
+  destino_id?: string;
+  traslado_mensual_id?: string;
   fecha: string;
-  hora_programada: string;
-  hora_real?: string;
+  hora_inicio?: string;
+  hora_fin?: string;
+  hora_salida_real?: string;
+  hora_llegada_real?: string;
   tipo_traslado: 'ida' | 'vuelta' | 'ida_vuelta';
-  estado: 'programado' | 'en_curso' | 'completado' | 'cancelado';
+  estado: 'programado' | 'confirmado' | 'en_curso' | 'completado' | 'cancelado' | 'no_realizado';
+  distancia_km?: number;
   kilometros_recorridos?: number;
   observaciones?: string;
+  motivo_cancelacion?: string;
+  paciente?: any;
+  conductor?: any;
+  destino?: any;
   created_at: string;
   updated_at: string;
 }
@@ -159,31 +168,41 @@ export interface FacturaDetalle {
 
 export interface Cobranza {
   id: string;
-  obra_social_id: string;
-  monto_total_facturado: number;
+  numero_cobranza: string;
+  fecha_cobranza: string;
+  obra_social_id?: string;
+  periodo_id?: string;
+  monto_total: number;
   monto_cobrado: number;
   monto_pendiente: number;
-  fecha_inicio: string;
-  fecha_corte: string;
-  estado: 'activa' | 'parcial' | 'completa' | 'vencida';
+  estado: 'pendiente' | 'parcial' | 'cobrado' | 'anulado';
+  fecha_vencimiento?: string;
   observaciones?: string;
   created_at: string;
   updated_at: string;
+  // Relaciones expandidas
+  obra_social?: ObraSocial;
+  periodo?: PeriodoFacturacion;
+  recibos?: Recibo[];
 }
 
 export interface Recibo {
   id: string;
   numero_recibo: string;
-  cobranza_id: string;
-  obra_social_id: string;
-  fecha_cobro: string;
-  monto_cobrado: number;
-  metodo_pago: 'efectivo' | 'transferencia' | 'cheque' | 'tarjeta_credito' | 'tarjeta_debito' | 'otro';
-  numero_transaccion?: string;
+  fecha_emision: string;
+  fecha_pago: string;
+  cobranza_id?: string;
+  obra_social_id?: string;
+  monto_total: number;
+  metodo_pago?: 'efectivo' | 'transferencia' | 'cheque' | 'tarjeta';
+  numero_operacion?: string;
+  estado: 'emitido' | 'confirmado' | 'anulado';
   observaciones?: string;
-  estado: 'borrador' | 'confirmado' | 'conciliado' | 'anulado';
   created_at: string;
   updated_at: string;
+  // Relaciones expandidas
+  cobranza?: Cobranza;
+  obra_social?: ObraSocial;
 }
 
 export interface GastoOperativo {

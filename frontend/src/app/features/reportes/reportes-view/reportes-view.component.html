@@ -1,58 +1,71 @@
-<!-- 🔶 MOCK BANNER -->
-<div class="mock-banner">
-  <i class="fas fa-flask"></i>
-  <span><strong>Pantalla de desarrollo:</strong> Esta sección muestra datos de ejemplo. No está conectada a la API.</span>
-</div>
+<!-- Error Banner -->
+@if (error()) {
+  <div class="error-banner">
+    <i class="fas fa-exclamation-triangle"></i>
+    <span>{{ error() }}</span>
+    <button class="btn btn-sm" (click)="retry()">
+      <i class="fas fa-redo"></i> Reintentar
+    </button>
+  </div>
+}
 
 <!-- Stats -->
 <div class="stats-grid">
   <div class="stat-card">
     <div class="stat-card-header">
-      <span class="stat-label">Reportes Generados</span>
-      <span class="stat-icon"><i class="fas fa-file-alt" style="color: var(--primary);"></i></span>
+      <span class="stat-label">Total Pacientes</span>
+      <span class="stat-icon"><i class="fas fa-users" style="color: var(--primary);"></i></span>
     </div>
-    <div class="stat-value">{{ reportesGenerados }}</div>
+    <div class="stat-value">{{ totalPacientes() }}</div>
     <div class="stat-change">
-      <span>Este mes</span>
+      <span>Activos en sistema</span>
     </div>
   </div>
 
   <div class="stat-card">
     <div class="stat-card-header">
-      <span class="stat-label">Pendientes</span>
+      <span class="stat-label">Total Facturado</span>
+      <span class="stat-icon"><i class="fas fa-file-invoice-dollar" style="color: var(--secondary);"></i></span>
+    </div>
+    <div class="stat-value">{{ totalFacturado() | currency:'ARS':'symbol-narrow':'1.0-0' }}</div>
+    <div class="stat-change positive">
+      <span>Período actual</span>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-card-header">
+      <span class="stat-label">Pendiente Cobro</span>
       <span class="stat-icon"><i class="fas fa-clock" style="color: var(--warning);"></i></span>
     </div>
-    <div class="stat-value">{{ reportesPendientes }}</div>
+    <div class="stat-value">{{ totalPendiente() | currency:'ARS':'symbol-narrow':'1.0-0' }}</div>
     <div class="stat-change">
-      <span>En cola de generación</span>
-    </div>
-  </div>
-
-  <div class="stat-card">
-    <div class="stat-card-header">
-      <span class="stat-label">Programados</span>
-      <span class="stat-icon"><i class="fas fa-calendar-check" style="color: var(--info);"></i></span>
-    </div>
-    <div class="stat-value">{{ reportesProgramados }}</div>
-    <div class="stat-change">
-      <span>Ejecución automática</span>
+      <span>Por cobrar</span>
     </div>
   </div>
 </div>
 
-<!-- Filtros -->
+<!-- Filtros Globales -->
 <div class="filters">
   <div class="filter-group">
-    <label class="filter-label">Buscar Reporte</label>
+    <label class="filter-label">Año</label>
+    <select class="form-select" [ngModel]="selectedAnio()" (ngModelChange)="selectedAnio.set($event)">
+      @for (a of anios; track a) {
+        <option [value]="a">{{ a }}</option>
+      }
+    </select>
+  </div>
+  <div class="filter-group">
+    <label class="filter-label">Buscar</label>
     <div class="search-input">
       <i class="fas fa-search"></i>
       <input type="text" class="form-input" placeholder="Nombre o descripción..." 
-             [(ngModel)]="searchText" (ngModelChange)="filterReportes()">
+             [ngModel]="searchText()" (ngModelChange)="searchText.set($event)">
     </div>
   </div>
   <div class="filter-group">
     <label class="filter-label">Categoría</label>
-    <select class="form-select" [(ngModel)]="selectedCategoria" (ngModelChange)="filterReportes()">
+    <select class="form-select" [ngModel]="selectedCategoria()" (ngModelChange)="selectedCategoria.set($event)">
       <option value="todos">Todas las categorías</option>
       @for (cat of categorias; track cat) {
         <option [value]="cat.toLowerCase()">{{ cat }}</option>
@@ -61,95 +74,109 @@
   </div>
 </div>
 
-<!-- Grid de Contenido -->
-<div class="reportes-grid">
-  <!-- Reportes Disponibles -->
-  <div class="card main-card">
+<!-- Loading -->
+@if (loading()) {
+  <div class="loading-container">
+    <i class="fas fa-spinner fa-spin fa-2x"></i>
+    <p>Generando reporte...</p>
+  </div>
+}
+
+<!-- Grid de Reportes -->
+@if (!loading()) {
+  <div class="card">
     <div class="card-header">
       <h2 class="card-title">Reportes Disponibles</h2>
       <p class="card-subtitle">Seleccione un reporte para generar</p>
     </div>
     
-    <div class="reportes-list">
-      @for (reporte of filteredReportes; track reporte.id) {
-        <div class="reporte-item">
+    <div class="reportes-grid">
+      @for (reporte of filteredReportes(); track reporte.id) {
+        <div class="reporte-card" (click)="generarReporte(reporte)">
           <div class="reporte-icon">
             <i class="fas {{ reporte.icono }}"></i>
           </div>
-          <div class="reporte-info">
+          <div class="reporte-content">
             <h4 class="reporte-nombre">{{ reporte.nombre }}</h4>
             <p class="reporte-descripcion">{{ reporte.descripcion }}</p>
-            <div class="reporte-meta">
-              <span class="badge badge-secondary">{{ reporte.categoria }}</span>
-              @if (reporte.ultimaGeneracion) {
-                <span class="ultima-gen">
-                  <i class="fas fa-history"></i>
-                  Última: {{ reporte.ultimaGeneracion | date:'dd/MM/yyyy' }}
-                </span>
-              }
-            </div>
           </div>
-          <div class="reporte-actions">
-            <button class="btn btn-primary btn-sm" (click)="generarReporte(reporte, 'PDF')">
-              <i class="fas fa-file-pdf"></i>
-              PDF
-            </button>
-            <button class="btn btn-secondary btn-sm" (click)="generarReporte(reporte, 'Excel')">
-              <i class="fas fa-file-excel"></i>
-              Excel
-            </button>
-            <button class="btn-icon" (click)="programarReporte(reporte)" title="Programar">
-              <i class="fas fa-calendar-plus"></i>
-            </button>
+          <div class="reporte-action">
+            <i class="fas fa-chevron-right"></i>
           </div>
+        </div>
+      } @empty {
+        <div class="empty-state">
+          <i class="fas fa-search"></i>
+          <p>No se encontraron reportes</p>
         </div>
       }
     </div>
   </div>
+}
 
-  <!-- Reportes Recientes -->
-  <div class="card side-card">
-    <div class="card-header d-flex justify-between align-center">
-      <div>
-        <h2 class="card-title">Reportes Recientes</h2>
-        <p class="card-subtitle">Últimos generados</p>
+<!-- Modal Resultado -->
+@if (showResultModal()) {
+  <div class="modal-backdrop" (click)="closeResultModal()"></div>
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <h3>{{ selectedReporteName() }}</h3>
+      <div class="modal-header-actions">
+        <button class="btn btn-secondary btn-sm" (click)="exportarCSV()">
+          <i class="fas fa-file-csv"></i> CSV
+        </button>
+        <button class="btn btn-secondary btn-sm" (click)="exportarJSON()">
+          <i class="fas fa-file-code"></i> JSON
+        </button>
+        <button class="btn btn-icon" (click)="closeResultModal()">
+          <i class="fas fa-times"></i>
+        </button>
       </div>
-      <button class="btn btn-link" (click)="verHistorial()">Ver todos</button>
     </div>
-    
-    <ul class="recientes-list">
-      @for (reciente of reportesRecientes; track reciente.id) {
-        <li class="reciente-item">
-          <div class="reciente-icon" [class.pdf]="reciente.formato === 'PDF'" [class.excel]="reciente.formato === 'Excel'">
-            <i class="fas" [class.fa-file-pdf]="reciente.formato === 'PDF'" [class.fa-file-excel]="reciente.formato === 'Excel'"></i>
-          </div>
-          <div class="reciente-info">
-            <span class="reciente-nombre">{{ reciente.nombre }}</span>
-            <span class="reciente-meta">{{ reciente.fechaGeneracion | date:'dd/MM HH:mm' }} · {{ reciente.tamanio }}</span>
-          </div>
-          <button class="btn-icon" (click)="descargarReporte(reciente)" title="Descargar">
-            <i class="fas fa-download"></i>
-          </button>
-        </li>
+    <div class="modal-body">
+      <!-- Resumen si existe -->
+      @if (getResumenData().length > 0) {
+        <div class="resumen-grid">
+          @for (item of getResumenData(); track item.label) {
+            <div class="resumen-item">
+              <span class="resumen-label">{{ item.label }}</span>
+              <span class="resumen-value">{{ item.value }}</span>
+            </div>
+          }
+        </div>
+        <hr>
       }
-    </ul>
-    
-    <hr style="margin: var(--spacing-lg) 0; border: none; border-top: 1px solid var(--border);">
-    
-    <div class="quick-stats">
-      <h4 class="quick-stats-title">Estadísticas Rápidas</h4>
-      <div class="quick-stat-item">
-        <span class="quick-stat-label">Total PDF este mes</span>
-        <span class="quick-stat-value">28</span>
-      </div>
-      <div class="quick-stat-item">
-        <span class="quick-stat-label">Total Excel este mes</span>
-        <span class="quick-stat-value">17</span>
-      </div>
-      <div class="quick-stat-item">
-        <span class="quick-stat-label">Espacio utilizado</span>
-        <span class="quick-stat-value">156 MB</span>
-      </div>
+      
+      <!-- Tabla de datos -->
+      @if (getReporteDataArray().length > 0) {
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                @for (header of getReporteHeaders(); track header) {
+                  <th>{{ formatLabel(header) }}</th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of getReporteDataArray(); track $index) {
+                <tr>
+                  @for (header of getReporteHeaders(); track header) {
+                    <td>{{ formatCellValue(row[header]) }}</td>
+                  }
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <div class="empty-state">
+          <i class="fas fa-info-circle"></i>
+          <p>No hay datos disponibles para este reporte</p>
+        </div>
+      }
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="closeResultModal()">Cerrar</button>
     </div>
   </div>
-</div>
+}
