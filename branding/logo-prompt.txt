@@ -1,0 +1,378 @@
+═══════════════════════════════════════════════════════════════════════════════
+PROMPT PARA GENERACIÓN DE LOGO - PAKApi
+API de Gestión de Traslados de Pacientes y Servicios Médicos
+═══════════════════════════════════════════════════════════════════════════════
+
+[ESPAÑOL]
+
+═══ 1. DESCRIPCIÓN DEL NEGOCIO ═══
+
+PAKApi es una API backend profesional para la gestión integral de traslados de pacientes y servicios médicos. El sistema facilita el manejo de:
+- Registro y gestión de pacientes (CRUD completo)
+- Coordinación de servicios de transporte médico
+- Integración con obras sociales y seguros de salud
+- Gestión de conductores, destinos y horarios
+- Facturación y períodos de cobro
+- Reportes y dashboards analíticos
+
+Tecnología: Supabase Edge Functions, autenticación JWT, PostgreSQL
+Público objetivo: Personal administrativo de clínicas, profesionales de la salud, pequeños y medianos centros médicos.
+
+═══ 2. PERSONALIDAD DE MARCA ═══
+
+- Profesional y confiable: transmite seguridad en el manejo de datos médicos sensibles
+- Moderna y tecnológica: refleja una solución digital actualizada
+- Accesible y clara: facilita la comprensión para usuarios no técnicos
+- Eficiente: comunica rapidez y organización en procesos administrativos
+- Humana: conexión con el cuidado de la salud y bienestar de pacientes
+
+═══ 3. ELEMENTOS GRÁFICOS RECOMENDADOS ═══
+
+- Cruz médica estilizada o símbolo de salud simplificado
+- Iconografía de movimiento/transporte (flechas, trayectorias, rutas)
+- Formas geométricas limpias que sugieran conectividad y sistemas
+- Líneas que representen flujos de trabajo o procesos organizados
+- Balance entre lo técnico (API/tecnología) y lo humano (cuidado médico)
+
+═══ 4. PALETA DE COLORES ═══
+
+Principal:
+- Azul profesional: #1E88E5 (confianza, tecnología, salud)
+- Azul oscuro: #0D47A1 (estabilidad, profesionalismo)
+
+Secundarios:
+- Verde médico: #43A047 (salud, bienestar, positivo)
+- Gris neutro: #546E7A (modernidad, equilibrio)
+
+Acentos:
+- Blanco: #FFFFFF (claridad, limpieza)
+- Azul claro: #64B5F6 (accesibilidad, apertura)
+
+═══ 5. TIPOGRAFÍAS SUGERIDAS ═══
+
+Para "PAK": Sans-serif moderna, bold o semibold (Montserrat Bold, Poppins SemiBold, Inter Bold)
+Para "Api": Sans-serif ligera o regular, minúsculas (Montserrat Light, Roboto Regular, Inter Regular)
+
+Alternativa: Tipografía monoespaciada para "Api" que refuerce el aspecto técnico (Source Code Pro, JetBrains Mono)
+
+═══ 6. VARIANTES DE LOGO ═══
+
+A. Marca Combinada (Primary): símbolo + "PAKApi" horizontal
+B. Emblema: símbolo integrado con texto en forma de badge/escudo
+C. Solo Símbolo: icono para apps, favicon, usos pequeños
+D. Wordmark: solo texto "PAKApi" con tratamiento tipográfico distintivo
+
+═══ 7. ENTREGABLES (FORMATOS Y TAMAÑOS) ═══
+
+Formatos:
+- SVG (vectorial, escalable)
+- PNG transparente (1024x1024, 512x512, 256x256, 128x128, 64x64, 32x32)
+- JPG fondo blanco (para documentos impresos)
+
+Versiones:
+- Color completo
+- Monocromática (negro sobre blanco)
+- Monocromática invertida (blanco sobre fondo oscuro)
+- Alto contraste (para accesibilidad)
+
+═══ 8. USOS PRINCIPALES ═══
+
+Digital:
+- Favicon (16x16, 32x32)
+- App icon (iOS/Android: 512x512, 1024x1024)
+- Header web (altura 40-60px, ancho variable)
+- Dashboard/panel de control
+- Documentación API
+
+Impreso:
+- Papel membretado
+- Tarjetas de presentación
+- Material promocional
+- Documentación técnica impresa
+
+═══ 9. RESTRICCIONES Y NEGATIVOS (QUÉ EVITAR) ═══
+
+NO usar:
+- Iconografía de ambulancias realistas o vehículos detallados
+- Símbolos religiosos o culturalmente específicos
+- Elementos muy ornamentados o vintage
+- Degradados complejos que no escalen bien
+- Más de 3 colores en una sola versión
+- Tipografías con serif clásicas o scripts decorativos
+- Elementos que pierdan legibilidad bajo 32x32px
+
+═══ 10. ACCESIBILIDAD Y LEGIBILIDAD ═══
+
+- Contraste mínimo 4.5:1 (WCAG AA) para texto sobre fondos
+- Iconografía simple que se distinga claramente en 16x16px
+- Variante de alto contraste disponible
+- Prueba de legibilidad en escala de grises
+- Espaciado adecuado entre elementos del logo
+
+═══ 11. TRES PROPUESTAS CONCEPTUALES ═══
+
+Propuesta 1 - "Ruta Médica"
+Símbolo: Cruz médica integrada con una línea de trayectoria curva que sugiere movimiento/transporte. Formas geométricas limpias, minimalistas.
+Estilo: Moderno, geométrico, flat design.
+
+Propuesta 2 - "Conexión Vital"
+Símbolo: Nodo central (representando el paciente) conectado con múltiples puntos (destinos/servicios) mediante líneas. Cruz médica sutil en el nodo central.
+Estilo: Tecnológico, de red/conectividad, abstracto.
+
+Propuesta 3 - "Escudo de Salud"
+Símbolo: Forma de escudo/badge con una cruz médica y un elemento de flecha/movimiento. Transmite protección y acción.
+Estilo: Badge moderno, balance entre confianza y dinamismo.
+
+═══ 12. KEYWORDS/ETIQUETAS (6) ═══
+
+1. medical API
+2. patient management
+3. healthcare technology
+4. professional healthcare
+5. medical logistics
+6. health services platform
+
+═══ 13. PROMPTS DE EJEMPLO PARA GENERACIÓN ═══
+
+Para Midjourney:
+"/imagine prompt: modern minimalist logo for PAKApi medical patient transport API, medical cross symbol integrated with curved movement lines, geometric shapes, professional blue #1E88E5 and green #43A047 color palette, clean sans-serif typography, flat design, white background, simple and scalable, tech healthcare aesthetic --ar 1:1 --stylize 250 --v 6"
+
+Para DALL·E 3:
+"Create a professional logo for PAKApi, a medical patient management API. Design should feature a minimalist medical cross integrated with abstract movement/connectivity symbols. Use modern blue (#1E88E5) and green (#43A047) colors. Typography: bold sans-serif 'PAK' with lighter 'Api'. Style: clean, geometric, flat design. Must be scalable and legible at small sizes. White background, vector-ready aesthetic."
+
+Para Stable Diffusion:
+"professional logo design, medical API branding, minimalist medical cross icon, blue and green color scheme, modern sans-serif typography PAKApi, flat design, geometric shapes, clean lines, white background, vector art style, healthcare technology aesthetic, high contrast, scalable design --neg realistic, gradient, 3D, ornate, vintage, complex details"
+
+Parámetros sugeridos:
+- Aspect Ratio: 1:1 (square), también probar 16:9 para versiones horizontales
+- Stylize: 100-300 (para Midjourney, balance entre creatividad y control)
+- Quality: máxima disponible
+- Negative prompts: "realistic vehicle, ambulance, photograph, gradient, shadow, 3D render, ornate details, script font, serif font, small text, cluttered"
+
+═══ 14. INSTRUCCIONES PARA VERSIONES MONOCROMAS Y ALTO CONTRASTE ═══
+
+Versión monocromática (negro):
+- Convertir todos los elementos de color a negro #000000
+- Mantener jerarquía visual mediante grosor de líneas y espaciado
+- Probar legibilidad en 32x32px
+
+Versión monocromática invertida (blanco):
+- Todos los elementos en blanco #FFFFFF sobre fondo oscuro #0D47A1 o negro
+- Ajustar grosor de líneas si es necesario para mantener visibilidad
+
+Versión alto contraste:
+- Usar solo negro #000000 y blanco #FFFFFF
+- Aumentar contraste de bordes
+- Simplificar detalles finos
+- Cumplir WCAG AAA (7:1) para elementos críticos
+
+═══ 15. NOTA PARA EL EQUIPO DE DISEÑO ═══
+
+Adaptación para materiales impresos:
+- Verificar que los colores en CMYK mantengan la vibración del RGB
+- Azul profesional (#1E88E5): aproximadamente C:80 M:45 Y:0 K:0
+- Verde médico (#43A047): aproximadamente C:70 M:10 Y:90 K:0
+- Preparar versión en Pantone para impresiones especiales
+
+Adaptación digital:
+- Exportar SVG con paths optimizados (sin grupos innecesarios)
+- Generar PNG con transparencia usando alpha channel
+- Para favicon: priorizar la legibilidad del símbolo sobre el texto
+- Para app icons: considerar agregar padding interno (10-15%) para adaptarse a máscaras de iOS/Android
+
+Símbolo adaptable:
+- El símbolo debe funcionar independientemente del texto
+- Debe ser reconocible en 16x16px (solo formas esenciales)
+- Variantes de símbolo: puede simplificarse aún más para tamaños muy pequeños eliminando detalles secundarios
+
+═══════════════════════════════════════════════════════════════════════════════
+LOGO GENERATION PROMPT - PAKApi
+Patient Transport Management and Medical Services API
+═══════════════════════════════════════════════════════════════════════════════
+
+[ENGLISH]
+
+═══ 1. BUSINESS DESCRIPTION ═══
+
+PAKApi is a professional backend API for comprehensive patient transport and medical services management. The system facilitates:
+- Patient registration and management (full CRUD)
+- Medical transport service coordination
+- Health insurance and social works integration
+- Driver, destination, and schedule management
+- Billing and collection periods
+- Reports and analytical dashboards
+
+Technology: Supabase Edge Functions, JWT authentication, PostgreSQL
+Target audience: Clinic administrative staff, health professionals, small and medium-sized medical centers.
+
+═══ 2. BRAND PERSONALITY ═══
+
+- Professional and trustworthy: conveys security in handling sensitive medical data
+- Modern and technological: reflects an up-to-date digital solution
+- Accessible and clear: facilitates understanding for non-technical users
+- Efficient: communicates speed and organization in administrative processes
+- Human: connection with healthcare and patient wellbeing
+
+═══ 3. RECOMMENDED GRAPHIC ELEMENTS ═══
+
+- Stylized medical cross or simplified health symbol
+- Movement/transport iconography (arrows, trajectories, routes)
+- Clean geometric shapes suggesting connectivity and systems
+- Lines representing workflows or organized processes
+- Balance between technical (API/technology) and human (medical care)
+
+═══ 4. COLOR PALETTE ═══
+
+Primary:
+- Professional blue: #1E88E5 (trust, technology, health)
+- Dark blue: #0D47A1 (stability, professionalism)
+
+Secondary:
+- Medical green: #43A047 (health, wellness, positive)
+- Neutral gray: #546E7A (modernity, balance)
+
+Accents:
+- White: #FFFFFF (clarity, cleanliness)
+- Light blue: #64B5F6 (accessibility, openness)
+
+═══ 5. SUGGESTED TYPOGRAPHY ═══
+
+For "PAK": Modern sans-serif, bold or semibold (Montserrat Bold, Poppins SemiBold, Inter Bold)
+For "Api": Light or regular sans-serif, lowercase (Montserrat Light, Roboto Regular, Inter Regular)
+
+Alternative: Monospaced typography for "Api" to reinforce technical aspect (Source Code Pro, JetBrains Mono)
+
+═══ 6. LOGO VARIANTS ═══
+
+A. Combined Mark (Primary): symbol + "PAKApi" horizontal
+B. Emblem: symbol integrated with text in badge/shield form
+C. Symbol Only: icon for apps, favicon, small uses
+D. Wordmark: text-only "PAKApi" with distinctive typographic treatment
+
+═══ 7. DELIVERABLES (FORMATS AND SIZES) ═══
+
+Formats:
+- SVG (vector, scalable)
+- Transparent PNG (1024x1024, 512x512, 256x256, 128x128, 64x64, 32x32)
+- White background JPG (for printed documents)
+
+Versions:
+- Full color
+- Monochrome (black on white)
+- Inverted monochrome (white on dark background)
+- High contrast (for accessibility)
+
+═══ 8. PRIMARY USES ═══
+
+Digital:
+- Favicon (16x16, 32x32)
+- App icon (iOS/Android: 512x512, 1024x1024)
+- Web header (height 40-60px, variable width)
+- Dashboard/control panel
+- API documentation
+
+Print:
+- Letterhead
+- Business cards
+- Promotional materials
+- Printed technical documentation
+
+═══ 9. RESTRICTIONS AND NEGATIVES (WHAT TO AVOID) ═══
+
+DO NOT use:
+- Realistic ambulance iconography or detailed vehicles
+- Religious or culturally specific symbols
+- Highly ornate or vintage elements
+- Complex gradients that don't scale well
+- More than 3 colors in a single version
+- Classic serif or decorative script typefaces
+- Elements that lose legibility below 32x32px
+
+═══ 10. ACCESSIBILITY AND LEGIBILITY ═══
+
+- Minimum contrast 4.5:1 (WCAG AA) for text on backgrounds
+- Simple iconography clearly distinguishable at 16x16px
+- High contrast variant available
+- Grayscale legibility test
+- Adequate spacing between logo elements
+
+═══ 11. THREE CONCEPTUAL PROPOSALS ═══
+
+Proposal 1 - "Medical Route"
+Symbol: Medical cross integrated with curved trajectory line suggesting movement/transport. Clean geometric shapes, minimalist.
+Style: Modern, geometric, flat design.
+
+Proposal 2 - "Vital Connection"
+Symbol: Central node (representing patient) connected to multiple points (destinations/services) via lines. Subtle medical cross in central node.
+Style: Technological, network/connectivity, abstract.
+
+Proposal 3 - "Health Shield"
+Symbol: Shield/badge shape with medical cross and arrow/movement element. Conveys protection and action.
+Style: Modern badge, balance between trust and dynamism.
+
+═══ 12. KEYWORDS/TAGS (6) ═══
+
+1. medical API
+2. patient management
+3. healthcare technology
+4. professional healthcare
+5. medical logistics
+6. health services platform
+
+═══ 13. EXAMPLE GENERATION PROMPTS ═══
+
+For Midjourney:
+"/imagine prompt: modern minimalist logo for PAKApi medical patient transport API, medical cross symbol integrated with curved movement lines, geometric shapes, professional blue #1E88E5 and green #43A047 color palette, clean sans-serif typography, flat design, white background, simple and scalable, tech healthcare aesthetic --ar 1:1 --stylize 250 --v 6"
+
+For DALL·E 3:
+"Create a professional logo for PAKApi, a medical patient management API. Design should feature a minimalist medical cross integrated with abstract movement/connectivity symbols. Use modern blue (#1E88E5) and green (#43A047) colors. Typography: bold sans-serif 'PAK' with lighter 'Api'. Style: clean, geometric, flat design. Must be scalable and legible at small sizes. White background, vector-ready aesthetic."
+
+For Stable Diffusion:
+"professional logo design, medical API branding, minimalist medical cross icon, blue and green color scheme, modern sans-serif typography PAKApi, flat design, geometric shapes, clean lines, white background, vector art style, healthcare technology aesthetic, high contrast, scalable design --neg realistic, gradient, 3D, ornate, vintage, complex details"
+
+Suggested parameters:
+- Aspect Ratio: 1:1 (square), also try 16:9 for horizontal versions
+- Stylize: 100-300 (for Midjourney, balance between creativity and control)
+- Quality: maximum available
+- Negative prompts: "realistic vehicle, ambulance, photograph, gradient, shadow, 3D render, ornate details, script font, serif font, small text, cluttered"
+
+═══ 14. INSTRUCTIONS FOR MONOCHROME AND HIGH CONTRAST VERSIONS ═══
+
+Monochrome version (black):
+- Convert all color elements to black #000000
+- Maintain visual hierarchy through line weight and spacing
+- Test legibility at 32x32px
+
+Inverted monochrome version (white):
+- All elements in white #FFFFFF on dark background #0D47A1 or black
+- Adjust line weight if necessary to maintain visibility
+
+High contrast version:
+- Use only black #000000 and white #FFFFFF
+- Increase edge contrast
+- Simplify fine details
+- Meet WCAG AAA (7:1) for critical elements
+
+═══ 15. NOTE FOR DESIGN TEAM ═══
+
+Adaptation for printed materials:
+- Verify that CMYK colors maintain RGB vibrancy
+- Professional blue (#1E88E5): approximately C:80 M:45 Y:0 K:0
+- Medical green (#43A047): approximately C:70 M:10 Y:90 K:0
+- Prepare Pantone version for special printing
+
+Digital adaptation:
+- Export SVG with optimized paths (no unnecessary groups)
+- Generate PNG with transparency using alpha channel
+- For favicon: prioritize symbol legibility over text
+- For app icons: consider adding internal padding (10-15%) to adapt to iOS/Android masks
+
+Adaptable symbol:
+- Symbol must work independently of text
+- Must be recognizable at 16x16px (only essential shapes)
+- Symbol variants: can be further simplified for very small sizes by removing secondary details
+
+═══════════════════════════════════════════════════════════════════════════════
+END OF DOCUMENT
+Word count: ~1,450 words (Spanish + English combined)
+═══════════════════════════════════════════════════════════════════════════════
